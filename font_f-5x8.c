@@ -1,17 +1,20 @@
-//  ---------------- Font from www.Display3000.com --------------------
+// Font_f-5x8.c - Copyright 2016, HZB, ILL/SANE & ISIS
+#define RELEASE_FONT5X8 1.00
 
-#include <avr/pgmspace.h>
+// HISTORY -------------------------------------------------------------
+// 1.00 - First release from www.Display3000.com
 
+#include <avr/pgmspace.h>  // For managing access to the EEPROM
 
 //-------------------------------------------------------------------------------
-//array for font 1 (small font)
+// Array for font 1 (small font)
 //-------------------------------------------------------------------------------
 //This is a 5x8 font good for small printings, scaling fine up to factor 2; 102 characters
-const prog_uint8_t Font1[] =
+const uint8_t Font1[] PROGMEM =
 {
    0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0x00 , 0x00,      // Space
    0x04 , 0x0E , 0x0E , 0x04 , 0x04 , 0x00 , 0x04 , 0x00,      //!
-   0x1B , 0x1B , 0x12 , 0x00 , 0x00 , 0x00 , 0x00 , 0x00,      // Anführungszeichen
+   0x1B , 0x1B , 0x12 , 0x00 , 0x00 , 0x00 , 0x00 , 0x00,      // quotation marks
    0x00 , 0x0A , 0x1F , 0x0A , 0x0A , 0x1F , 0x0A , 0x00,      //#
    0x08 , 0x0E , 0x10 , 0x0C , 0x02 , 0x1C , 0x04 , 0x00,      //$
    0x19 , 0x19 , 0x02 , 0x04 , 0x08 , 0x13 , 0x13 , 0x00,      //%
