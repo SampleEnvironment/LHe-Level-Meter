@@ -3805,7 +3805,7 @@ int main(void)
 		//=========================================================================
 		// Battery checking
 		//=========================================================================
-/*		if(batt_min >= map_to_batt(readChannel_calib(BATTERY, ADC_LOOPS, r_zero)))
+		if(batt_min >= map_to_batt(readChannel_calib(BATTERY, ADC_LOOPS, r_zero)))
 		{	
 			// Last measurement before shutting down
 			MEASURE_PIN_ON
@@ -3858,7 +3858,7 @@ int main(void)
 			ex_errorCode = ex_errorCode_Shutdown;
 			
 		}
-*/		
+		
 		//=========================================================================
 		// Check receive buffer for commands from database server
 		//=========================================================================
