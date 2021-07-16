@@ -14,6 +14,8 @@
 
 extern LVM_ModelType LVM;
 
+
+
 enum PARENT_MODE
 {
 	offline,

@@ -15,9 +15,10 @@
 #include "../display_utilities.h"
 #include "../HoneywellSSC.h"
 #include "../main.h"
-#include "../xbee.h"
-#include "../xbee_utilities.h"
 #include "../timer_utilities.h"
+
+#include "../avr-util-library/xbee.h"
+#include "../avr-util-library/DS3231M.h"
 
 #ifdef DISP_3000
 #include "../StringPixelCoordTable.h"

@@ -18,8 +18,8 @@
 #include "display_utilities.h"
 #include "keyboard.h"
 #include "timer_utilities.h"
-#include "DS3231M_helevel.h"
-#include "xbee.h"
+#include "avr-util-library/DS3231M.h"
+#include "avr-util-library/xbee.h"
 #ifdef DISP_3000
 #include "StringPixelCoordTable.h"
 #endif
@@ -286,15 +286,15 @@ void paint_he_level(double he_level, double total_volume, _Bool print_Percentage
 }
 
 // paints time and pressure
-void paint_time_pressure(TimeBuff ltime, double lpress, _Bool update)
+void paint_time_pressure(struct tm ltime, double lpress, _Bool update)
 {
 
 	char temp[15];
 
 	if (!update) LCD_Print("               ", xoff + X_PTP_2, Y_PTP_20, 2, 1, 1, FGC, BGC);  // clears line (not necessary if in update mode)
 	
-	if ((ltime.minute < 10)) sprintf(temp,"%i:0%i  ", ltime.hour, ltime.minute);
-	if (!(ltime.minute < 10)) sprintf(temp,"%i:%i  ", ltime.hour, ltime.minute);
+	if ((ltime.tm_min< 10)) sprintf(temp,"%i:0%i  ", ltime.tm_hour, ltime.tm_min);
+	if (!(ltime.tm_min < 10)) sprintf(temp,"%i:%i  ", ltime.tm_hour, ltime.tm_min);
 	LCD_Print(temp, xoff + X_PTP_2, Y_PTP_20, 2, 1, 1, ERR, BGC);
 
 	if (lpress > 0)
@@ -507,7 +507,7 @@ void paint_buttons(char *top, char *bottom, uint8_t type)
 
 
 ///paints or updates main window depending on update parameter
-void paint_main(TimeBuff ltime, _Bool netstat, _Bool update)
+void paint_main(struct tm ltime, _Bool netstat, _Bool update)
 {
 	//void paint_main(  TimeBuff ltime, _Bool offline, _Bool update)
 	
@@ -601,7 +601,7 @@ void paint_start_filling(posType * PosModel, _Bool update)
 }
 
 ///paints or updates filling window
-void paint_filling(TimeBuff ltime, _Bool netstat, _Bool update, _Bool draw_wait)
+void paint_filling(struct tm ltime, _Bool netstat, _Bool update, _Bool draw_wait)
 {
 	if (!update)
 	{

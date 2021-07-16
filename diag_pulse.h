@@ -15,7 +15,7 @@
 #include "main.h"
 #include "adwandler.h"
 #include "display_utilities.h"
-#include "xbee.h"
+#include "avr-util-library/xbee.h"
 #include "keyboard.h"
 #include "Controller/base_controller.h"
 #define NORMAL 1

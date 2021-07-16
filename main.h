@@ -7,6 +7,7 @@
 
 #include "config.h"
 #include "display_driver.h"
+#include "avr-util-library/module_globals.h"
 
 
 
@@ -23,8 +24,7 @@ extern EWindowOrientation ili_Orientation;
 #endif
 
 
-#define XBEE_V_S1  1
-#define XBEE_V_SC2 2
+
 
 
 
@@ -303,18 +303,6 @@ typedef struct {
 
 }Temp_buffersType;
 
-//====================================================================
-//			VERSION
-//====================================================================
-typedef struct{
-	// Version vars
-	uint16_t Fw_version;
-	uint8_t Branch_id;
-	uint16_t FW_eeprom_changed ;
-	uint8_t hw_version_xbee ;
-
-}VersionType;
-
 
 //====================================================================
 //			VARS
@@ -484,25 +472,6 @@ typedef struct
 #define DRAW_U 1
 #define DRAW_R 2
 
-
-// I2C Busrecovery
-
-#define LOW 0
-
-#define INPUT &= ~
-
-#define  OUTPUT |=
-
-#define SDA PINC4
-#define SCL PINC2
-
-#define pinMode(X,Y) (DDRC Y (_BV(X)))
-
-#define  INPUT_PULLUP(X) DDRC &= ~ (_BV(X)); PORTC |= _BV(X);
-#define  INPUT_NO_PULLUP(X) DDRC &= ~ (_BV(X)); PORTC &= ~(_BV(X));
-
-
-#define digitalRead(X) ((PORTC & (1<<X)) && 1)
 
 
 //#define CHECK_ERROR(LETTERS_ERROR) 			(status_byte & (1<<6))

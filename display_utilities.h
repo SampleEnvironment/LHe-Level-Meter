@@ -8,7 +8,7 @@
 #include "display.h"
 #include "main.h"
 
-#include "DS3231M_helevel.h"
+#include "avr-util-library/DS3231M.h"
 
 // Variables for Display
 
@@ -71,21 +71,21 @@ void paint_wait_screen(void);
 void paint_he_level(double he_level, double total_volume, _Bool print_Percentage);
 
 void paint_info_line(char *line, _Bool update);
-void paint_time_pressure(TimeBuff ltime, double lpress, _Bool update);
+void paint_time_pressure(struct tm ltime, double lpress, _Bool update);
 void paint_batt(uint8_t batt, uint8_t critical_batt);
 void paint_progress_bar(uint8_t x, uint8_t y, uint8_t progress);
 void clear_progress_bar(uint8_t x, uint8_t y);
 void draw_current_wait_time(uint8_t x, uint8_t y, uint16_t sec_must, uint16_t secs_is, unsigned int color);
 void paint_buttons(char *top, char *bottom, uint8_t mitte);
 void paint_enter_number(uint8_t param);
-void paint_main(TimeBuff ltime, _Bool offline, _Bool update);
+void paint_main(struct tm ltime, _Bool offline, _Bool update);
 void paint_Notification( LCD_MessageType *Message);
 
 
 
 void paint_start_filling(posType * PosModel, _Bool update);
 
-void paint_filling(TimeBuff ltime, _Bool netstat, _Bool update, _Bool draw_wait);
+void paint_filling(struct tm ltime, _Bool netstat, _Bool update, _Bool draw_wait);
 
 char* itoc(char * letterstr,uint8_t letter_num);
 _Bool  update_filling_pos(posType *PosModel,char *pos );

@@ -15,7 +15,8 @@
 #include "Controller/pulse_select_mode.h"
 #include "Controller/option_mode.h"
 #include "timer_utilities.h"
-
+#include "avr-util-library/I2C_utilities.h"
+#include "avr-util-library/DS3231M.h"
 
 // 1. legacy diag Pulse
 
@@ -577,27 +578,27 @@ void diag_pulse_send(diag_pulseType *dp){
 
 	
 
-	if (DS3231M_status.connected)
+	if (connected.DS3231M)
 	{
 		DS3231M_read_time();
 
 	}
 	else
 	{
-		Time.second = 0;
-		Time.minute = 0;
-		Time.hour   = 0;
-		Time.date   = 0;
-		Time.month  = 0;
-		Time.year   = 0;
+		Time.tm_sec = 0;
+		Time.tm_min = 0;
+		Time.tm_hour  = 0;
+		Time.tm_mday   = 0;
+		Time.tm_mon  = 0;
+		Time.tm_year   = 0;
 	}
 
-	diag_send_buffer[0] = Time.second;
-	diag_send_buffer[1] = Time.minute;
-	diag_send_buffer[2] = Time.hour;
-	diag_send_buffer[3] = Time.date;
-	diag_send_buffer[4] = Time.month;
-	diag_send_buffer[5] = Time.year;
+	diag_send_buffer[0] = Time.tm_sec;
+	diag_send_buffer[1] = Time.tm_min;
+	diag_send_buffer[2] = Time.tm_hour;
+	diag_send_buffer[3] = Time.tm_mday;
+	diag_send_buffer[4] = Time.tm_mon;
+	diag_send_buffer[5] = Time.tm_year;
 
 	//TODO
 	uint8_t Datatpoints_per_Packet = 30;

@@ -14,15 +14,21 @@
 #include "../main.h"
 #include "../HoneywellSSC.h"
 #include "../adwandler.h"
-#include "../xbee.h"
-#include "../xbee_utilities.h"
 #include "../diag_pulse.h"
+
+
+#include "../avr-util-library/xbee.h"
+#include "../avr-util-library/xbee_utilities.h"
+#include "../avr-util-library/I2C_utilities.h"
+#include "../avr-util-library/status.h"
+#include "../avr-util-library/DS3231M.h"
+
 
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
 #include <avr/eeprom.h>
-
+#include <time.h>
 
 globalModesType global_mode = {
 	.netstat = online,
@@ -256,19 +262,19 @@ void measure(Controller_Model * Model){
 	MEASURE_PIN_OFF
 
 	// enter time
-	if(DS3231M_status.connected)
+	if(connected.DS3231M)
 	{
 		DS3231M_read_time();
 
 	}
 	else
 	{
-		Time.second = 0;
-		Time.minute = 0;
-		Time.hour   = 0;
-		Time.date   = 0;
-		Time.month  = 0;
-		Time.year   = 0;
+		Time.tm_sec  = 0;
+		Time.tm_min  = 0;
+		Time.tm_hour = 0;
+		Time.tm_mday = 0;
+		Time.tm_mon  = 0;
+		Time.tm_year = 0;
 	}
 
 	// enter pressure
@@ -328,7 +334,7 @@ void shutdown_LVM(Controller_Model *Model){
 				if (xbee_send_message(LVM.measbuff->measurements[LVM.measbuff->firstMeas].type, LVM.measbuff->measurements[LVM.measbuff->firstMeas].data, LVM.measbuff->measurements[LVM.measbuff->firstMeas].data_len))
 				{
 					// there is no way to know if the data was transmitted correctly, so let's hope for the best....
-					xbee_set_status_byte(0); // Clear all errors
+					set_status(0); // Clear all errors
 					--LVM.measbuff->numberStored;
 					if (LVM.measbuff->firstMeas < (MEASBUFFER_LENGTH-1)) LVM.measbuff->firstMeas = LVM.measbuff->firstMeas + 1;
 					else LVM.measbuff->firstMeas = 0;
@@ -425,13 +431,13 @@ void manage_Xbee_sleep_cycles(Controller_Model *Model){
 
 				LVM.temp->buffer[index++] = (uint16_t) LVM.vars->pressure_level >> 8;
 				LVM.temp->buffer[index++] = (uint16_t) LVM.vars->pressure_level;
-				LVM.temp->buffer[index++] = xbee_get_status_byte();
+				LVM.temp->buffer[index++] = get_status();
 
 				// Try to reconnect to the network
 				xbee_reconnect();
 
 				//uint8_t status = 0;
-				TimeBuff newtime2;
+				struct tm  newtime2;
 
 				#ifdef ALLOW_COM
 				paint_info_line(STR_SEND_AWAKE_MSG,0);
@@ -441,14 +447,14 @@ void manage_Xbee_sleep_cycles(Controller_Model *Model){
 
 
 					// set time
-					newtime2.second =	LVM.temp->buffer[0];
-					newtime2.minute =	LVM.temp->buffer[1];
-					newtime2.hour =		LVM.temp->buffer[2];
-					newtime2.date =		LVM.temp->buffer[3];
-					newtime2.month =	LVM.temp->buffer[4];
-					newtime2.year =		LVM.temp->buffer[5];
+					newtime2.tm_sec =	LVM.temp->buffer[0];
+					newtime2.tm_min =	LVM.temp->buffer[1];
+					newtime2.tm_hour =		LVM.temp->buffer[2];
+					newtime2.tm_mday =		LVM.temp->buffer[3];
+					newtime2.tm_mon =	LVM.temp->buffer[4];
+					newtime2.tm_year =		LVM.temp->buffer[5];
 
-					if (DS3231M_status.connected)
+					if (connected.DS3231M)
 					{
 						DS3231M_set_time(&newtime2);
 					}
@@ -458,7 +464,7 @@ void manage_Xbee_sleep_cycles(Controller_Model *Model){
 				// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 				if (xbee_send_message(XBEE_ACTIVE_MSG, LVM.temp->buffer, index))
 				{
-					xbee_set_status_byte(0); // Clear all errors
+					set_status(0); // Clear all errors
 				}
 				#endif
 
@@ -493,7 +499,7 @@ void manage_Xbee_sleep_cycles(Controller_Model *Model){
 						if (xbee_send_message(LVM.measbuff->measurements[LVM.measbuff->firstMeas].type, LVM.measbuff->measurements[LVM.measbuff->firstMeas].data, LVM.measbuff->measurements[LVM.measbuff->firstMeas].data_len))
 						{
 							// there is no way to know if the data was transmitted correctly, so let's hope for the best....
-							xbee_set_status_byte(0); // Clear all errors
+							set_status(0); // Clear all errors
 							--LVM.measbuff->numberStored;
 							if (LVM.measbuff->firstMeas < (MEASBUFFER_LENGTH-1)) LVM.measbuff->firstMeas = LVM.measbuff->firstMeas + 1;
 							else LVM.measbuff->firstMeas = 0;
@@ -637,10 +643,10 @@ void handle_received_Messages(Controller_Model *Model){
 			switch(Model->mode->curr)
 			{
 				case ex_main:
-				paint_main(Time, Model->mode->netstat, PAINT_ALL);
+				paint_main( Time, Model->mode->netstat, PAINT_ALL);
 				break;
 				case ex_filling:
-				paint_filling(Time, Model->mode->netstat, 0, 1);
+				paint_filling( Time, Model->mode->netstat, 0, 1);
 				break;
 				default:
 				break;
@@ -706,28 +712,28 @@ void handle_received_Messages(Controller_Model *Model){
 			LVM.temp->buffer[index++] = ((uint16_t)(LVM.options->batt_max*10))>>8;
 			LVM.temp->buffer[index++] = LVM.options->batt_max*10;
 			LVM.temp->buffer[index++] = LVM.options->critical_batt;
-			LVM.temp->buffer[index++] = xbee_get_status_byte();
+			LVM.temp->buffer[index++] = get_status();
 
 			// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 			if (xbee_send_message(GET_OPTIONS_CMD, LVM.temp->buffer, index))
 			{
-				xbee_set_status_byte(0); // Clear all errors
+				set_status(0); // Clear all errors
 			}
 			break;
 			case SET_OPTIONS_CMD:	// (#13) Set device settings received from the database server.
 			if (NUMBER_OPTIONS_BYTES == frameBuffer[reply_Id].data_len)
 			{
 				// set time
-				if (DS3231M_status.connected)
+				if (connected.DS3231M)
 				{
-					TimeBuff newtime;
+					struct tm newtime;
 
-					newtime.second = frameBuffer[reply_Id].data[0];
-					newtime.minute = frameBuffer[reply_Id].data[1];
-					newtime.hour = frameBuffer[reply_Id].data[2];
-					newtime.date = frameBuffer[reply_Id].data[3];
-					newtime.month = frameBuffer[reply_Id].data[4];
-					newtime.year = frameBuffer[reply_Id].data[5];
+					newtime.tm_sec= frameBuffer[reply_Id].data[0];
+					newtime.tm_min = frameBuffer[reply_Id].data[1];
+					newtime.tm_hour = frameBuffer[reply_Id].data[2];
+					newtime.tm_mday = frameBuffer[reply_Id].data[3];
+					newtime.tm_mon = frameBuffer[reply_Id].data[4];
+					newtime.tm_year = frameBuffer[reply_Id].data[5];
 
 					DS3231M_set_time(&newtime);
 				}
@@ -883,12 +889,12 @@ void handle_received_Messages(Controller_Model *Model){
 					index++;
 					ptr = &LVM.pos->Strings[index][0];
 				}
-				LVM.temp->buffer[i++] = xbee_get_status_byte();
+				LVM.temp->buffer[i++] = get_status();
 
 				// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 				if (xbee_send_message(GET_LETTERS_CMD, LVM.temp->buffer, i))
 				{
-					xbee_set_status_byte(0); // Clear all errors
+					set_status(0); // Clear all errors
 				}
 
 				#ifdef ALLOW_DEBUG
@@ -977,12 +983,12 @@ void handle_received_Messages(Controller_Model *Model){
 			index = 0;
 			LVM.temp->buffer[index++] = LVM.vars->options_pw >> 8;
 			LVM.temp->buffer[index++] = LVM.vars->options_pw;
-			LVM.temp->buffer[index++] = xbee_get_status_byte();
+			LVM.temp->buffer[index++] = get_status();
 
 			// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 			if (xbee_send_message(GET_PASSWORD_CMD, LVM.temp->buffer, index))
 			{
-				xbee_set_status_byte(0); // Clear all errors
+				set_status(0); // Clear all errors
 			}
 			#ifdef ALLOW_DEBUG
 			paint_info_line(STR_PASSW_SENT , 0);
@@ -1002,12 +1008,12 @@ void handle_received_Messages(Controller_Model *Model){
 			index = 0;
 
 			LVM.temp->buffer[index++] = xbee_get_sleep_period();		// Sleeping period in minute
-			LVM.temp->buffer[index++] = xbee_get_status_byte();
+			LVM.temp->buffer[index++] = get_status();
 
 			// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 			if (xbee_send_message(GET_XBEE_SLEEP_TIME_CMD, LVM.temp->buffer, index))
 			{
-				xbee_set_status_byte(0); // Clear all errors
+				set_status(0); // Clear all errors
 			}
 			#ifdef ALLOW_DEBUG
 			paint_info_line(STR_SLEEP_TIME_SENT, 0);
@@ -1038,12 +1044,12 @@ void handle_received_Messages(Controller_Model *Model){
 			index = 0;
 
 			LVM.temp->buffer[index++] = xbee_get_awake_period();		// Awake period in seconds
-			LVM.temp->buffer[index++] = xbee_get_status_byte();
+			LVM.temp->buffer[index++] = get_status();
 
 			// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 			if (xbee_send_message(GET_XBEE_AWAKE_TIME_CMD, LVM.temp->buffer, index))
 			{
-				xbee_set_status_byte(0); // Clear all errors
+				set_status(0); // Clear all errors
 			}
 
 			#ifdef ALLOW_DEBUG
@@ -1082,10 +1088,10 @@ void handle_received_Messages(Controller_Model *Model){
 				switch(Model->mode->curr)
 				{
 					case ex_main:
-					paint_main(Time, Model->mode->netstat, PAINT_ALL);
+					paint_main( Time, Model->mode->netstat, PAINT_ALL);
 					break;
 					case ex_filling:
-					paint_filling(Time, Model->mode->netstat, 0, 1);
+					paint_filling( Time, Model->mode->netstat, 0, 1);
 					break;
 					default:
 					break;
@@ -1145,7 +1151,7 @@ void handle_received_Messages(Controller_Model *Model){
 			// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 			if (xbee_send_message(UNKNOWN_MSG, LVM.temp->buffer, 1+frameBuffer[reply_Id].data_len))
 			{
-				xbee_set_status_byte(0); // Clear all errors
+				set_status(0); // Clear all errors
 			}
 		}//switch(frameBuffer[reply_Id].type)
 		buffer_removeData(reply_Id);	//mark cmd as done !

@@ -16,10 +16,14 @@
 #include "../display_utilities.h"
 #include "../HoneywellSSC.h"
 #include "../main.h"
-#include "../xbee.h"
-#include "../xbee_utilities.h"
-#include "../timer_utilities.h"
 #include "../keyboard.h"
+#include "../timer_utilities.h"
+
+#include "../avr-util-library/xbee.h"
+#include "../avr-util-library/xbee_utilities.h"
+#include "../avr-util-library/I2C_utilities.h"
+#include "../avr-util-library/status.h"
+#include "../avr-util-library/DS3231M.h"
 
 
 #ifdef DISP_3000
@@ -104,7 +108,7 @@ void main_pressedFILL(Controller_Model *Model){
 
 
 		index = devicePos_to_buffer(LVM.vars->device_pos, index, LVM.temp->buffer);  // Positions are 4 letters
-		LVM.temp->buffer[index++] = xbee_get_status_byte();
+		LVM.temp->buffer[index++] = get_status();
 
 		#ifdef ALLOW_COM
 		// Send packed message and get an answer
@@ -117,7 +121,7 @@ void main_pressedFILL(Controller_Model *Model){
 		// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 		if (xbee_send_message(FILLING_BEGIN_MSG, LVM.temp->buffer, index))
 		{
-			xbee_set_status_byte(0); // Clear all errors
+			set_status(0); // Clear all errors
 		}
 		#endif
 
@@ -269,7 +273,7 @@ void main_pressedDOWN(Controller_Model *Model){
 
 		LVM.temp->buffer[index++] = (uint16_t) LVM.vars->pressure_level >> 8;
 		LVM.temp->buffer[index++] = (uint16_t) LVM.vars->pressure_level;
-		LVM.temp->buffer[index++] = xbee_get_status_byte();
+		LVM.temp->buffer[index++] = get_status();
 
 
 
@@ -297,21 +301,21 @@ void main_pressedDOWN(Controller_Model *Model){
 				InitScreen_AddLine(STR_NEW_TIME_RECEIVED,0);
 
 				// set time
-				TimeBuff newtime2;
-				newtime2.second =	LVM.temp->buffer[0];
-				newtime2.minute =	LVM.temp->buffer[1];
-				newtime2.hour =		LVM.temp->buffer[2];
-				newtime2.date =		LVM.temp->buffer[3];
-				newtime2.month =	LVM.temp->buffer[4];
-				newtime2.year =		LVM.temp->buffer[5];
+				struct tm newtime2;
+				newtime2.tm_sec =	LVM.temp->buffer[0];
+				newtime2.tm_min =	LVM.temp->buffer[1];
+				newtime2.tm_hour =		LVM.temp->buffer[2];
+				newtime2.tm_mday =		LVM.temp->buffer[3];
+				newtime2.tm_mon =	LVM.temp->buffer[4];
+				newtime2.tm_year =		LVM.temp->buffer[5];
 
 				// Message on screen
-				sprintf(LVM.temp->string,STR_NEW_DATE, newtime2.date, newtime2.month, newtime2.year+2000);
+				sprintf(LVM.temp->string,STR_NEW_DATE, newtime2.tm_mday, newtime2.tm_mon, newtime2.tm_year+2000);
 				InitScreen_AddLine(LVM.temp->string,0);
-				sprintf(LVM.temp->string,STR_NEW_TIME, newtime2.hour, newtime2.minute, newtime2.second);
+				sprintf(LVM.temp->string,STR_NEW_TIME, newtime2.tm_sec, newtime2.tm_min, newtime2.tm_hour);
 				InitScreen_AddLine(LVM.temp->string,0);
 
-				if (DS3231M_status.connected)
+				if (connected.DS3231M)
 				{
 					DS3231M_set_time(&newtime2);
 				}
@@ -328,7 +332,7 @@ void main_pressedDOWN(Controller_Model *Model){
 			// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 			if (xbee_send_message(XBEE_ACTIVE_MSG, LVM.temp->buffer, index))
 			{
-				xbee_set_status_byte(0); // Clear all errors
+				set_status(0); // Clear all errors
 			}
 			#endif
 
@@ -365,7 +369,7 @@ void main_pressedDOWN(Controller_Model *Model){
 				if (xbee_send_message(LVM.measbuff->measurements[LVM.measbuff->firstMeas].type, LVM.measbuff->measurements[LVM.measbuff->firstMeas].data, LVM.measbuff->measurements[LVM.measbuff->firstMeas].data_len))
 				{
 					// there is no way to know if the data was transmitted correctly, so let's hope for the best....
-					xbee_set_status_byte(0); // Clear all errors
+					set_status(0); // Clear all errors
 					--LVM.measbuff->numberStored;
 					if (LVM.measbuff->firstMeas < (MEASBUFFER_LENGTH-1)) LVM.measbuff->firstMeas = LVM.measbuff->firstMeas + 1;
 					else LVM.measbuff->firstMeas = 0;
@@ -536,7 +540,7 @@ void autofill_check(Controller_Model * Model){
 
 
 				indx = devicePos_to_buffer(LVM.vars->device_pos, indx, LVM.temp->buffer);
-				LVM.temp->buffer[indx++] = xbee_get_status_byte();
+				LVM.temp->buffer[indx++] = get_status();
 
 				//send
 				#ifdef ALLOW_COM
@@ -548,7 +552,7 @@ void autofill_check(Controller_Model * Model){
 				// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 				if (xbee_send_message(FILLING_BEGIN_MSG, LVM.temp->buffer, indx))
 				{
-					xbee_set_status_byte(0); // Clear all errors
+					set_status(0); // Clear all errors
 				}
 				#endif
 

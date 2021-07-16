@@ -26,10 +26,7 @@
 #include "display_utilities.h"
 #include "keyboard.h"
 #include "timer_utilities.h"
-#include "usart.h"
-#include "xbee.h"
-#include "xbee_utilities.h"
-#include "DS3231M_helevel.h"
+
 #include "HoneywellSSC.h"
 #include "Controller/option_mode.h"
 #include "Controller/filling_mode.h"
@@ -41,7 +38,15 @@
 
 
 #include "diag_pulse.h"
-#include "i2cmaster.h"
+#include "avr-util-library/i2cmaster.h"
+#include "avr-util-library/usart.h"
+#include "avr-util-library/xbee.h"
+#include "avr-util-library/xbee_utilities.h"
+#include "avr-util-library/DS3231M.h"
+#include "avr-util-library/I2C_utilities.h"
+#include "avr-util-library/module_globals.h"
+
+
 
 #ifdef DISP_3000
 #include "StringPixelCoordTable.h"
@@ -162,12 +167,7 @@ posType PosModel = {
 Temp_buffersType temp;
 
 
-VersionType version = {
-	.Fw_version = FIRMWARE_VERSION,
-	.Branch_id = BRANCH_ID,
-	.FW_eeprom_changed = LAST_FIRMWARE_EEPROM_CHANGED,
-	.hw_version_xbee = 0
-};
+
 
 
 
@@ -281,6 +281,8 @@ inline _Bool auto_fill_pin_on(void)
 }
 
 
+//TODO REMOVE 
+/*
 int I2C_ClearBus(void) {
 
 
@@ -340,7 +342,7 @@ int I2C_ClearBus(void) {
 
 	return 0; // all ok
 }
-
+*/
 
 
 
@@ -356,19 +358,19 @@ int I2C_ClearBus(void) {
 
 uint8_t collect_and_send_MeasData(uint8_t *meas_buffer,uint8_t Message_Code){
 	// enter time
-	if (DS3231M_status.connected)
+	if (connected.DS3231M)
 	{
 		DS3231M_read_time();
 
 	}
 	else
 	{
-		Time.second = 0;
-		Time.minute = 0;
-		Time.hour   = 0;
-		Time.date   = 0;
-		Time.month  = 0;
-		Time.year   = 0;
+		Time.tm_sec = 0;
+		Time.tm_min = 0;
+		Time.tm_hour   = 0;
+		Time.tm_mday  = 0;
+		Time.tm_mon  = 0;
+		Time.tm_year   = 0;
 	}
 
 	// enter pressure
@@ -385,12 +387,12 @@ uint8_t collect_and_send_MeasData(uint8_t *meas_buffer,uint8_t Message_Code){
 
 
 	// enter time
-	meas_buffer[index++] = Time.second;
-	meas_buffer[index++] = Time.minute;
-	meas_buffer[index++] = Time.hour;
-	meas_buffer[index++] = Time.date;
-	meas_buffer[index++] = Time.month;
-	meas_buffer[index++] = Time.year;
+	meas_buffer[index++] = Time.tm_sec;
+	meas_buffer[index++] = Time.tm_min;
+	meas_buffer[index++] = Time.tm_hour;
+	meas_buffer[index++] = Time.tm_mday;
+	meas_buffer[index++] = Time.tm_mon;
+	meas_buffer[index++] = Time.tm_year;
 
 
 	if(LVM.vars->he_level < 0)	// If negative He level, send error code
@@ -410,7 +412,7 @@ uint8_t collect_and_send_MeasData(uint8_t *meas_buffer,uint8_t Message_Code){
 	meas_buffer[index++] = (uint16_t) LVM.vars->pressure_level;
 
 	// enter temperature
-	if (DS3231M_status.connected)
+	if (connected.DS3231M)
 	{
 		DS3231M_read_temperature();
 
@@ -439,7 +441,7 @@ uint8_t collect_and_send_MeasData(uint8_t *meas_buffer,uint8_t Message_Code){
 	// position
 	index =  devicePos_to_buffer(LVM.vars->device_pos, index, LVM.temp->buffer);  // Positions are 4 letters
 
-	meas_buffer[index++] = xbee_get_status_byte();
+	meas_buffer[index++] = get_status();
 	if (LVM.vars->r_val_last_Meas > 6300){
 		LVM.vars->r_val_last_Meas = 6300;
 	}
@@ -455,7 +457,7 @@ uint8_t collect_and_send_MeasData(uint8_t *meas_buffer,uint8_t Message_Code){
 		// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 		if (xbee_send_message(Message_Code, meas_buffer, index))
 		{
-			xbee_set_status_byte(0); // Clear all errors
+			set_status(0); // Clear all errors
 		}
 
 	}
@@ -476,7 +478,7 @@ uint8_t collect_and_send_MeasData(uint8_t *meas_buffer,uint8_t Message_Code){
 		// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 		if (xbee_send_message(Message_Code, meas_buffer, index))
 		{
-			xbee_set_status_byte(0); // Clear all errors
+			set_status(0); // Clear all errors
 		}
 		#endif
 	}
@@ -574,6 +576,38 @@ uint8_t xbee_send_login_msg(uint8_t db_cmd_type, uint8_t *buffer)
 	return 1;	//bad options /main will set default
 	#endif
 }
+
+
+inline void xbee_wake_up_plus(void)
+{
+	if (xbee.sleeping)
+	{
+		xbee_wake_up();
+	
+	}
+
+	// Clear then set the timeout for awake time
+	set_timeout(0, TIMER_5, RESET_TIMER);
+	set_timeout(xbee.awake_period, TIMER_5, USE_TIMER);		// Stay active for xbee_awake_period
+
+	xbee.sleeping = false;									// Xbee module is not sleeping anymore
+
+}
+
+
+
+
+
+inline void xbee_sleep_plus(void)
+{
+	xbee_sleep();
+	xbee.sleeping = true;
+	// Clear then set the timeout for sleeping time
+	set_timeout(0, TIMER_5, RESET_TIMER);
+	set_timeout(xbee.sleep_period*60, TIMER_5, USE_TIMER);
+	//	LCD_Print("xbee_sleep_plus", 5, 40, 2, 1, 1, FGC, BGC);
+}
+
 
 
 
@@ -858,14 +892,14 @@ int main(void)
 	// Timer
 	InitScreen_AddLine(STR_INIT_I2C_TIMER,1); //	LCD_Print("Init I2C Timer", 5, 40, 2, 1, 1, FGC, BGC);
 
-	if (init_DS3231M() == 0) // trying to connect with DS3231M (time)
+	if (init_DS3231M(&paint_info_line) == 0) // trying to connect with DS3231M (time)
 	{
-		DS3231M_status.connected = 1;
+		connected.DS3231M = 1;
 		InitScreen_AddLine(STR_SUCCESSFUL,0);  //LCD_Print("successful", 5, 60, 2, 1, 1, FGC, BGC);
 	}
 	else
 	{
-		DS3231M_status.connected = 0;
+		connected.DS3231M = 0;
 		InitScreen_AddLine(STR_UN_SUCCESSFUL,0);  //LCD_Print("not successful", 5, 60, 2, 1, 1, FGC, BGC);
 	}
 
@@ -1086,18 +1120,18 @@ int main(void)
 
 						// set time
 
-						TimeBuff newtime;
-						newtime.second =	LVM.temp->buffer[0];
-						newtime.minute =	LVM.temp->buffer[1];
-						newtime.hour =		LVM.temp->buffer[2];
-						newtime.date =		LVM.temp->buffer[3];
-						newtime.month =		LVM.temp->buffer[4];
-						newtime.year =		LVM.temp->buffer[5];
+						struct tm newtime;
+						newtime.tm_sec  =	LVM.temp->buffer[0];
+						newtime.tm_min =	LVM.temp->buffer[1];
+						newtime.tm_hour =		LVM.temp->buffer[2];
+						newtime.tm_mday=		LVM.temp->buffer[3];
+						newtime.tm_mon =		LVM.temp->buffer[4];
+						newtime.tm_year =		LVM.temp->buffer[5];
 
 						// Message on screen
-						sprintf(LVM.temp->string,STR_NEW_DATE, newtime.date, newtime.month, newtime.year+2000);
+						sprintf(LVM.temp->string,STR_NEW_DATE, newtime.tm_mday, newtime.tm_mon, newtime.tm_year+2000);
 						InitScreen_AddLine(LVM.temp->string,0);
-						sprintf(LVM.temp->string,STR_NEW_TIME, newtime.hour, newtime.minute, newtime.second);
+						sprintf(LVM.temp->string,STR_NEW_TIME, newtime.tm_hour, newtime.tm_min, newtime.tm_sec);
 						InitScreen_AddLine(LVM.temp->string,0);
 
 						/*								LCD_Print("new date", 5, 20, 2, 1, 1, FGC, BGC);
@@ -1110,7 +1144,7 @@ int main(void)
 						draw_int(newtime.second, 65, 80, "", ERR);
 						delay_ms(2000);
 						*/
-						if (DS3231M_status.connected)
+						if (connected.DS3231M)
 						{
 							DS3231M_set_time(&newtime);
 						}
@@ -1397,11 +1431,11 @@ int main(void)
 	{
 		
 
-		if (!DS3231M_status.connected)
+		if (!connected.DS3231M)
 		{
 			if (!I2C_ClearBus())
 			{
-				DS3231M_status.connected = 1;
+				connected.DS3231M = 1;
 				}else{
 				paint_info_line("I2C recovery failed",1);
 			}
