@@ -18,8 +18,8 @@
 #include "display_utilities.h"
 #include "keyboard.h"
 #include "timer_utilities.h"
-#include "avr-util-library/DS3231M.h"
-#include "avr-util-library/xbee.h"
+#include "DS3231M.h"
+#include "xbee.h"
 #ifdef DISP_3000
 #include "StringPixelCoordTable.h"
 #endif

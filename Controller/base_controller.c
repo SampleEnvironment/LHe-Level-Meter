@@ -17,11 +17,11 @@
 #include "../diag_pulse.h"
 
 
-#include "../avr-util-library/xbee.h"
-#include "../avr-util-library/xbee_utilities.h"
-#include "../avr-util-library/I2C_utilities.h"
-#include "../avr-util-library/status.h"
-#include "../avr-util-library/DS3231M.h"
+#include "xbee.h"
+#include "xbee_utilities.h"
+#include "I2C_utilities.h"
+#include "status.h"
+#include "DS3231M.h"
 
 
 #include <stdbool.h>
@@ -334,7 +334,7 @@ void shutdown_LVM(Controller_Model *Model){
 				if (xbee_send_message(LVM.measbuff->measurements[LVM.measbuff->firstMeas].type, LVM.measbuff->measurements[LVM.measbuff->firstMeas].data, LVM.measbuff->measurements[LVM.measbuff->firstMeas].data_len))
 				{
 					// there is no way to know if the data was transmitted correctly, so let's hope for the best....
-					set_status(0); // Clear all errors
+					CLEAR_ALL(); // Clear all errors
 					--LVM.measbuff->numberStored;
 					if (LVM.measbuff->firstMeas < (MEASBUFFER_LENGTH-1)) LVM.measbuff->firstMeas = LVM.measbuff->firstMeas + 1;
 					else LVM.measbuff->firstMeas = 0;
@@ -431,7 +431,7 @@ void manage_Xbee_sleep_cycles(Controller_Model *Model){
 
 				LVM.temp->buffer[index++] = (uint16_t) LVM.vars->pressure_level >> 8;
 				LVM.temp->buffer[index++] = (uint16_t) LVM.vars->pressure_level;
-				LVM.temp->buffer[index++] = get_status();
+				LVM.temp->buffer[index++] =  get_status_byte_levelmeter();
 
 				// Try to reconnect to the network
 				xbee_reconnect();
@@ -464,7 +464,7 @@ void manage_Xbee_sleep_cycles(Controller_Model *Model){
 				// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 				if (xbee_send_message(XBEE_ACTIVE_MSG, LVM.temp->buffer, index))
 				{
-					set_status(0); // Clear all errors
+					CLEAR_ALL(); // Clear all errors
 				}
 				#endif
 
@@ -499,7 +499,7 @@ void manage_Xbee_sleep_cycles(Controller_Model *Model){
 						if (xbee_send_message(LVM.measbuff->measurements[LVM.measbuff->firstMeas].type, LVM.measbuff->measurements[LVM.measbuff->firstMeas].data, LVM.measbuff->measurements[LVM.measbuff->firstMeas].data_len))
 						{
 							// there is no way to know if the data was transmitted correctly, so let's hope for the best....
-							set_status(0); // Clear all errors
+							CLEAR_ALL(); // Clear all errors
 							--LVM.measbuff->numberStored;
 							if (LVM.measbuff->firstMeas < (MEASBUFFER_LENGTH-1)) LVM.measbuff->firstMeas = LVM.measbuff->firstMeas + 1;
 							else LVM.measbuff->firstMeas = 0;
@@ -712,12 +712,12 @@ void handle_received_Messages(Controller_Model *Model){
 			LVM.temp->buffer[index++] = ((uint16_t)(LVM.options->batt_max*10))>>8;
 			LVM.temp->buffer[index++] = LVM.options->batt_max*10;
 			LVM.temp->buffer[index++] = LVM.options->critical_batt;
-			LVM.temp->buffer[index++] = get_status();
+			LVM.temp->buffer[index++] =  get_status_byte_levelmeter();
 
 			// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 			if (xbee_send_message(GET_OPTIONS_CMD, LVM.temp->buffer, index))
 			{
-				set_status(0); // Clear all errors
+				CLEAR_ALL(); // Clear all errors
 			}
 			break;
 			case SET_OPTIONS_CMD:	// (#13) Set device settings received from the database server.
@@ -889,12 +889,12 @@ void handle_received_Messages(Controller_Model *Model){
 					index++;
 					ptr = &LVM.pos->Strings[index][0];
 				}
-				LVM.temp->buffer[i++] = get_status();
+				LVM.temp->buffer[i++] =  get_status_byte_levelmeter();
 
 				// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 				if (xbee_send_message(GET_LETTERS_CMD, LVM.temp->buffer, i))
 				{
-					set_status(0); // Clear all errors
+					CLEAR_ALL(); // Clear all errors
 				}
 
 				#ifdef ALLOW_DEBUG
@@ -969,7 +969,7 @@ void handle_received_Messages(Controller_Model *Model){
 				LVM.pos->RangeNums[i_letters][0] = END;
 				LVM.pos->StrLen[i_letters] = 0;
 
-				CLEAR_ERROR(LETTERS_ERROR);;
+				CLEAR_ERROR(LETTERS_ERROR);
 
 				#ifdef ALLOW_DEBUG
 				paint_info_line(STR_POS_WRITTEN , 0);
@@ -983,12 +983,12 @@ void handle_received_Messages(Controller_Model *Model){
 			index = 0;
 			LVM.temp->buffer[index++] = LVM.vars->options_pw >> 8;
 			LVM.temp->buffer[index++] = LVM.vars->options_pw;
-			LVM.temp->buffer[index++] = get_status();
+			LVM.temp->buffer[index++] =  get_status_byte_levelmeter();
 
 			// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 			if (xbee_send_message(GET_PASSWORD_CMD, LVM.temp->buffer, index))
 			{
-				set_status(0); // Clear all errors
+				CLEAR_ALL(); // Clear all errors
 			}
 			#ifdef ALLOW_DEBUG
 			paint_info_line(STR_PASSW_SENT , 0);
@@ -1008,12 +1008,12 @@ void handle_received_Messages(Controller_Model *Model){
 			index = 0;
 
 			LVM.temp->buffer[index++] = xbee_get_sleep_period();		// Sleeping period in minute
-			LVM.temp->buffer[index++] = get_status();
+			LVM.temp->buffer[index++] =  get_status_byte_levelmeter();
 
 			// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 			if (xbee_send_message(GET_XBEE_SLEEP_TIME_CMD, LVM.temp->buffer, index))
 			{
-				set_status(0); // Clear all errors
+				CLEAR_ALL(); // Clear all errors
 			}
 			#ifdef ALLOW_DEBUG
 			paint_info_line(STR_SLEEP_TIME_SENT, 0);
@@ -1044,12 +1044,12 @@ void handle_received_Messages(Controller_Model *Model){
 			index = 0;
 
 			LVM.temp->buffer[index++] = xbee_get_awake_period();		// Awake period in seconds
-			LVM.temp->buffer[index++] = get_status();
+			LVM.temp->buffer[index++] =  get_status_byte_levelmeter();
 
 			// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 			if (xbee_send_message(GET_XBEE_AWAKE_TIME_CMD, LVM.temp->buffer, index))
 			{
-				set_status(0); // Clear all errors
+				CLEAR_ALL(); // Clear all errors
 			}
 
 			#ifdef ALLOW_DEBUG
@@ -1151,7 +1151,7 @@ void handle_received_Messages(Controller_Model *Model){
 			// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 			if (xbee_send_message(UNKNOWN_MSG, LVM.temp->buffer, 1+frameBuffer[reply_Id].data_len))
 			{
-				set_status(0); // Clear all errors
+				CLEAR_ALL(); // Clear all errors
 			}
 		}//switch(frameBuffer[reply_Id].type)
 		buffer_removeData(reply_Id);	//mark cmd as done !

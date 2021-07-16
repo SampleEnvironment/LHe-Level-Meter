@@ -17,8 +17,8 @@
 #include "../display_utilities.h"
 #include "../HoneywellSSC.h"
 #include "../main.h"
-#include "../avr-util-library/xbee.h"
-#include "../avr-util-library/xbee_utilities.h"
+#include "xbee.h"
+#include "xbee_utilities.h"
 #include "../timer_utilities.h"
 #include "../keyboard.h"
 
@@ -1194,7 +1194,7 @@ void option_exit(Controller_Model * Model){
 			LVM.temp->buffer[index++] = ((uint16_t)(LVM.options->batt_max*10))>>8;
 			LVM.temp->buffer[index++] = round(LVM.options->batt_max*10);
 			LVM.temp->buffer[index++] = LVM.options->critical_batt;
-			LVM.temp->buffer[index++] = get_status();
+			LVM.temp->buffer[index++] =  get_status_byte_levelmeter();
 
 			InitScreen_AddLine(STR_SAVING_SETTINGS,1);
 			InitScreen_AddLine(STR_TO_THE_SERVER,0);
@@ -1208,7 +1208,7 @@ void option_exit(Controller_Model * Model){
 			// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 			if (xbee_send_message(OPTIONS_CHANGED_MSG, LVM.temp->buffer, index))
 			{
-				set_status(0); // Clear all errors
+				CLEAR_ALL(); // Clear all errors
 			}
 			#endif
 			// Free XBee module

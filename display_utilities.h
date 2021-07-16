@@ -8,7 +8,7 @@
 #include "display.h"
 #include "main.h"
 
-#include "avr-util-library/DS3231M.h"
+#include "DS3231M.h"
 
 // Variables for Display
 

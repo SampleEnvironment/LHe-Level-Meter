@@ -7,7 +7,7 @@
 
 #include "config.h"
 #include "display_driver.h"
-#include "avr-util-library/module_globals.h"
+#include "module_globals.h"
 
 
 

@@ -38,13 +38,14 @@
 
 
 #include "diag_pulse.h"
-#include "avr-util-library/i2cmaster.h"
-#include "avr-util-library/usart.h"
-#include "avr-util-library/xbee.h"
-#include "avr-util-library/xbee_utilities.h"
-#include "avr-util-library/DS3231M.h"
-#include "avr-util-library/I2C_utilities.h"
-#include "avr-util-library/module_globals.h"
+#include "i2cmaster.h"
+#include "usart.h"
+#include "xbee.h"
+#include "xbee_utilities.h"
+#include "DS3231M.h"
+#include "I2C_utilities.h"
+#include "module_globals.h"
+#include "status.h"
 
 
 
@@ -441,7 +442,7 @@ uint8_t collect_and_send_MeasData(uint8_t *meas_buffer,uint8_t Message_Code){
 	// position
 	index =  devicePos_to_buffer(LVM.vars->device_pos, index, LVM.temp->buffer);  // Positions are 4 letters
 
-	meas_buffer[index++] = get_status();
+	meas_buffer[index++] =  get_status_byte_levelmeter();
 	if (LVM.vars->r_val_last_Meas > 6300){
 		LVM.vars->r_val_last_Meas = 6300;
 	}
@@ -457,7 +458,7 @@ uint8_t collect_and_send_MeasData(uint8_t *meas_buffer,uint8_t Message_Code){
 		// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 		if (xbee_send_message(Message_Code, meas_buffer, index))
 		{
-			set_status(0); // Clear all errors
+			CLEAR_ALL(); // Clear all errors
 		}
 
 	}
@@ -478,7 +479,7 @@ uint8_t collect_and_send_MeasData(uint8_t *meas_buffer,uint8_t Message_Code){
 		// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 		if (xbee_send_message(Message_Code, meas_buffer, index))
 		{
-			set_status(0); // Clear all errors
+			CLEAR_ALL(); // Clear all errors
 		}
 		#endif
 	}
@@ -731,6 +732,10 @@ int main(void)
 	LVM.options->display_reversed 	= eeprom_read_byte(&LVM.eeprom->display_reversed);
 	#endif
 
+	version_INIT(FIRMWARE_VERSION,BRANCH_ID,LAST_FIRMWARE_EEPROM_CHANGED);
+	xbee_init(&paint_info_line,LVM.vars->Device_ID_Str,DEV_ID_CHARS_MAX);
+
+
 	LCD_Init();
 
 
@@ -927,7 +932,7 @@ int main(void)
 		break;
 	}
 
-	LVM.version->hw_version_xbee =   (xbee_hardware_version() > 0x2000)? XBEE_V_SC2 : XBEE_V_S1;
+	xbee_hardware_version();
 	
 	
 	#ifdef ili9341

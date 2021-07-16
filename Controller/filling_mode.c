@@ -17,8 +17,8 @@
 #include "../main.h"
 #include "../timer_utilities.h"
 
-#include "../avr-util-library/xbee.h"
-#include "../avr-util-library/DS3231M.h"
+#include "xbee.h"
+#include "DS3231M.h"
 
 #ifdef DISP_3000
 #include "../StringPixelCoordTable.h"
