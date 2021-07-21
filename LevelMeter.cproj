@@ -165,6 +165,7 @@
       <Value>F_CPU=6144000UL</Value>
       <Value>DEBUG</Value>
       <Value>LEVELMETER</Value>
+      <Value>USE_XBEE</Value>
     </ListValues>
   </avrgcc.compiler.symbols.DefSymbols>
   <avrgcc.compiler.directories.IncludePaths>
