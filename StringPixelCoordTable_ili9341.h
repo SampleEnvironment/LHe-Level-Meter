@@ -483,7 +483,9 @@
 #define X_DP_3 (BORDER_OFFSET + 200)//(BORDER_OFFSET +3) 
 #define X_DP_20 (BORDER_OFFSET +3) 
 #define X_DP_60 90
-#define X_DP_75 180
+#define X_DP_60_AVG 74
+#define X_DP_60_NORMAL X_DP_60_AVG+4*FONT1_W
+#define X_DP_75 (180+1*FONT1_W)
 #define X_DP_147 (X_PB_159-(3*LD_HALF_CHAR_WIDTH)+1)
 #define X_DP_147_SEND (X_PB_159-(3*LD_HALF_CHAR_WIDTH)-5)
 

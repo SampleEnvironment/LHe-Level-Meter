@@ -7,6 +7,7 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <util/delay.h>
 
 #include "base_controller.h"
 #include "getCode_mode.h"

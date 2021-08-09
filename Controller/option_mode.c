@@ -21,6 +21,7 @@
 #include "xbee_utilities.h"
 #include "../timer_utilities.h"
 #include "../keyboard.h"
+#include "status.h"
 
 #ifdef DISP_3000
 #include "../StringPixelCoordTable.h"

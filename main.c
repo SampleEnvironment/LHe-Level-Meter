@@ -388,12 +388,12 @@ uint8_t collect_and_send_MeasData(uint8_t *meas_buffer,uint8_t Message_Code){
 
 
 	// enter time
-	meas_buffer[index++] = Time.tm_sec;
-	meas_buffer[index++] = Time.tm_min;
-	meas_buffer[index++] = Time.tm_hour;
-	meas_buffer[index++] = Time.tm_mday;
-	meas_buffer[index++] = Time.tm_mon;
-	meas_buffer[index++] = Time.tm_year;
+	meas_buffer[index++] = Time.tm_sec;   //0
+	meas_buffer[index++] = Time.tm_min;   //1
+	meas_buffer[index++] = Time.tm_hour;  //2
+	meas_buffer[index++] = Time.tm_mday;  //3
+	meas_buffer[index++] = Time.tm_mon;   //4
+	meas_buffer[index++] = Time.tm_year;  //5
 
 
 	if(LVM.vars->he_level < 0)	// If negative He level, send error code
@@ -403,14 +403,14 @@ uint8_t collect_and_send_MeasData(uint8_t *meas_buffer,uint8_t Message_Code){
 	}
 	else
 	{
-		meas_buffer[index++] = ((uint16_t)(LVM.vars->he_level*10))>>8;
-		meas_buffer[index++] = ((uint16_t)(LVM.vars->he_level*10));
+		meas_buffer[index++] = ((uint16_t)(LVM.vars->he_level*10))>>8;  //6
+		meas_buffer[index++] = ((uint16_t)(LVM.vars->he_level*10));     //7
 	}
 
-	meas_buffer[index++] = LVM.vars->batt_level;
+	meas_buffer[index++] = LVM.vars->batt_level;           //8
 
-	meas_buffer[index++] = (uint16_t) LVM.vars->pressure_level >> 8;
-	meas_buffer[index++] = (uint16_t) LVM.vars->pressure_level;
+	meas_buffer[index++] = (uint16_t) LVM.vars->pressure_level >> 8;  //9
+	meas_buffer[index++] = (uint16_t) LVM.vars->pressure_level;       //10
 
 	// enter temperature
 	if (connected.DS3231M)
@@ -426,8 +426,8 @@ uint8_t collect_and_send_MeasData(uint8_t *meas_buffer,uint8_t Message_Code){
 		_delay_ms(2000);
 		*/
 
-		meas_buffer[index++] = (uint16_t) (DS3231M_Temperature * 100) >> 8;
-		meas_buffer[index++] = (uint16_t) (DS3231M_Temperature * 100);
+		meas_buffer[index++] = (uint16_t) (DS3231M_Temperature * 100) >> 8;  //11
+		meas_buffer[index++] = (uint16_t) (DS3231M_Temperature * 100);       //12
 	}
 	else
 	{
@@ -440,16 +440,16 @@ uint8_t collect_and_send_MeasData(uint8_t *meas_buffer,uint8_t Message_Code){
 	}
 
 	// position
-	index =  devicePos_to_buffer(LVM.vars->device_pos, index, LVM.temp->buffer);  // Positions are 4 letters
+	index =  devicePos_to_buffer(LVM.vars->device_pos, index, LVM.temp->buffer);  // Positions are 4 letters  13..16
 
-	meas_buffer[index++] =  get_status_byte_levelmeter();
-	if (LVM.vars->r_val_last_Meas > 6300){
-		LVM.vars->r_val_last_Meas = 6300;
+	meas_buffer[index++] =  get_status_byte_levelmeter(); //17
+	if (LVM.vars->r_val_last_Meas > 650){  
+		LVM.vars->r_val_last_Meas = 650;
 	}
 
 
-	meas_buffer[index++] = ((uint16_t)(LVM.vars->r_val_last_Meas*10))>>8;
-	meas_buffer[index++] = ((uint16_t)(LVM.vars->r_val_last_Meas*10));
+	meas_buffer[index++] = ((uint16_t)(LVM.vars->r_val_last_Meas*100))>>8;  //18
+	meas_buffer[index++] = ((uint16_t)(LVM.vars->r_val_last_Meas*100));     //19
 
 	memcpy(LVM.temp->databuffer,meas_buffer,index);
 

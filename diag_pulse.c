@@ -166,6 +166,12 @@ void diag_pulse_coords(diag_pulseType *dp){
 		//coordinate system for diagnostic pulse
 		LCD_Print("Pulse", xoff+X_DP_20, Y_DP_2, 2, 1,1, ERR, BGC);
 		
+		
+		#ifdef ili9341
+				LCD_Print("            ", xoff+X_DP_60_AVG, Y_DP_6, 1, 1, 1, FGC, BGC);
+		#endif
+
+		
 		if (dp->pulse_type == NORMAL )
 		{
 			paint_buttons("save", "esc", 2);
@@ -546,7 +552,11 @@ void diag_pulse_move_cursor(diag_pulseType *dp,int8_t direction){
 		draw_int_without_erasing(dp->u_max, xoff+X_DP_3,dp->top_zero - dp->y_maxpixels + Y_DP_OFFS, "V", FGC, DP_AXIS_FONTNR);
 		
 		if(dp->pulse_type == NORMAL){
-			draw_double_without_erasing(dp->diag_res, xoff+X_DP_60, Y_DP_6, 1, "Ohm", ERR, 1);
+			#ifdef ili9341
+
+			LCD_Print("Avg:",xoff+X_DP_60_AVG,Y_DP_6,1,1,1,FGC,BGC);
+			#endif
+			draw_double_without_erasing(dp->diag_res, xoff+X_DP_60_NORMAL, Y_DP_6, 1, "Ohm", ERR, 1);
 		}
 		else
 		{
@@ -557,7 +567,11 @@ void diag_pulse_move_cursor(diag_pulseType *dp,int8_t direction){
 
 	if (dp->top_unit == dp->r_point){
 		draw_int_without_erasing(dp->r_max, xoff+X_DP_3,dp->top_zero - dp->y_maxpixels+ Y_DP_OFFS, "Ohm", FGC, DP_AXIS_FONTNR);
-		LCD_Print("        ", xoff+X_DP_60, Y_DP_6, 1, 1, 1, FGC, BGC);
+		#ifdef ili9341
+		LCD_Print("            ", xoff+X_DP_60_AVG, Y_DP_6, 1, 1, 1, FGC, BGC);
+		#else
+		LCD_Print("        ", xoff+X_DP_60_AVG, Y_DP_6, 1, 1, 1, FGC, BGC);
+		#endif
 		draw_double_without_erasing(((double)dp->r[dp->active_point])/100,xoff+X_DP_60, Y_DP_6,1, "Ohm", ERR, 1);
 	}
 
@@ -740,7 +754,11 @@ void diag_pulse(diag_pulseType *dp){
 
 
 		dp->diag_res = ((double) (dp->r_span* dp->u_avg* 1000 / dp->i_avg) + dp->r_zero);  // conversion from mA to A !!!!
-		draw_double(dp->diag_res, xoff+X_DP_60, Y_DP_6, 1, "Ohm", ERR, 1);
+		#ifdef ili9341
+			LCD_Print("Avg:",xoff+X_DP_60_AVG,Y_DP_6,1,1,1,FGC,BGC);
+		#endif 
+	
+		draw_double(dp->diag_res, xoff+X_DP_60_NORMAL, Y_DP_6, 1, "Ohm", ERR, 1);
 
 		}else{
 		draw_double_without_erasing(((double)dp->u[dp->active_point])/100,xoff+X_DP_60, Y_DP_6,1, "V", ERR, 1);
@@ -891,7 +909,7 @@ void diag_pulse(diag_pulseType *dp){
 
 			dp->draw_all = true;
 			
-			
+
 			diag_pulse_coords(dp);
 
 			for(uint8_t i = 0; i< dp->points_in_plot-1; i++){
