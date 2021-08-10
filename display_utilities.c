@@ -240,8 +240,8 @@ void paint_he_level(double he_level, double total_volume, _Bool print_Percentage
 	int16_t disp;
 	
 
-	LCD_Print("   ", xoff + X_PHL_2, Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4,SCALE_PHL_4, ERR, BGC); //changed from x_PHL_10 to X_PHL_2
-	LCD_Print(" ", xoff + X_PHL_110, Y_PHL_61, 2, 2, 2, ERR, BGC);
+	LCD_Print("   ", xoff + (CENTER_LINE-((SCALE_PHL_4*3*FONT3_W)+FONT2_W*2)*0.5), Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4,SCALE_PHL_4, ERR, BGC); //changed from x_PHL_10 to X_PHL_2
+	LCD_Print(" ", xoff + (CENTER_LINE-((SCALE_PHL_4*3*FONT3_W)+FONT2_W*2)*0.5)+(3*FONT3_W*SCALE_PHL_4)-X_PHL_L_OFFSET, Y_PHL_61, 2, 2, 2, ERR, BGC);
 	
 
 	
@@ -260,12 +260,12 @@ void paint_he_level(double he_level, double total_volume, _Bool print_Percentage
 
 		sprintf(temp, "%d",disp);
 		
-		
-		LCD_Print(temp, xoff + X_PHL_2, Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4, SCALE_PHL_4, ERR, BGC);
-		if (disp < 10) LCD_Print("l", xoff + X_PHL_45, Y_PHL_61, 2, 2, 2, ERR, BGC);
-		else
-		if (disp < 100) LCD_Print("l", xoff + X_PHL_80, Y_PHL_61, 2, 2, 2, ERR, BGC);
-		else LCD_Print("l", xoff + X_PHL_110, Y_PHL_61, 2, 2, 2, ERR, BGC);
+		uint8_t digits = strlen(temp);
+
+		//LCD_Print(temp, xoff + X_PHL_2, Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4, SCALE_PHL_4, ERR, BGC);
+		LCD_Print(temp,xoff+ (CENTER_LINE-((SCALE_PHL_4*digits*FONT3_W)+FONT2_W*2)*0.5), Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4, SCALE_PHL_4, ERR, BGC);
+
+		LCD_Print("l", xoff + (CENTER_LINE-((SCALE_PHL_4*digits*FONT3_W)+FONT2_W*2)*0.5)+(digits*FONT3_W*SCALE_PHL_4)-X_PHL_L_OFFSET, Y_PHL_61, 2, 2, 2, ERR, BGC);
 
 		if (print_Percentage)
 		{

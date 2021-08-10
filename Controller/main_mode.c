@@ -421,6 +421,14 @@ void main_pressedBOT(Controller_Model *Model){
 	// Set options mode
 	Model->mode->next = ex_options;
 	
+	if (Model->mode->netstat == offline)
+	{
+		make_he_vol_changable();
+
+
+	}
+
+	
 
 	set_timeout(0, TIMER_3, RESET_TIMER);
 	set_timeout(OPT_TIMEOUT_TIME, TIMER_3, USE_TIMER);

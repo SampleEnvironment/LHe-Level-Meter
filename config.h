@@ -9,8 +9,8 @@
 #ifndef CONFIG_H_
 
 
-#define ili9341
-//#define DISP_3000
+//#define ili9341
+#define DISP_3000
 
 
 #define HZB

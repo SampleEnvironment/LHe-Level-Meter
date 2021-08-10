@@ -1233,7 +1233,14 @@ void option_exit(Controller_Model * Model){
 
 }
 
+void make_he_vol_changable(void)
+{
 
+		total_volume_opt.increment= 0.1;
+		total_volume_opt.continuousInc = 1;
+		total_volume_opt.MIN = TOTAL_VOL_MIN;
+		total_volume_opt.MAX = TOTAL_VOL_MAX;
+}
 
 void paint_opt_model(){
 	char temp_print[40];

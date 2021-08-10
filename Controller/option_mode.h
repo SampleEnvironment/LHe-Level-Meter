@@ -199,7 +199,7 @@ void null_valueDraw(ValueOptions *optEntry, unsigned int color);
 void null_vlueChange (ValueOptions *optEntry, int key);
 void ValOptNull_init(ValueOptionsNull *optEntry, uint16_t lineYcoord,char *OptName, char * optval);
 
-
+void make_he_vol_changable(void);
 
 void  OptentrysInit(void);
 

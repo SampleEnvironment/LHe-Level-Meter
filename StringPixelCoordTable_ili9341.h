@@ -214,13 +214,12 @@
 #define FONTNR_PHL_2 3										  // Highres Font Selected
 #define SCALE_PHL_4 2										  // Highres-Font only needs 2x Scaling
 #define X_PHL_1 1			                           		  // Clear He-Percentage Line
+#define X_PHL_HE_LVL  // Centered He level
 #define X_PHL_2 (X_PM_1)									  // Distance of He-Level and Percentage from left border/Buttons
 #define X_PHL_5 5											  // debug mode
 #define X_PHL_25 (((LCD_WIDTH-XOFFSET_32)/2)-(2*6*FONT2_W)/2) // "Cable?" centered
 
-#define X_PHL_45 (X_PM_1 +(FONT3_W-5)*SCALE_PHL_4+8)			  // "l" unit if He-Level < 10
-#define X_PHL_80 (X_PM_1 + (FONT3_W-5)*2*SCALE_PHL_4+8)			  // "l" unit if He-Level < 100
-#define X_PHL_110 (X_PM_1 + (FONT3_W-5)*3*SCALE_PHL_4+8)		  // "l" Unit if He-Level > 100
+#define X_PHL_L_OFFSET 8 		  // "l" offset to the left
 
 #define X_PHL_85 (X_PM_1+FONT2_W*9+HALF_SPACE_WIDTH_FONT_2)   // unit "l" of percentage He-Level < 100
 #define X_PHL_93 (X_PM_1+FONT2_W*12+HALF_SPACE_WIDTH_FONT_2)  // unit "l" of percentage He-Level else

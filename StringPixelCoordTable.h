@@ -11,6 +11,9 @@
 #define FONT2_W 9
 #define FONT2_H 15
 
+#define FONT3_W 9
+#define FONT3_H 15
+
 //Font Params //TODO use Values that are defined by the Font
 #define CHAR_CELL_WIDTH_FONT_1 6
 #define HALF_SPACE_WIDTH_FONT_1 3
@@ -134,11 +137,12 @@
 #define X_PHL_5 5
 #define X_PHL_10 10
 #define X_PHL_25 25
-#define X_PHL_45 45
-#define X_PHL_80 80
+
+#define X_PHL_L_OFFSET 0 		  // "l" offset to the left
+
 #define X_PHL_85 85
 #define X_PHL_93 93
-#define X_PHL_110 110
+
 
 #define Y_PHL_37 37
 #define Y_PHL_61 61
