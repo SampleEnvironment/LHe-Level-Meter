@@ -136,4 +136,5 @@ void manage_Xbee_sleep_cycles(Controller_Model *Model);
 void interval_slow_changed(Controller_Model *Model);
 void Battery_check(Controller_Model *Model);
 void handle_received_Messages(Controller_Model *Model);
+double get_he_level(double res_min, double res_max, double r_span, double r_zero, uint8_t count, double quench_time, double quench_current, double wait_time, double meas_current, uint8_t show_progress);
 #endif /* BASE_CONTROLLER_H_ */

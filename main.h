@@ -200,8 +200,6 @@ extern EWindowOrientation ili_Orientation;
 // List of error codes
 //==============================================================
 
-#define errCode_TooHighRes			2000
-
 
 #define CHECK_BOUNDS(VAR,MIN,MAX,DEF) if((LVM.options->VAR < MIN) || (LVM.options->VAR > MAX || isnan(LVM.options->VAR))){LVM.options->VAR = DEF;};
 

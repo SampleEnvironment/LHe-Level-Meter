@@ -13,7 +13,7 @@
 #include "../display_utilities.h"
 #include "../main.h"
 #include "../HoneywellSSC.h"
-#include "../adwandler.h"
+#include "adwandler.h"
 #include "../diag_pulse.h"
 
 
@@ -601,6 +601,124 @@ void Battery_check(Controller_Model *Model){
 }
 
 
+// Measure liquid He level
+double get_he_level(double res_min, double res_max, double r_span, double r_zero, uint8_t count, double quench_time, double quench_current, double wait_time, double meas_current, uint8_t show_progress)
+{
+
+	double u_val = 0, i_val = 0;				// Initialize voltage and current variables
+	//	uint16_t u_val_temp = 0, i_val_temp = 0;	// Initialize voltage and current buffer variables
+	
+	uint16_t quench_time_ms = quench_time*1000;				// Converts seconds to ms
+	uint16_t wait_time_ms	= wait_time*1000;				// Converts seconds to ms
+	//	uint8_t steps_sum 		= floor(((double) ((quench_time_ms+wait_time)/OVERFLOW_IN_MS_8_BIT)));	//118.x floor: 118
+	//	uint8_t	step 			= floor(steps_sum/9.0);			//13
+	//	uint16_t current_count = 0;
+	
+
+	//=========================================================================
+	// Display progress bar
+	//=========================================================================
+
+	if(show_progress)
+	{
+		paint_progress_bar(xoff+X_GHL_5, Y_GHL_105, 1);
+	}
+
+	
+	//=========================================================================
+	//PWM-Configuration to control measuring current
+	//=========================================================================
+	
+	// Start PWM
+	TCCR2A = (1 << COM2A1) | (0 << COM2A0) | (1 << WGM21) | (1 << WGM20);
+	TCCR2B = (0 << WGM22) | (1 << CS22) | (0 << CS21) | (1 << CS20);
+	DDRD |= (1 << PD7);			// Set PORTD.7 as output
+
+	// Switch on current supply to quench_current to quench the He probe
+	// Calculation of the corrected set value for the current with the constants given in main.h
+	OCR2A = (uint8_t)round(quench_current*(double)(SET_CURRENT_FACTOR)+(double)(SET_CURRENT_OFFSET));
+
+
+	//init_0_timer8();	// Enable Timer interrupt
+	set_timeout(quench_time_ms, TIMER_0, USE_TIMER);
+	while(set_timeout(0, TIMER_0, USE_TIMER))
+	{
+	}
+
+	if(show_progress)
+	{
+		paint_progress_bar(xoff+X_GHL_5, Y_GHL_105, floor(10*quench_time/(quench_time+wait_time)));
+	}
+	
+	// Set current supply to meas_current for the measurement
+	// Calculation of the corrected set value for the current with the constants given in main.h
+	OCR2A = (uint8_t)round(meas_current*(double)(SET_CURRENT_FACTOR)+(double)(SET_CURRENT_OFFSET));
+	set_timeout(wait_time_ms, TIMER_0, USE_TIMER);
+	while(set_timeout(0, TIMER_0, USE_TIMER))
+	{
+	}
+
+	if(show_progress)
+	{
+		paint_progress_bar(xoff+X_GHL_5, Y_GHL_105, 9);
+	}
+
+	for(uint8_t i=0;i < count; ++i)
+	{
+		
+		u_val += readChannel(VOLT_PROBE_MEAS, ADC_LOOPS); // VOLT_PROBE_MEAS =2 / ADC_LOOPS=10 /
+		i_val += readChannel(CURRENT_PROBE_MEAS, ADC_LOOPS); // CURRENT_PROBE_MEAS = 1
+		//		u_val  += readChannel_calib(VOLT_PROBE_MEAS, ADC_LOOPS, r_zero); // VOLT_PROBE_MEAS =2 / ADC_LOOPS=10 /
+		//		i_val  += readChannel_calib(CURRENT_PROBE_MEAS, ADC_LOOPS, r_zero); // CURRENT_PROBE_MEAS = 1
+		
+		
+	}
+	// Stop PWM
+	DDRD &= (0 << PD7);			// Set PORTD.7 as input
+
+	if(show_progress)	paint_progress_bar(xoff+X_GHL_5, Y_GHL_105, 10);
+
+	u_val = (double) u_val/count;		// Calculate the averaged voltage
+	i_val = (double) i_val/count;		// Calculate the averaged current
+	
+	if(i_val <= 0) i_val=1;
+	
+	//double r_val = ((double) u_val/i_val)*r_span-10;
+	
+	
+	// Voltage reference 3.34 V measured on the PCB
+	// On PA1, R18 & R19 divide the voltage probe (82500+3740)/3740=23.06
+	// On PA2, we measured 952 mV for 81,36 mA => 81.36/952 = 0.08546 mA/mV
+	// double r_val = ((u_val*3.34/1024)*23.06)/((i_val*3.34/1024)*0.08546);
+	
+	double r_val = 0;
+	
+
+	// Calculate resistance with correction
+	if (map_to_current(i_val) > 10) // > current should be > 10 mA, else broken cable?
+	r_val = (r_span * map_to_volt(u_val) * 1000 / map_to_current(i_val)) + r_zero;  // factor 1000:  mA to A
+	else
+	r_val = 6000;  // Any cable connected
+	
+	
+	LVM.vars->r_val_last_Meas = r_val;
+	
+	// Added by JG for debugging
+	#ifdef ALLOW_DEBUG
+	char str_temp[50];
+	sprintf(str_temp,"i: %d / u: %d / res: %d\n", (int)i_val, (int)u_val, (int)r_val);
+	LCD_Print(str_temp, xoff+X_GHL_5, Y_GHL_90, 1, 1, 1, FGC, black);
+	_delay_ms(3000);
+	#endif
+
+	
+	return calc_he_level(r_val, res_min, res_max);
+
+}
+
+
+
+
 //TODO --> clean up
 void handle_received_Messages(Controller_Model *Model){
 	//=========================================================================
@@ -1141,7 +1259,7 @@ void handle_received_Messages(Controller_Model *Model){
 		
 				break;
 			}
-			case ILM_BROADCAST_MSG: // ILM messages are sent in broadcast mode and are ignored by other devices
+			case ILM_SEND_DATA: // ILM messages are sent in broadcast mode and are ignored by other devices
 			break;
 
 			default:	// (#10) Unknown command, send error code to the database server

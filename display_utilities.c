@@ -20,6 +20,7 @@
 #include "timer_utilities.h"
 #include "DS3231M.h"
 #include "xbee.h"
+#include "adwandler.h"
 #ifdef DISP_3000
 #include "StringPixelCoordTable.h"
 #endif
