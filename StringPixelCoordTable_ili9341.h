@@ -41,6 +41,7 @@
 #ifdef Lucida_Console_Alpha_Num
 #define FONT3_H 40
 #define FONT3_W 34
+#define FONT3_W1 29
 #endif
 
 #ifdef Lucida_Console

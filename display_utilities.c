@@ -240,10 +240,20 @@ void paint_he_level(double he_level, double total_volume, _Bool print_Percentage
 	char temp[10];
 	int16_t disp;
 	
+		#ifdef ili9341
+		//LCD_Print(temp, xoff + X_PHL_2, Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4, SCALE_PHL_4, ERR, BGC);
+		LCD_Print("   ",xoff+ (CENTER_LINE-((SCALE_PHL_4*3*FONT3_W)+FONT2_W*2)*0.5), Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4, SCALE_PHL_4, ERR, BGC);
 
-	LCD_Print("   ", xoff + (CENTER_LINE-((SCALE_PHL_4*3*FONT3_W)+FONT2_W*2)*0.5), Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4,SCALE_PHL_4, ERR, BGC); //changed from x_PHL_10 to X_PHL_2
-	LCD_Print(" ", xoff + (CENTER_LINE-((SCALE_PHL_4*3*FONT3_W)+FONT2_W*2)*0.5)+(3*FONT3_W*SCALE_PHL_4)-X_PHL_L_OFFSET, Y_PHL_61, 2, 2, 2, ERR, BGC);
-	
+		LCD_Print(" ", xoff + (CENTER_LINE-((SCALE_PHL_4*3*FONT3_W)+FONT2_W*2)*0.5)+(FONT3_W *SCALE_PHL_4+FONT3_W1 *SCALE_PHL_4*2), Y_PHL_61, 2, 2, 2, ERR, BGC);
+		#endif
+
+		#ifdef  DISP_3000
+		//LCD_Print(temp, xoff + X_PHL_2, Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4, SCALE_PHL_4, ERR, BGC);
+		LCD_Print("   ",xoff+ (CENTER_LINE-((SCALE_PHL_4*3*FONT3_W)+FONT2_W*2)*0.5), Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4, SCALE_PHL_4, ERR, BGC);
+
+		LCD_Print(" ", xoff + (CENTER_LINE-((SCALE_PHL_4*3*FONT3_W)+FONT2_W*2)*0.5)+(3*FONT3_W*SCALE_PHL_4)-X_PHL_L_OFFSET, Y_PHL_61, 2, 2, 2, ERR, BGC);
+		#endif
+
 
 	
 	
@@ -262,11 +272,23 @@ void paint_he_level(double he_level, double total_volume, _Bool print_Percentage
 		sprintf(temp, "%d",disp);
 		
 		uint8_t digits = strlen(temp);
+		
+		
+//TODO this is terrible !!! redwork is in order  somehow font three has a different width for a single char (34), and for muutltiple chars (29) 
+		#ifdef ili9341
+		//LCD_Print(temp, xoff + X_PHL_2, Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4, SCALE_PHL_4, ERR, BGC);
+		LCD_Print(temp,xoff+ (CENTER_LINE-((SCALE_PHL_4*digits*FONT3_W)+FONT2_W*2)*0.5), Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4, SCALE_PHL_4, ERR, BGC);
 
+		LCD_Print("l", xoff + (CENTER_LINE-((SCALE_PHL_4*digits*FONT3_W)+FONT2_W*2)*0.5)+(FONT3_W *SCALE_PHL_4+FONT3_W1 *SCALE_PHL_4*(digits-1)), Y_PHL_61, 2, 2, 2, ERR, BGC);
+		#endif
+
+		#ifdef  DISP_3000
 		//LCD_Print(temp, xoff + X_PHL_2, Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4, SCALE_PHL_4, ERR, BGC);
 		LCD_Print(temp,xoff+ (CENTER_LINE-((SCALE_PHL_4*digits*FONT3_W)+FONT2_W*2)*0.5), Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4, SCALE_PHL_4, ERR, BGC);
 
 		LCD_Print("l", xoff + (CENTER_LINE-((SCALE_PHL_4*digits*FONT3_W)+FONT2_W*2)*0.5)+(digits*FONT3_W*SCALE_PHL_4)-X_PHL_L_OFFSET, Y_PHL_61, 2, 2, 2, ERR, BGC);
+		#endif
+
 
 		if (print_Percentage)
 		{
