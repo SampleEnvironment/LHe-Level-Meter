@@ -119,6 +119,7 @@ ISR(TIMER0_OVF_vect)
 ISR(TIMER1_COMPA_vect)
 {
 	t16_1_overflow ++;
+	count_t_elapsed ++;
 }
 
 ISR(TIMER2_OVF_vect)

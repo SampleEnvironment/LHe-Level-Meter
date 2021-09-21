@@ -717,7 +717,226 @@ double get_he_level(double res_min, double res_max, double r_span, double r_zero
 }
 
 
+void set_Options(uint8_t * optBuffer,uint8_t OpCode){
 
+	optionsType OptBuff;
+	// set time
+	if (connected.DS3231M)
+	{
+		struct tm newtime;
+
+		newtime.tm_sec=   optBuffer[0];
+		newtime.tm_min =  optBuffer[1];
+		newtime.tm_hour = optBuffer[2];
+		newtime.tm_mday = optBuffer[3];
+		newtime.tm_mon =  optBuffer[4];
+		newtime.tm_year = optBuffer[5];
+
+		DS3231M_set_time(&newtime);
+	}
+	
+	OptBuff.transmit_slow    =   (optBuffer[6]<<8)  + optBuffer[7];
+	OptBuff.transmit_fast    =   (optBuffer[8]<<8)  + optBuffer[9];
+	OptBuff.res_min          =  ((optBuffer[10]<<8) + optBuffer[11])/10.0;
+	OptBuff.res_max          =  ((optBuffer[12]<<8) + optBuffer[13])/10.0;
+	OptBuff.quench_time      =  ((optBuffer[14]<<8) + optBuffer[15])/1000.0;
+	OptBuff.quench_current   =   (optBuffer[16]<<8) + optBuffer[17];
+	OptBuff.wait_time        =  ((optBuffer[18]<<8) + optBuffer[19])/1000.0;
+	OptBuff.meas_current     =   (optBuffer[20]<<8) + optBuffer[21];
+	OptBuff.meas_cycles      =   optBuffer[22];
+	OptBuff.fill_timeout     =  optBuffer[23];
+	OptBuff.span             = ((optBuffer[24]<<8) + optBuffer[25])/10.0;
+	OptBuff.zero             = (optBuffer[26] < 128)? ((optBuffer[26] * 256) + optBuffer[27]) : ((optBuffer[26]-256) * 256 + optBuffer[27]);
+	OptBuff.total_volume     = ((optBuffer[28]<<8) + optBuffer[29])/10.0;
+	OptBuff.he_min           =  optBuffer[30];
+	OptBuff.display_reversed = optBuffer[31];
+	OptBuff.batt_min         = ((optBuffer[32]<<8) + optBuffer[33])/10.0;
+	OptBuff.batt_max         = ((optBuffer[34]<<8) + optBuffer[35])/10.0;
+	OptBuff.critical_batt    =  optBuffer[36];
+	
+	
+	// duplicate options that are only in eeprom
+	OptBuff.r_span          = LVM.options->r_span;
+	OptBuff.r_zero          = LVM.options->r_zero;
+	OptBuff.enable_pressure = LVM.options->enable_pressure;
+	OptBuff.Dev_ID_alpahnum = LVM.options->Dev_ID_alpahnum;
+	OptBuff.Dev_ID_Max_len  = LVM.options->Dev_ID_Max_len;
+	
+	
+	uint8_t out_of_bounds =  Options_Buonds_Check(&OptBuff);
+	
+	OptBuff.transmit_slow_min = true;
+	OptBuff.transmit_fast_sec = true;
+	
+	if(OptBuff.transmit_slow > 60)
+	{
+		OptBuff.transmit_slow_min = false;
+		OptBuff.transmit_slow /=60;
+	}
+	
+	if (OptBuff.transmit_fast > 60)
+	{
+		OptBuff.transmit_fast_sec = false;
+		OptBuff.transmit_fast /=60;
+	}
+	
+
+	
+	switch (OpCode)
+	{
+		case LOGIN_MSG:
+		case FORCE_LOGIN_MSG:
+		
+		LVM.vars->options_pw =  (optBuffer[37]<<8) + optBuffer[38];
+		
+		xbee_set_sleep_period(optBuffer[39]);
+		xbee_set_awake_period(optBuffer[40]);
+		
+		
+		break;
+		
+		case SET_OPTIONS_CMD:
+		
+		LVM.temp->buffer[0] = out_of_bounds;
+		
+		if (OptBuff.transmit_slow != LVM.options->transmit_slow)
+		{
+			LVM.vars->transmit_slow_changed = true;
+		}
+		
+		if (OptBuff.transmit_fast!= LVM.options->transmit_fast)
+		{
+			LVM.vars->transmit_fast_changed = true;
+		}
+		
+		xbee_send_message(SET_OPTIONS_CMD,LVM.temp->buffer,1);
+		
+		if(out_of_bounds){
+			// device keeps running with its original options
+			return;
+		}
+		
+		
+		break;
+		
+		default:
+		break;
+	}
+	
+	// copy newly received and tested  options into operational options struct
+	
+	DISPLAY_CONFIG
+	xoff = (!LVM.options->display_reversed)? 0 : XOffset;
+	memcpy(LVM.options,&OptBuff,sizeof(optionsType));
+
+	
+
+}
+
+uint8_t write_Opts_to_Buffer(uint8_t * sendbuff){
+	
+			uint8_t index = 0;
+
+
+			if(LVM.options->transmit_slow_min)
+			{
+				sendbuff[index++] = LVM.options->transmit_slow>>8;
+				sendbuff[index++] = LVM.options->transmit_slow;
+			}
+			else
+			{
+				sendbuff[index++] = (LVM.options->transmit_slow*60)>>8;
+				sendbuff[index++] = LVM.options->transmit_slow*60;
+			}
+			if(LVM.options->transmit_fast_sec)
+			{
+				sendbuff[index++] = LVM.options->transmit_fast>>8;
+				sendbuff[index++] = LVM.options->transmit_fast;
+			}
+			else
+			{
+				sendbuff[index++] = (LVM.options->transmit_fast*60)>>8;
+				sendbuff[index++] = LVM.options->transmit_fast*60;
+			}
+			sendbuff[index++] = ((uint16_t)(LVM.options->res_min*10))>>8;
+			sendbuff[index++] = round(LVM.options->res_min*10);
+			sendbuff[index++] = ((uint16_t)(LVM.options->res_max*10))>>8;
+			sendbuff[index++] = round(LVM.options->res_max*10);
+
+			sendbuff[index++] = ((uint16_t)(LVM.options->quench_time*1000))>>8;
+			sendbuff[index++] = round(LVM.options->quench_time*1000);
+			sendbuff[index++] = ((uint16_t)LVM.options->quench_current)>>8;
+			sendbuff[index++] = round(LVM.options->quench_current);
+			sendbuff[index++] = ((uint16_t)(LVM.options->wait_time*1000))>>8;
+			sendbuff[index++] = round(LVM.options->wait_time*1000);
+			sendbuff[index++] = ((uint16_t)LVM.options->meas_current)>>8;
+			sendbuff[index++] = round(LVM.options->meas_current);
+
+			sendbuff[index++] = LVM.options->meas_cycles;
+			sendbuff[index++] = LVM.options->fill_timeout;
+			
+
+			
+			sendbuff[index++] = ((uint16_t)(LVM.options->span*10))>>8;
+			sendbuff[index++] = round(LVM.options->span*10);
+
+			
+			int16_t zero16 = (int16_t)(LVM.options->zero*10);
+			sendbuff[index++] = zero16 >> 8;
+			sendbuff[index++] = round(zero16) ;
+
+			sendbuff[index++] = LVM.options->he_min;
+			sendbuff[index++] = LVM.options->display_reversed;
+
+			sendbuff[index++] = ((uint16_t)(LVM.options->batt_min*10))>>8;
+			sendbuff[index++] = round(LVM.options->batt_min*10);
+			sendbuff[index++] = ((uint16_t)(LVM.options->batt_max*10))>>8;
+			sendbuff[index++] = round(LVM.options->batt_max*10);
+			sendbuff[index++] = LVM.options->critical_batt;
+			sendbuff[index++] =  get_status_byte_levelmeter();
+			
+			return index;
+}
+
+uint8_t Options_Buonds_Check(optionsType * optBuff){
+	uint8_t Val_outof_Bounds = 0;
+	CHECK_BOUNDS(optBuff->transmit_slow,TRANSMIT_SLOW_MIN,TRANSMIT_SLOW_MAX*60,TRANSMIT_SLOW_DEF*60,Val_outof_Bounds)
+	CHECK_BOUNDS(optBuff->transmit_fast,TRANSMIT_FAST_MIN,TRANSMIT_FAST_MAX*60,TRANSMIT_FAST_DEF*60,Val_outof_Bounds)
+	
+	CHECK_BOUNDS(optBuff->quench_time,QUENCH_TIME_MIN,QUENCH_TIME_MAX,QUENCH_TIME_DEF,Val_outof_Bounds)
+	CHECK_BOUNDS(optBuff->quench_current,QUENCH_CURRENT_MIN,QUENCH_CURRENT_MAX,QUENCH_CURRENT_DEF,Val_outof_Bounds)
+	CHECK_BOUNDS(optBuff->wait_time,WAIT_TIME_MIN,WAIT_TIME_MAX,WAIT_TIME_DEF,Val_outof_Bounds)
+	CHECK_BOUNDS(optBuff->meas_current,MEAS_CURRENT_MIN,MEAS_CURRENT_MAX,MEAS_CURRENT_DEF,Val_outof_Bounds)
+	
+	CHECK_BOUNDS(optBuff->meas_cycles,MEASUREMENT_CYCLES_MIN,MEASUREMENT_CYCLES_MAX,MEASUREMENT_CYCLES_DEF,Val_outof_Bounds)
+	CHECK_BOUNDS(optBuff->fill_timeout,MIN_FILLING_TIMEOUT,MAX_FILLING_TIMEOUT,FILLING_TIMEOUT_DEF,Val_outof_Bounds)
+	CHECK_BOUNDS(optBuff->he_min,MIN_AUTO_FILL_HE,MAX_AUTO_FILL_HE,AUTO_FILL_HE_DEF,Val_outof_Bounds)
+	
+	CHECK_BOUNDS(optBuff->res_min,RES_MIN_MIN,RES_MIN_MAX,RES_MIN_DEF,Val_outof_Bounds)
+	CHECK_BOUNDS(optBuff->res_max,RES_MAX_MIN,RES_MAX_MAX,RES_MAX_DEF,Val_outof_Bounds)
+	
+	CHECK_BOUNDS(optBuff->span,MIN_SPAN,MAX_SPAN,SPAN_DEF,Val_outof_Bounds)
+	CHECK_BOUNDS(optBuff->zero,MIN_ZERO,MAX_ZERO,ZERO_DEF,Val_outof_Bounds)
+	
+	CHECK_BOUNDS(optBuff->batt_min,BATT_MIN_MIN,BATT_MIN_MAX,BATT_MIN_DEF,Val_outof_Bounds)
+	CHECK_BOUNDS(optBuff->batt_max,BATT_MAX_MIN,BATT_MAX_MAX,BATT_MAX_DEF,Val_outof_Bounds)
+	
+	CHECK_BOUNDS(optBuff->critical_batt,CRITICAL_BATT_MIN,CRITICAL_BATT_MAX,CRITICAL_BATT_DEF,Val_outof_Bounds)
+	CHECK_BOUNDS(optBuff->total_volume,TOTAL_VOL_MIN,TOTAL_VOL_MAX,TOTAL_VOL_DEF,Val_outof_Bounds)
+	
+	CHECK_BOUNDS(optBuff->Dev_ID_Max_len,DEV_ID_CHARS_MIN,DEV_ID_CHARS_MAX,DEV_ID_CHARS_DEF,Val_outof_Bounds)
+	
+	CHECK_BOUNDS(optBuff->Dev_ID_Max_len,DEV_ID_CHARS_MIN,DEV_ID_CHARS_MAX,DEV_ID_CHARS_DEF,Val_outof_Bounds)
+	
+	if(optBuff->r_span <= 0){
+		optBuff->r_span = R_SPAN_DEF;
+		Val_outof_Bounds = 1;
+	}
+	
+	
+
+	return Val_outof_Bounds;
+}
 
 //TODO --> clean up
 void handle_received_Messages(Controller_Model *Model){
@@ -773,64 +992,8 @@ void handle_received_Messages(Controller_Model *Model){
 			break;
 			case GET_OPTIONS_CMD: ;	// (#12) Send device settings to the database server.
 
+			uint8_t index = write_Opts_to_Buffer(LVM.temp->buffer);
 
-			uint8_t index = 0;
-
-
-			if(LVM.options->transmit_slow_min)
-			{
-				LVM.temp->buffer[index++] = LVM.options->transmit_slow>>8;
-				LVM.temp->buffer[index++] = LVM.options->transmit_slow;
-			}
-			else
-			{
-				LVM.temp->buffer[index++] = (LVM.options->transmit_slow*60)>>8;
-				LVM.temp->buffer[index++] = LVM.options->transmit_slow*60;
-			}
-			if(LVM.options->transmit_fast_sec)
-			{
-				LVM.temp->buffer[index++] = LVM.options->transmit_fast>>8;
-				LVM.temp->buffer[index++] = LVM.options->transmit_fast;
-			}
-			else
-			{
-				LVM.temp->buffer[index++] = (LVM.options->transmit_fast*60)>>8;
-				LVM.temp->buffer[index++] = LVM.options->transmit_fast*60;
-			}
-			LVM.temp->buffer[index++] = ((uint16_t)(LVM.options->res_min*10))>>8;
-			LVM.temp->buffer[index++] = LVM.options->res_min*10;
-			LVM.temp->buffer[index++] = ((uint16_t)(LVM.options->res_max*10))>>8;
-			LVM.temp->buffer[index++] = LVM.options->res_max*10;
-
-			LVM.temp->buffer[index++] = ((uint16_t)(LVM.options->quench_time*1000))>>8;
-			LVM.temp->buffer[index++] = (LVM.options->quench_time*1000);
-			LVM.temp->buffer[index++] = ((uint16_t)LVM.options->quench_current)>>8;
-			LVM.temp->buffer[index++] = LVM.options->quench_current;
-			LVM.temp->buffer[index++] = ((uint16_t)(LVM.options->wait_time*1000))>>8;
-			LVM.temp->buffer[index++] = (LVM.options->wait_time*1000);
-			LVM.temp->buffer[index++] = ((uint16_t)LVM.options->meas_current)>>8;
-			LVM.temp->buffer[index++] = LVM.options->meas_current;
-
-			LVM.temp->buffer[index++] = LVM.options->meas_cycles;
-			LVM.temp->buffer[index++] = LVM.options->fill_timeout;
-			LVM.temp->buffer[index++] = ((uint16_t)(LVM.options->span*10))>>8;
-			LVM.temp->buffer[index++] = LVM.options->span*10;
-
-			if (LVM.options->zero >= 0)
-			{ LVM.temp->buffer[index++] = ((uint16_t)(LVM.options->zero*10))>>8;
-			LVM.temp->buffer[index++] = LVM.options->zero*10;}
-			else { LVM.temp->buffer[index++] = ((uint16_t)(LVM.options->zero*10 + 65536))>>8;
-			LVM.temp->buffer[index++] = LVM.options->zero*10 + 65536;}
-
-			LVM.temp->buffer[index++] = LVM.options->he_min;
-			LVM.temp->buffer[index++] = LVM.options->display_reversed;
-
-			LVM.temp->buffer[index++] = ((uint16_t)(LVM.options->batt_min*10))>>8;
-			LVM.temp->buffer[index++] = LVM.options->batt_min*10;
-			LVM.temp->buffer[index++] = ((uint16_t)(LVM.options->batt_max*10))>>8;
-			LVM.temp->buffer[index++] = LVM.options->batt_max*10;
-			LVM.temp->buffer[index++] = LVM.options->critical_batt;
-			LVM.temp->buffer[index++] =  get_status_byte_levelmeter();
 
 			// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 			if (xbee_send_message(GET_OPTIONS_CMD, LVM.temp->buffer, index))
@@ -841,98 +1004,7 @@ void handle_received_Messages(Controller_Model *Model){
 			case SET_OPTIONS_CMD:	// (#13) Set device settings received from the database server.
 			if (NUMBER_OPTIONS_BYTES == frameBuffer[reply_Id].data_len)
 			{
-				// set time
-				if (connected.DS3231M)
-				{
-					struct tm newtime;
-
-					newtime.tm_sec= frameBuffer[reply_Id].data[0];
-					newtime.tm_min = frameBuffer[reply_Id].data[1];
-					newtime.tm_hour = frameBuffer[reply_Id].data[2];
-					newtime.tm_mday = frameBuffer[reply_Id].data[3];
-					newtime.tm_mon = frameBuffer[reply_Id].data[4];
-					newtime.tm_year = frameBuffer[reply_Id].data[5];
-
-					DS3231M_set_time(&newtime);
-				}
-
-				uint16_t temp_transmit_slow = (frameBuffer[reply_Id].data[6]<<8) + frameBuffer[reply_Id].data[7];
-				if(LVM.options->transmit_slow != temp_transmit_slow)
-				{
-					LVM.vars->transmit_slow_changed = true;
-					LVM.options->transmit_slow = temp_transmit_slow;
-					LVM.options->transmit_slow_min = true;
-				}
-
-				if(LVM.options->transmit_slow <= 0) LVM.options->transmit_slow = TRANSMIT_SLOW_DEF;
-				if(LVM.options->transmit_slow > 60)
-				{
-					LVM.options->transmit_slow /= 60;
-					LVM.options->transmit_slow_min = false;
-				}
-				else LVM.options->transmit_slow_min = true;
-
-				LVM.options->transmit_fast = (frameBuffer[reply_Id].data[8]<<8) + frameBuffer[reply_Id].data[9];
-				if(LVM.options->transmit_fast <= 0) LVM.options->transmit_fast = TRANSMIT_FAST_DEF;
-				if(LVM.options->transmit_fast > 60)
-				{
-					LVM.options->transmit_fast /= 60;
-					LVM.options->transmit_fast_sec = false;
-				}
-				else LVM.options->transmit_fast_sec = true;
-
-				LVM.options->res_min = ((frameBuffer[reply_Id].data[10]<<8) + frameBuffer[reply_Id].data[11])/10.0;
-				if(LVM.options->res_min < 0) LVM.options->res_min = RES_MIN_DEF;
-
-				LVM.options->res_max = ((frameBuffer[reply_Id].data[12]<<8) + frameBuffer[reply_Id].data[13])/10.0;
-				if(LVM.options->res_max <= 0) LVM.options->res_max = RES_MAX_DEF;
-
-				LVM.options->quench_time = ((frameBuffer[reply_Id].data[14]<<8) + frameBuffer[reply_Id].data[15])/1000.0;
-				if(LVM.options->quench_time < 0) LVM.options->quench_time = QUENCH_TIME_DEF;
-
-				LVM.options->quench_current = (frameBuffer[reply_Id].data[16]<<8) + frameBuffer[reply_Id].data[17];
-				if(LVM.options->quench_current <= 0) LVM.options->quench_current = QUENCH_CURRENT_DEF;
-
-				LVM.options->wait_time = ((frameBuffer[reply_Id].data[18]<<8) + frameBuffer[reply_Id].data[19])/1000.0;
-				if(LVM.options->wait_time <= 0) LVM.options->wait_time = WAIT_TIME_DEF;
-
-				LVM.options->meas_current = (frameBuffer[reply_Id].data[20]<<8) + frameBuffer[reply_Id].data[21];
-				//						meas_current = (meas_current <= 0)? MEAS_CURRENT_DEF;
-				if(LVM.options->meas_current <= 0) LVM.options->meas_current = MEAS_CURRENT_DEF;
-
-				LVM.options->meas_cycles = (!frameBuffer[reply_Id].data[22])? MEASUREMENT_CYCLES_DEF : frameBuffer[reply_Id].data[22];
-				LVM.options->fill_timeout = (!frameBuffer[reply_Id].data[23])? FILLING_TIMEOUT_DEF : frameBuffer[reply_Id].data[23];
-
-				LVM.options->span = ((frameBuffer[reply_Id].data[24]<<8) + frameBuffer[reply_Id].data[25])/10.0;
-				if(LVM.options->span <= 0) LVM.options->span = SPAN_DEF;
-
-				// zero is signed 2 byte integer, if buffer[20] is >=128 then zero is negative
-				LVM.options->zero = (frameBuffer[reply_Id].data[26] < 128)? ((frameBuffer[reply_Id].data[26] * 256) + frameBuffer[reply_Id].data[27])
-				: ((frameBuffer[reply_Id].data[26]-256) * 256 + frameBuffer[reply_Id].data[27]);
-				/* if (frameBuffer[reply_Id].data[26] < 128) zero = ((frameBuffer[reply_Id].data[26]<<8) + frameBuffer[reply_Id].data[27]);
-				else zero = (((frameBuffer[reply_Id].data[26] - 256) * 256) + frameBuffer[reply_Id].data[27]); */
-				LVM.options->zero = LVM.options->zero/10;
-				// alternative?						zero = (double)((((frameBuffer[reply_Id].data[26]<<8) + frameBuffer[reply_Id].data[27])/10.0));
-
-				LVM.options->total_volume = ((frameBuffer[reply_Id].data[28]<<8) + frameBuffer[reply_Id].data[29])/10.0;
-				if(LVM.options->total_volume <= TOTAL_VOL_MIN) LVM.options->total_volume = TOTAL_VOL_DEF;
-
-				LVM.options->he_min = (!frameBuffer[reply_Id].data[30])? AUTO_FILL_HE_DEF : frameBuffer[reply_Id].data[30];
-				if (LVM.options->he_min < MIN_AUTO_FILL_HE) LVM.options->he_min = MIN_AUTO_FILL_HE;
-				if (LVM.options->he_min > MAX_AUTO_FILL_HE) LVM.options->he_min = MAX_AUTO_FILL_HE;
-
-				LVM.options->display_reversed = frameBuffer[reply_Id].data[31];
-				DISPLAY_CONFIG
-				xoff = (!LVM.options->display_reversed)? 0 : XOffset;
-
-				LVM.options->batt_min = ((frameBuffer[reply_Id].data[32]<<8) + frameBuffer[reply_Id].data[33])/10.0;
-				if(LVM.options->batt_min <= 0) LVM.options->batt_min = BATT_MIN_DEF;
-
-				LVM.options->batt_max = ((frameBuffer[reply_Id].data[34]<<8) + frameBuffer[reply_Id].data[35])/10.0;
-				if(LVM.options->batt_max <= 0) LVM.options->batt_max = BATT_MAX_DEF;
-
-				LVM.options->critical_batt = (!frameBuffer[reply_Id].data[36])? CRITICAL_BATT_DEF : frameBuffer[reply_Id].data[36];
-				
+				set_Options((uint8_t*)frameBuffer[reply_Id].data,SET_OPTIONS_CMD);
 				// Save settings in EEPROM
 				#ifdef ALLOW_EEPROM_SAVING
 				write_opts_to_EEPROM();
@@ -946,38 +1018,15 @@ void handle_received_Messages(Controller_Model *Model){
 				_delay_ms(1000);
 				LVM.message->Received = true;
 			}
-			else
-			{	// Set default settings
-				LVM.options->transmit_slow = TRANSMIT_SLOW_DEF;
-				LVM.options->transmit_slow_min = false;
-				LVM.options->transmit_fast = TRANSMIT_FAST_DEF;
-				LVM.options->quench_time = QUENCH_TIME_DEF;
-				LVM.options->quench_current = QUENCH_CURRENT_DEF;
-				LVM.options->wait_time = WAIT_TIME_DEF;
-				LVM.options->meas_current = MEAS_CURRENT_DEF;
-				LVM.options->meas_cycles = MEASUREMENT_CYCLES_DEF;
-				LVM.options->fill_timeout = FILLING_TIMEOUT_DEF;
-				LVM.options->res_min = RES_MIN_DEF;
-				LVM.options->res_max = RES_MAX_DEF;
-				LVM.options->span = SPAN_DEF;
-				LVM.options->zero = ZERO_DEF;
-				LVM.options->he_min = AUTO_FILL_HE_DEF;
-				LVM.options->display_reversed = 0;
-				DISPLAY_CONFIG
-				xoff = (!LVM.options->display_reversed)? 0 : XOffset;
-				LVM.options->batt_min = BATT_MIN_DEF;
-				LVM.options->batt_max = BATT_MAX_DEF;
-				LVM.options->critical_batt = CRITICAL_BATT_DEF;
-				LVM.options->total_volume = TOTAL_VOL_DEF;
 
-				//BAD_OPTIONS:
-				InitScreen_AddLine(STR_BAD_OPTS_RECEIVED, 1);
-				InitScreen_AddLine(STR_DEFAULT_OPTS_SET, 0);
-				InitScreen_AddLine(STR_PRESS_MEASURE_X2, 0);
-				InitScreen_AddLine(STR_TO_CONTINUE, 0);
-				LVM.message->Received = true;
-				_delay_ms(1000);
-			}
+			//BAD_OPTIONS:
+			InitScreen_AddLine(STR_BAD_OPTS_RECEIVED, 1);
+			InitScreen_AddLine(STR_DEFAULT_OPTS_SET, 0);
+			InitScreen_AddLine(STR_PRESS_MEASURE_X2, 0);
+			InitScreen_AddLine(STR_TO_CONTINUE, 0);
+			LVM.message->Received = true;
+			_delay_ms(1000);
+			
 			break;
 			case GET_LETTERS_CMD:	// (#14) Send list of available device positions to the database server.
 			{
@@ -1220,8 +1269,8 @@ void handle_received_Messages(Controller_Model *Model){
 			case  TRIGGER_REMOTE_U_OVER_I:
 			{
 				
-	
-		
+				
+				
 				_delay_ms(1000);
 				diag_pulseType dp_u_i;
 				
@@ -1256,7 +1305,7 @@ void handle_received_Messages(Controller_Model *Model){
 					default:
 					break;
 				}	// End switch
-		
+				
 				break;
 			}
 			case ILM_SEND_DATA: // ILM messages are sent in broadcast mode and are ignored by other devices

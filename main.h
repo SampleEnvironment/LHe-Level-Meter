@@ -201,8 +201,8 @@ extern EWindowOrientation ili_Orientation;
 //==============================================================
 
 
-#define CHECK_BOUNDS(VAR,MIN,MAX,DEF) if((LVM.options->VAR < MIN) || (LVM.options->VAR > MAX || isnan(LVM.options->VAR))){LVM.options->VAR = DEF;};
 
+#define CHECK_BOUNDS(VAR,MIN,MAX,DEF,FLAG) if((VAR < MIN) || (VAR > MAX || isnan(VAR))){VAR = DEF; FLAG = 1;};
 
 //====================================================================
 //			OPTIONS
@@ -230,7 +230,7 @@ typedef struct{
 	double batt_max;
 	uint8_t critical_batt;
 	double total_volume;
-	_Bool display_reversed;
+	uint8_t display_reversed;
 	_Bool Dev_ID_alpahnum;
 	uint8_t Dev_ID_Max_len;
 }optionsType;
@@ -342,35 +342,8 @@ typedef struct{
 
 typedef struct
 {
-	float	r_span;
-	float 	r_zero;
-
-	//options
-	uint16_t 	transmit_slow;
-	uint8_t 	transmit_slow_min;
-	uint16_t 	transmit_fast;
-	uint8_t 	transmit_fast_sec;
-	uint16_t 	quench_time;
-	uint16_t 	quench_current;
-	uint16_t 	wait_time;
-	uint16_t 	meas_current;
-	uint8_t 	meas_cycles;
-	uint8_t 	fill_timeout;
-	uint8_t 	he_min;
-	uint16_t 	res_min;
-	uint16_t 	res_max;
-	uint16_t 	span;
-	uint16_t 	zero;
-	//	uint8_t		ee_enable_pressure = 0;
-	uint8_t		enable_pressure;  //???
-	uint16_t 	batt_min;
-	uint16_t 	batt_max;
-	uint8_t 	critical_batt;
-	uint16_t 	total_volume;
-	uint8_t     display_reversed;
-	uint8_t     alphanum ;
-	uint8_t     dev_id_char_num ;
-	uint16_t    eeprom_changed;
+    optionsType  eeOptions;
+	uint16_t     eeprom_changed;
 }eememType;
 
 

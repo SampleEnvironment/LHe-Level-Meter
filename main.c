@@ -62,12 +62,12 @@
 
 
 /**
- * @brief Ringbuffer for unsent Measurements
- *
- *	Ringbuffer containing all Messages that could not be sent due to a Network error.
- * 
- */
- 
+* @brief Ringbuffer for unsent Measurements
+*
+*	Ringbuffer containing all Messages that could not be sent due to a Network error.
+*
+*/
+
 MeasBufferType measbuff = {
 	.firstMeas = 0,
 	.nextfreeEntry = 0,
@@ -80,35 +80,31 @@ MeasBufferType measbuff = {
 //calibration
 
 eememType  EEMEM eeVars = {
-
-	.r_span = R_SPAN_DEF,
-	.r_zero = R_ZERO_DEF,
-
-	//options
-	.transmit_slow  = TRANSMIT_SLOW_DEF,
-	.transmit_slow_min = 0,
-	.transmit_fast  = TRANSMIT_FAST_DEF,
-	.transmit_fast_sec= 0,
-	.quench_time  = QUENCH_TIME_DEF * 1000,
-	.quench_current = QUENCH_CURRENT_DEF,
-	.wait_time = WAIT_TIME_DEF * 1000,
-	.meas_current  = MEAS_CURRENT_DEF,
-	.meas_cycles  = MEASUREMENT_CYCLES_DEF,
-	.fill_timeout  = FILLING_TIMEOUT_DEF,
-	.he_min  = AUTO_FILL_HE_DEF,
-	.res_min  = RES_MIN_DEF * 10,
-	.res_max  = RES_MAX_DEF * 10,
-	.span  = SPAN_DEF * 10,
-	.zero  = ZERO_DEF * 10,
-	//	uint8_t		ee_enable_pressure = 0;
-	.enable_pressure  = 0,  //???
-	.batt_min  = BATT_MIN_DEF * 10,
-	.batt_max  = BATT_MAX_DEF * 10,
-	.critical_batt = CRITICAL_BATT_DEF,
-	.total_volume  = TOTAL_VOL_DEF*10,
-	.display_reversed = 0,
-	.alphanum = 0,
-	.dev_id_char_num= DEV_ID_CHARS_DEF,
+	.eeOptions.r_span = R_SPAN_DEF,
+	.eeOptions.r_zero = R_ZERO_DEF,
+	.eeOptions.transmit_slow = TRANSMIT_SLOW_DEF,		// Define time interval between regular network connections (5 hours as default)
+	.eeOptions.transmit_slow_min = false,					// Time interval between regular network connections defined in minutes
+	.eeOptions.transmit_fast = TRANSMIT_FAST_DEF,			// Define reduced time interval when Helium is filling (1 minute as default)
+	.eeOptions.transmit_fast_sec = false,					// Reduced time interval between network s defined in seconds
+	.eeOptions.quench_time = QUENCH_TIME_DEF,				// Quench duration in seconds
+	.eeOptions.quench_current = QUENCH_CURRENT_DEF,		// Quench current in mA
+	.eeOptions.wait_time = WAIT_TIME_DEF,					// Stabilization duration in seconds
+	.eeOptions.meas_current = MEAS_CURRENT_DEF,			// Measurement current in mA
+	.eeOptions.meas_cycles = MEASUREMENT_CYCLES_DEF,
+	.eeOptions.fill_timeout = FILLING_TIMEOUT_DEF,
+	.eeOptions.he_min = AUTO_FILL_HE_DEF,
+	.eeOptions.res_min = RES_MIN_DEF,
+	.eeOptions.res_max = RES_MAX_DEF,
+	.eeOptions.span = SPAN_DEF,
+	.eeOptions.zero = ZERO_DEF,
+	.eeOptions.enable_pressure = false,
+	.eeOptions.batt_min = BATT_MIN_DEF,
+	.eeOptions.batt_max = BATT_MAX_DEF,
+	.eeOptions.critical_batt = CRITICAL_BATT_DEF,
+	.eeOptions.total_volume = TOTAL_VOL_DEF,
+	.eeOptions.display_reversed = false,
+	.eeOptions.Dev_ID_alpahnum = DEVICE_ID_ALPHANUMERIC ,
+	.eeOptions.Dev_ID_Max_len = DEVICE_ID_UI_MAX_LEN,
 	.eeprom_changed = EEPROM_CHANGED_DEF
 };
 
@@ -282,79 +278,6 @@ inline _Bool auto_fill_pin_on(void)
 }
 
 
-//TODO REMOVE 
-/*
-int I2C_ClearBus(void) {
-
-
-
-	TWCR &= ~(_BV(TWEN)); //Disable the Atmel 2-Wire interface so we can control the SDA and SCL pins directly
-
-
-	INPUT_PULLUP(SDA);; // Make SDA (data) and SCL (clock) pins Inputs with pullup.
-	INPUT_PULLUP(SCL);
-
-	_Bool SCL_LOW = (digitalRead(SCL) == LOW); // Check is SCL is Low.
-	if (SCL_LOW) { //If it is held low Arduno cannot become the I2C master.
-		return 1; //I2C bus error. Could not clear SCL clock line held low
-	}
-
-	_Bool SDA_LOW = (digitalRead(SDA) == LOW);  // vi. Check SDA input.
-	int clockCount = 20; // > 2x9 clock
-
-	while (SDA_LOW && (clockCount > 0)) { //  vii. If SDA is Low,
-		clockCount--;
-		// Note: I2C bus is open collector so do NOT drive SCL or SDA high.
-		INPUT_NO_PULLUP(SCL); // release SCL pullup so that when made output it will be LOW
-		pinMode(SCL, OUTPUT); // then clock SCL Low
-		_delay_us(10); //  for >5uS
-		pinMode(SCL, INPUT); // release SCL LOW
-		INPUT_PULLUP(SCL); // turn on pullup resistors again
-		// do not force high as slave may be holding it low for clock stretching.
-		_delay_us(10); //  for >5uS
-		// The >5uS is so that even the slowest I2C devices are handled.
-		SCL_LOW = (digitalRead(SCL) == LOW); // Check if SCL is Low.
-		int counter = 20;
-		while (SCL_LOW && (counter > 0)) {  //  loop waiting for SCL to become High only wait 2sec.
-			counter--;
-			_delay_ms(100);
-			SCL_LOW = (digitalRead(SCL) == LOW);
-		}
-		if (SCL_LOW) { // still low after 2 sec error
-			return 2; // I2C bus error. Could not clear. SCL clock line held low by slave clock stretch for >2sec
-		}
-		SDA_LOW = (digitalRead(SDA) == LOW); //   and check SDA input again and loop
-	}
-	if (SDA_LOW) { // still low
-		return 3; // I2C bus error. Could not clear. SDA data line held low
-	}
-
-	// else pull SDA line low for Start or Repeated Start
-	INPUT_NO_PULLUP(SDA); // remove pullup.
-	pinMode(SDA, OUTPUT);  // and then make it LOW i.e. send an I2C Start or Repeated start control.
-	// When there is only one I2C master a Start or Repeat Start has the same function as a Stop and clears the bus.
-	/// A Repeat Start is a Start occurring after a Start with no intervening Stop.
-	_delay_us(10); // wait >5uS
-	pinMode(SDA, INPUT); // remove output low
-	INPUT_PULLUP(SDA);; // and make SDA high i.e. send I2C STOP control.
-	_delay_us(10); // x. wait >5uS
-
-	i2c_init();
-
-	return 0; // all ok
-}
-*/
-
-
-
-
-
-
-
-
-
-
-
 
 
 uint8_t collect_and_send_MeasData(uint8_t *meas_buffer,uint8_t Message_Code){
@@ -442,14 +365,32 @@ uint8_t collect_and_send_MeasData(uint8_t *meas_buffer,uint8_t Message_Code){
 	// position
 	index =  devicePos_to_buffer(LVM.vars->device_pos, index, LVM.temp->buffer);  // Positions are 4 letters  13..16
 
-	meas_buffer[index++] =  get_status_byte_levelmeter(); //17
-	if (LVM.vars->r_val_last_Meas > 650){  
+	if (LVM.vars->r_val_last_Meas > 650){
 		LVM.vars->r_val_last_Meas = 650;
 	}
 
 
-	meas_buffer[index++] = ((uint16_t)(LVM.vars->r_val_last_Meas*100))>>8;  //18
-	meas_buffer[index++] = ((uint16_t)(LVM.vars->r_val_last_Meas*100));     //19
+	//TODO remove after fw 210 this is for testing p urposes only
+	if (FIRMWARE_VERSION > 209)
+	{
+		meas_buffer[index++] = ((uint16_t)(LVM.vars->r_val_last_Meas*100))>>8;  //17
+		meas_buffer[index++] = ((uint16_t)(LVM.vars->r_val_last_Meas*100));     //18
+
+		meas_buffer[index++] =  get_status_byte_levelmeter(); //19
+	}
+	
+	if (FIRMWARE_VERSION <= 209)
+	{
+		meas_buffer[index++] =  get_status_byte_levelmeter(); //17
+		
+		meas_buffer[index++] = ((uint16_t)(LVM.vars->r_val_last_Meas*100))>>8;  //18
+		meas_buffer[index++] = ((uint16_t)(LVM.vars->r_val_last_Meas*100));     //19
+	}
+
+
+
+
+
 
 	memcpy(LVM.temp->databuffer,meas_buffer,index);
 
@@ -584,7 +525,7 @@ inline void xbee_wake_up_plus(void)
 	if (xbee.sleeping)
 	{
 		xbee_wake_up();
-	
+		
 	}
 
 	// Clear then set the timeout for awake time
@@ -614,69 +555,57 @@ inline void xbee_sleep_plus(void)
 
 
 void write_opts_to_EEPROM(void){
-	eeprom_write_float(&LVM.eeprom->r_zero, LVM.options->r_zero);
-	eeprom_write_float(&LVM.eeprom->r_span, LVM.options->r_span);
-
-	eeprom_write_word(&LVM.eeprom->transmit_slow, LVM.options->transmit_slow);
-	eeprom_write_byte(&LVM.eeprom->transmit_slow_min, LVM.options->transmit_slow_min);
-	eeprom_write_word(&LVM.eeprom->transmit_fast, LVM.options->transmit_fast);
-	eeprom_write_byte(&LVM.eeprom->transmit_fast_sec, LVM.options->transmit_fast_sec);
-	eeprom_write_word(&LVM.eeprom->quench_time, (uint16_t) (LVM.options->quench_time*1000));
-	eeprom_write_word(&LVM.eeprom->quench_current, (uint16_t) LVM.options->quench_current);
-	eeprom_write_word(&LVM.eeprom->wait_time, (uint16_t) (LVM.options->wait_time*1000));
-	eeprom_write_word(&LVM.eeprom->meas_current, (uint16_t) LVM.options->meas_current);
-
-	eeprom_write_byte(&LVM.eeprom->meas_cycles, LVM.options->meas_cycles);
-	eeprom_write_byte(&LVM.eeprom->fill_timeout, LVM.options->fill_timeout);
-	eeprom_write_byte(&LVM.eeprom->he_min, LVM.options->he_min);
-	eeprom_write_word(&LVM.eeprom->res_min, (uint16_t) (LVM.options->res_min*10));
-	eeprom_write_word(&LVM.eeprom->res_max, (uint16_t) (LVM.options->res_max*10));
-	eeprom_write_word(&LVM.eeprom->span, (uint16_t) (LVM.options->span*10));
-	eeprom_write_word(&LVM.eeprom->zero, (uint16_t) (LVM.options->zero*10));
-	eeprom_write_byte(&LVM.eeprom->enable_pressure, LVM.options->enable_pressure);
-	eeprom_write_word(&LVM.eeprom->batt_min, (uint16_t) (LVM.options->batt_min*10));
-	eeprom_write_word(&LVM.eeprom->batt_max, (uint16_t) (LVM.options->batt_max*10));
-	eeprom_write_byte(&LVM.eeprom->critical_batt, LVM.options->critical_batt);
-
-	eeprom_write_word(&LVM.eeprom->total_volume, (uint16_t) (LVM.options->total_volume*10));
-	eeprom_write_byte(&LVM.eeprom->display_reversed, LVM.options->display_reversed);
-
-	eeprom_write_byte(&LVM.eeprom->alphanum,LVM.options->Dev_ID_alpahnum);
-	eeprom_write_byte(&LVM.eeprom->dev_id_char_num,LVM.options->Dev_ID_Max_len);
+	
+	optionsType OptBuff;
+	
+	memcpy(LVM.options,&OptBuff,sizeof(optionsType));
+	
+	
+	//transmit_ slow is saved in minutes in eeprom
+	if(!OptBuff.transmit_slow_min){
+		OptBuff.transmit_slow *= 60;
+	}
+	
+	//transmit_ slow is saved in seconds in eeprom
+	if(!OptBuff.transmit_fast_sec){
+		OptBuff.transmit_fast *= 60;
+	}
+	
+	eeprom_update_block(LVM.options,&LVM.eeprom->eeOptions,sizeof(optionsType));
 
 }
 
 void write_DEFS_to_EEPROM(void){
-	eeprom_write_float(&LVM.eeprom->r_zero,R_ZERO_DEF );
-	eeprom_write_float(&LVM.eeprom->r_span, R_SPAN_DEF);
-
-	eeprom_write_word(&LVM.eeprom->transmit_slow, TRANSMIT_SLOW_DEF);
-	eeprom_write_byte(&LVM.eeprom->transmit_slow_min, false);
-	eeprom_write_word(&LVM.eeprom->transmit_fast, TRANSMIT_FAST_DEF);
-	eeprom_write_byte(&LVM.eeprom->transmit_fast_sec, false);
-	eeprom_write_word(&LVM.eeprom->quench_time,QUENCH_TIME_DEF*1000);
-	eeprom_write_word(&LVM.eeprom->quench_current, QUENCH_CURRENT_DEF);
-	eeprom_write_word(&LVM.eeprom->wait_time, WAIT_TIME_DEF*1000);
-	eeprom_write_word(&LVM.eeprom->meas_current, MEAS_CURRENT_DEF);
-
-	eeprom_write_byte(&LVM.eeprom->meas_cycles, MEASUREMENT_CYCLES_DEF);
-	eeprom_write_byte(&LVM.eeprom->fill_timeout, FILLING_TIMEOUT_DEF);
-	eeprom_write_byte(&LVM.eeprom->he_min, AUTO_FILL_HE_DEF);
-	eeprom_write_word(&LVM.eeprom->res_min, RES_MIN_DEF*10);
-	eeprom_write_word(&LVM.eeprom->res_max, RES_MAX_DEF*10);
-	eeprom_write_word(&LVM.eeprom->span, SPAN_DEF*10);
-	eeprom_write_word(&LVM.eeprom->zero, ZERO_DEF*10);
-	eeprom_write_byte(&LVM.eeprom->enable_pressure, 0);
-	eeprom_write_word(&LVM.eeprom->batt_min, BATT_MIN_DEF*10);
-	eeprom_write_word(&LVM.eeprom->batt_max, BATT_MAX_DEF*10);
-	eeprom_write_byte(&LVM.eeprom->critical_batt, CRITICAL_BATT_DEF);
-
-	eeprom_write_word(&LVM.eeprom->total_volume, TOTAL_VOL_DEF*10);
-	eeprom_write_byte(&LVM.eeprom->display_reversed, false);
 	
-	eeprom_write_byte(&LVM.eeprom->alphanum,false);
-	eeprom_write_byte(&LVM.eeprom->dev_id_char_num,DEV_ID_CHARS_DEF);
+	optionsType OptBuff = {
+		.r_zero = R_ZERO_DEF,
+		.r_span = R_SPAN_DEF,
+		.transmit_slow = TRANSMIT_SLOW_DEF,
+		.transmit_fast = TRANSMIT_FAST_DEF,
+		.transmit_slow_min = false,
+		.transmit_fast_sec = false,
+		.quench_time       = QUENCH_TIME_DEF,
+		.quench_current    = QUENCH_CURRENT_DEF,
+		.wait_time         = WAIT_TIME_DEF,
+		.meas_current      = MEAS_CURRENT_DEF,
+		.meas_cycles       = MEASUREMENT_CYCLES_DEF,
+		.fill_timeout      = FILLING_TIMEOUT_DEF,
+		.he_min            = AUTO_FILL_HE_DEF,
+		.res_min           = RES_MIN_DEF,
+		.res_max           = RES_MAX_DEF,
+		.span              = SPAN_DEF,
+		.zero              = ZERO_DEF,
+		.enable_pressure   = 0,
+		.batt_min          = BATT_MIN_DEF,
+		.batt_max          = BATT_MAX_DEF,
+		.critical_batt     = CRITICAL_BATT_DEF,
+		.display_reversed  = false,
+		.Dev_ID_alpahnum   = false,
+		.Dev_ID_Max_len    = DEV_ID_CHARS_DEF
+		
+	};
 	
+	eeprom_update_block(&OptBuff,&LVM.eeprom->eeOptions,sizeof(optionsType));
 	
 
 }
@@ -729,7 +658,7 @@ int main(void)
 	// Initialization
 	//=========================================================================
 	#ifdef ALLOW_EEPROM_SAVING
-	LVM.options->display_reversed 	= eeprom_read_byte(&LVM.eeprom->display_reversed);
+	LVM.options->display_reversed 	= eeprom_read_byte(&eeVars.eeOptions.display_reversed);
 	#endif
 
 	version_INIT(FIRMWARE_VERSION,BRANCH_ID,LAST_FIRMWARE_EEPROM_CHANGED);
@@ -815,34 +744,30 @@ int main(void)
 	//write_DEFS_to_EEPROM();
 
 	#ifdef ALLOW_EEPROM_SAVING
-	LVM.options->r_span 				= (double) (eeprom_read_float(&LVM.eeprom->r_span));
-	if(LVM.options->r_span < 0 || isnan(LVM.options->r_span)) LVM.options->r_span = R_SPAN_DEF;
-	LVM.options->r_zero 				= (double) (eeprom_read_float(&LVM.eeprom->r_zero));
-	if(LVM.options->r_zero < 0 || isnan(LVM.options->r_zero) || LVM.options->r_zero > 100)	LVM.options->r_zero = R_ZERO_DEF;
-	LVM.options->transmit_slow 		= eeprom_read_word(&LVM.eeprom->transmit_slow); 					CHECK_BOUNDS(transmit_slow,TRANSMIT_SLOW_MIN,TRANSMIT_SLOW_MAX,TRANSMIT_SLOW_DEF)
-	LVM.options->transmit_slow_min 	= eeprom_read_byte(&LVM.eeprom->transmit_slow_min);					if(LVM.options->transmit_slow == TRANSMIT_SLOW_DEF) 	LVM.options->transmit_slow_min = false; //???
-	LVM.options->transmit_fast 		= eeprom_read_word(&LVM.eeprom->transmit_fast);						CHECK_BOUNDS(transmit_fast,TRANSMIT_FAST_MIN,TRANSMIT_FAST_MAX,TRANSMIT_FAST_DEF)
-	LVM.options->transmit_fast_sec	= eeprom_read_byte(&LVM.eeprom->transmit_fast_sec);					if(LVM.options->transmit_fast == TRANSMIT_FAST_DEF) 	LVM.options->transmit_fast_sec = false;  //???
-	LVM.options->quench_time			= (double) (eeprom_read_word(&LVM.eeprom->quench_time)/1000.0);	CHECK_BOUNDS(quench_time,QUENCH_TIME_MIN,QUENCH_TIME_MAX,QUENCH_TIME_DEF)
-	LVM.options->quench_current		= (double) (eeprom_read_word(&LVM.eeprom->quench_current));			CHECK_BOUNDS(quench_current,QUENCH_CURRENT_MIN,QUENCH_CURRENT_MAX,QUENCH_CURRENT_DEF)
-	LVM.options->wait_time			= (double) (eeprom_read_word(&LVM.eeprom->wait_time)/1000.0);		CHECK_BOUNDS(wait_time,WAIT_TIME_MIN,WAIT_TIME_MAX,WAIT_TIME_DEF)
-	LVM.options->meas_current		= (double) (eeprom_read_word(&LVM.eeprom->meas_current));			CHECK_BOUNDS(meas_current,MEAS_CURRENT_MIN,MEAS_CURRENT_MAX,MEAS_CURRENT_DEF)
-	LVM.options->meas_cycles 		= eeprom_read_byte(&LVM.eeprom->meas_cycles);						CHECK_BOUNDS(meas_cycles,MEASUREMENT_CYCLES_MIN,MEASUREMENT_CYCLES_MAX,MEASUREMENT_CYCLES_DEF)
-	LVM.options->fill_timeout 		= eeprom_read_byte(&LVM.eeprom->fill_timeout);						CHECK_BOUNDS(fill_timeout,MIN_FILLING_TIMEOUT,MAX_FILLING_TIMEOUT,FILLING_TIMEOUT_DEF)
-	LVM.options->he_min 				= eeprom_read_byte(&LVM.eeprom->he_min);						CHECK_BOUNDS(he_min,MIN_AUTO_FILL_HE,MAX_AUTO_FILL_HE,AUTO_FILL_HE_DEF)
-	LVM.options->res_min 			= (double) (eeprom_read_word(&LVM.eeprom->res_min)/10.0);			CHECK_BOUNDS(res_min,RES_MIN_MIN,RES_MIN_MAX,RES_MIN_DEF)
-	LVM.options->res_max 			= (double) (eeprom_read_word(&LVM.eeprom->res_max)/10.0);			CHECK_BOUNDS(res_max,RES_MAX_MIN,RES_MAX_MAX,RES_MAX_DEF)
-	LVM.options->span 				= (double) (eeprom_read_word(&LVM.eeprom->span)/10.0);				CHECK_BOUNDS(span,MIN_SPAN,MAX_SPAN,SPAN_DEF)
-	LVM.options->zero 				= (double) (eeprom_read_word(&LVM.eeprom->zero)/10.0);				CHECK_BOUNDS(zero,MIN_ZERO,MAX_ZERO,ZERO_DEF)
-	LVM.options->enable_pressure 	= eeprom_read_byte(&LVM.eeprom->enable_pressure);					if(LVM.options->enable_pressure > 2) 	LVM.options->enable_pressure= 0;
-	LVM.options->batt_min 			= (double) (eeprom_read_word(&LVM.eeprom->batt_min)/10.0);			CHECK_BOUNDS(batt_min,BATT_MIN_MIN,BATT_MIN_MAX,BATT_MIN_DEF)
-	LVM.options->batt_max 			= (double) (eeprom_read_word(&LVM.eeprom->batt_max)/10.0);			CHECK_BOUNDS(batt_max,BATT_MAX_MIN,BATT_MAX_MAX,BATT_MAX_DEF)
-	LVM.options->critical_batt 		= eeprom_read_byte(&LVM.eeprom->critical_batt);						CHECK_BOUNDS(critical_batt,CRITICAL_BATT_MIN,CRITICAL_BATT_MAX,CRITICAL_BATT_DEF)
-	LVM.options->total_volume		= (double) (eeprom_read_word(&LVM.eeprom->total_volume)/10.0);		CHECK_BOUNDS(total_volume,TOTAL_VOL_MIN,TOTAL_VOL_MAX,TOTAL_VOL_DEF)
-	LVM.options->Dev_ID_alpahnum     = eeprom_read_byte(&LVM.eeprom->alphanum);
-	LVM.options->Dev_ID_Max_len		= eeprom_read_byte(&LVM.eeprom->dev_id_char_num);					CHECK_BOUNDS(Dev_ID_Max_len,DEV_ID_CHARS_MIN,DEV_ID_CHARS_MAX,DEV_ID_CHARS_DEF)
+
+	
+	eeprom_read_block(LVM.options,&LVM.eeprom->eeOptions,sizeof(optionsType));
+	
+	Options_Buonds_Check(LVM.options);
+	
+	LVM.options->transmit_slow_min = true;
+	LVM.options->transmit_fast_sec = true;
+	
+	if(LVM.options->transmit_slow > 60)
+	{
+		LVM.options->transmit_slow_min = false;
+		LVM.options->transmit_slow /=60;
+	}
+	
+	if (LVM.options->transmit_fast > 60)
+	{
+		LVM.options->transmit_fast_sec = false;
+		LVM.options->transmit_fast /=60;
+	}
 	
 	LVM.vars->eeprom_changed              = eeprom_read_word(&LVM.eeprom->eeprom_changed);
+	
+	
 	
 	diag_set_temp_r_span(LVM.options->r_span);
 	
@@ -1111,7 +1036,7 @@ int main(void)
 					draw_int(status, 85, 60, "status", ERR);
 					_delay_ms(1000);
 					*/
-		
+					
 
 					switch(status)
 					{
@@ -1121,153 +1046,14 @@ int main(void)
 						//Message on screen
 						InitScreen_AddLine(STR_GOOD_OPTIONS,0);
 
-						//parse buffer
-
-						// set time
-
-						struct tm newtime;
-						newtime.tm_sec  =	LVM.temp->buffer[0];
-						newtime.tm_min =	LVM.temp->buffer[1];
-						newtime.tm_hour =		LVM.temp->buffer[2];
-						newtime.tm_mday=		LVM.temp->buffer[3];
-						newtime.tm_mon =		LVM.temp->buffer[4];
-						newtime.tm_year =		LVM.temp->buffer[5];
-
+						set_Options(LVM.temp->buffer,LOGIN_MSG);
+						
+						
 						// Message on screen
-						sprintf(LVM.temp->string,STR_NEW_DATE, newtime.tm_mday, newtime.tm_mon, newtime.tm_year+2000);
+						sprintf(LVM.temp->string,STR_NEW_DATE, Time.tm_mday, Time.tm_mon, Time.tm_year+2000);
 						InitScreen_AddLine(LVM.temp->string,0);
-						sprintf(LVM.temp->string,STR_NEW_TIME, newtime.tm_hour, newtime.tm_min, newtime.tm_sec);
+						sprintf(LVM.temp->string,STR_NEW_TIME, Time.tm_hour, Time.tm_min, Time.tm_sec);
 						InitScreen_AddLine(LVM.temp->string,0);
-
-						/*								LCD_Print("new date", 5, 20, 2, 1, 1, FGC, BGC);
-						draw_int(newtime.date, 5, 40, ".", ERR);
-						draw_int(newtime.month, 35, 40, ".", ERR);
-						draw_int(newtime.year+2000, 65, 40, "", ERR);
-						LCD_Print("new time", 5, 60, 2, 1, 1, FGC, BGC);
-						draw_int(newtime.hour, 5, 80, ":", ERR);
-						draw_int(newtime.minute, 35, 80, ":", ERR);
-						draw_int(newtime.second, 65, 80, "", ERR);
-						delay_ms(2000);
-						*/
-						if (connected.DS3231M)
-						{
-							DS3231M_set_time(&newtime);
-						}
-
-
-						// Transmit slow in minutes
-						LVM.options->transmit_slow = (LVM.temp->buffer[6]<<8) + LVM.temp->buffer[7];
-						LVM.options->transmit_slow_min = true;
-						if(LVM.options->transmit_slow < TRANSMIT_SLOW_MIN) LVM.options->transmit_slow = TRANSMIT_SLOW_MIN;
-
-						if(LVM.options->transmit_slow > 60)
-						{
-							LVM.options->transmit_slow /= 60;
-							LVM.options->transmit_slow_min = false;
-							if (LVM.options->transmit_slow > TRANSMIT_SLOW_MAX) LVM.options->transmit_slow = TRANSMIT_SLOW_MAX;
-						}
-
-
-						// Transmit fast in seconds
-						LVM.options->transmit_fast = (LVM.temp->buffer[8]<<8) + LVM.temp->buffer[9];
-						LVM.options->transmit_fast_sec = true;
-
-						if(LVM.options->transmit_fast < TRANSMIT_FAST_MIN) LVM.options->transmit_fast = TRANSMIT_FAST_MIN;
-
-						if(LVM.options->transmit_fast > 60)
-						{
-							LVM.options->transmit_fast /= 60;
-							LVM.options->transmit_fast_sec = false;
-							if (LVM.options->transmit_fast > TRANSMIT_FAST_MAX) LVM.options->transmit_fast = TRANSMIT_FAST_MAX;
-						}
-
-						// Minimum resistance multiplied by factor 10
-						LVM.options->res_min = (double)(((LVM.temp->buffer[10]<<8) + LVM.temp->buffer[11])/10.0);
-						if(LVM.options->res_min < 0) LVM.options->res_min = RES_MIN_MIN;
-
-						// Maximum resistance multiplied by factor 10
-						LVM.options->res_max = (double)(((LVM.temp->buffer[12]<<8) + LVM.temp->buffer[13])/10.0);
-						if(LVM.options->res_max <= 0) LVM.options->res_max = RES_MAX_DEF;
-
-						// Quench time in ms - stored in seconds
-						LVM.options->quench_time = round_double(((LVM.temp->buffer[14]<<8) + LVM.temp->buffer[15])/1000.0, 1);
-						if(LVM.options->quench_time < 0) LVM.options->quench_time = QUENCH_TIME_DEF;
-
-						/*							LCD_Print("quench time", 5, 20, 2, 1, 1, FGC, BGC);
-						_delay_ms(1000);
-						draw_double(quench_time, 5, 40, 1, "", ERR);
-						draw_double(buffer[14], 5, 60, 1, "", ERR);
-						draw_double(buffer[15], 5, 80, 1, "", ERR);
-						_delay_ms(4000);
-						*/
-						// Quench current in mA
-						LVM.options->quench_current = (double)(((LVM.temp->buffer[16]<<8) + LVM.temp->buffer[17]));
-						if(LVM.options->quench_current <= 0) LVM.options->quench_current = QUENCH_CURRENT_DEF;
-
-						/*							LCD_Print("quench current", 5, 20, 2, 1, 1, FGC, BGC);
-						_delay_ms(1000);
-						draw_double(quench_current, 5, 40, 1, "", ERR);
-						draw_double(buffer[16], 5, 60, 1, "", ERR);
-						draw_double(buffer[17], 5, 80, 1, "", ERR);
-						_delay_ms(4000);
-						*/
-
-						// Wait time in ms - stored in seconds
-						LVM.options->wait_time = round_double(((LVM.temp->buffer[18]<<8) + LVM.temp->buffer[19])/1000.0, 1);
-						if(LVM.options->wait_time <= 0) LVM.options->wait_time = WAIT_TIME_DEF;
-
-						// Measurement current in mA
-						LVM.options->meas_current = (double)(((LVM.temp->buffer[20]<<8) + LVM.temp->buffer[21]));
-						if(LVM.options->meas_current <= 0) LVM.options->meas_current = MEAS_CURRENT_DEF;
-
-						// Number of measuring cycles of He probe
-						LVM.options->meas_cycles = (!LVM.temp->buffer[22])? MEASUREMENT_CYCLES_DEF : LVM.temp->buffer[22];
-
-						// Timeout while filling
-						LVM.options->fill_timeout = (!LVM.temp->buffer[23])? FILLING_TIMEOUT_DEF : LVM.temp->buffer[23];
-
-						// Span & zero
-						LVM.options->span = ((LVM.temp->buffer[24]<<8) + LVM.temp->buffer[25])/10.0;
-						if(LVM.options->span <= 0) LVM.options->span = SPAN_DEF;
-
-						// zero is signed 2 byte integer, if buffer[20] is >=128 then zero is negative
-						LVM.options->zero = (LVM.temp->buffer[26] < 128)? ((LVM.temp->buffer[26] * 256) + LVM.temp->buffer[27]) : ((LVM.temp->buffer[26]-256) * 256 + LVM.temp->buffer[27]);
-						LVM.options->zero = LVM.options->zero/10;
-						// alternative							zero = (double)((((buffer[26]<<8) + buffer[27])/10.0));
-
-
-						// Total volume of the dewar multiplied by factor 10
-						LVM.options->total_volume = round_double(((LVM.temp->buffer[28]<<8) + LVM.temp->buffer[29])/10.0, 1);
-						if(LVM.options->total_volume <= 0) LVM.options->total_volume = TOTAL_VOL_DEF;
-
-						// Minimum Helium Level when in Auto Fill Mode (in %)
-						LVM.options->he_min = (!LVM.temp->buffer[30])? AUTO_FILL_HE_DEF : LVM.temp->buffer[30];
-						if (LVM.options->he_min < MIN_AUTO_FILL_HE) LVM.options->he_min = MIN_AUTO_FILL_HE;
-						if (LVM.options->he_min > MAX_AUTO_FILL_HE) LVM.options->he_min = MAX_AUTO_FILL_HE;
-
-						// Orientation of display
-						LVM.options->display_reversed = LVM.temp->buffer[31];
-						DISPLAY_CONFIG
-						xoff = (!LVM.options->display_reversed)? 0 : XOffset;
-
-						// Minimum voltage of the battery multiplied by factor 10
-						LVM.options->batt_min = round_double(((LVM.temp->buffer[32]<<8) + LVM.temp->buffer[33])/10.0, 1);
-						if(LVM.options->batt_min <= 0) LVM.options->batt_min = BATT_MIN_DEF;
-
-						// Maximum voltage of the battery multiplied by factor 10
-						LVM.options->batt_max = round_double(((LVM.temp->buffer[34]<<8) + LVM.temp->buffer[35])/10.0, 1);
-						if(LVM.options->batt_max <= 0) LVM.options->batt_max = BATT_MAX_DEF;
-
-						// Critical percentage of battery
-						LVM.options->critical_batt = (!LVM.temp->buffer[36])? CRITICAL_BATT_DEF : LVM.temp->buffer[36];
-
-
-						LVM.vars->options_pw = ((LVM.temp->buffer[37]<<8) + LVM.temp->buffer[38]);
-
-						xbee_set_sleep_period(LVM.temp->buffer[39]);
-
-						xbee_set_awake_period(LVM.temp->buffer[40]);
-
 
 						// Save settings in EEPROM
 						#ifdef ALLOW_EEPROM_SAVING
@@ -1347,7 +1133,7 @@ int main(void)
 						break;
 						case 0xFF:
 						//FAILED_LOGIN:
-		
+						
 						_delay_ms(5000);
 						global_mode.curr = ex_error;
 						global_mode.next = ex_error;

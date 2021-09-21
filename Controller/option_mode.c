@@ -1135,67 +1135,7 @@ void option_exit(Controller_Model * Model){
 			xbee_wake_up_plus();
 			
 
-
-			uint8_t index = 0;
-
-
-			if(LVM.options->transmit_slow_min)
-			{
-				LVM.temp->buffer[index++] = LVM.options->transmit_slow>>8;
-				LVM.temp->buffer[index++] = LVM.options->transmit_slow;
-			}
-			else
-			{
-				LVM.temp->buffer[index++] = (LVM.options->transmit_slow*60)>>8;
-				LVM.temp->buffer[index++] = LVM.options->transmit_slow*60;
-			}
-			if(LVM.options->transmit_fast_sec)
-			{
-				LVM.temp->buffer[index++] = LVM.options->transmit_fast>>8;
-				LVM.temp->buffer[index++] = LVM.options->transmit_fast;
-			}
-			else
-			{
-				LVM.temp->buffer[index++] = (LVM.options->transmit_fast*60)>>8;
-				LVM.temp->buffer[index++] = LVM.options->transmit_fast*60;
-			}
-			LVM.temp->buffer[index++] = ((uint16_t)(LVM.options->res_min*10))>>8;
-			LVM.temp->buffer[index++] = round(LVM.options->res_min*10);
-			LVM.temp->buffer[index++] = ((uint16_t)(LVM.options->res_max*10))>>8;
-			LVM.temp->buffer[index++] = round(LVM.options->res_max*10);
-
-			LVM.temp->buffer[index++] = ((uint16_t)(LVM.options->quench_time*1000))>>8;
-			LVM.temp->buffer[index++] = round(LVM.options->quench_time*1000);
-			LVM.temp->buffer[index++] = ((uint16_t)LVM.options->quench_current)>>8;
-			LVM.temp->buffer[index++] = round(LVM.options->quench_current);
-			LVM.temp->buffer[index++] = ((uint16_t)(LVM.options->wait_time*1000))>>8;
-			LVM.temp->buffer[index++] = round(LVM.options->wait_time*1000);
-			LVM.temp->buffer[index++] = ((uint16_t)LVM.options->meas_current)>>8;
-			LVM.temp->buffer[index++] = round(LVM.options->meas_current);
-
-			LVM.temp->buffer[index++] = LVM.options->meas_cycles;
-			LVM.temp->buffer[index++] = LVM.options->fill_timeout;
-			LVM.temp->buffer[index++] = ((uint16_t)(LVM.options->span*10))>>8;
-			LVM.temp->buffer[index++] = round(LVM.options->span*10);
-
-			if (LVM.options->zero >= 0)
-			{ LVM.temp->buffer[index++] = ((uint16_t)(LVM.options->zero*10))>>8;
-			LVM.temp->buffer[index++] = LVM.options->zero*10;}
-			else { LVM.temp->buffer[index++] = ((uint16_t)(LVM.options->zero*10 + 65536))>>8;
-			LVM.temp->buffer[index++] = LVM.options->zero*10 + 65536;}
-
-			//									buffer[22] = ((uint16_t)((ZERO_NULLPUNKT+zero)*10))>>8;
-			//									buffer[23] = (ZERO_NULLPUNKT+zero)*10;
-
-			LVM.temp->buffer[index++] = LVM.options->he_min;
-			LVM.temp->buffer[index++] = LVM.options->display_reversed;
-
-			LVM.temp->buffer[index++] = ((uint16_t)(LVM.options->batt_min*10))>>8;
-			LVM.temp->buffer[index++] = round(LVM.options->batt_min*10);
-			LVM.temp->buffer[index++] = ((uint16_t)(LVM.options->batt_max*10))>>8;
-			LVM.temp->buffer[index++] = round(LVM.options->batt_max*10);
-			LVM.temp->buffer[index++] = LVM.options->critical_batt;
-			LVM.temp->buffer[index++] =  get_status_byte_levelmeter();
+			uint8_t index = write_Opts_to_Buffer(LVM.temp->buffer);
 
 			InitScreen_AddLine(STR_SAVING_SETTINGS,1);
 			InitScreen_AddLine(STR_TO_THE_SERVER,0);

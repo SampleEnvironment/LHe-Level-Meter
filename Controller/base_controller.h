@@ -124,7 +124,9 @@ _Bool base_display_off_pressed(void);
 _Bool base_display_DONOTHING(void);
 
 void base_display_extend_onTime(void);
-
+void set_Options(uint8_t * optBuffer,uint8_t OpCode);
+uint8_t Options_Buonds_Check(optionsType * optBuff);
+uint8_t write_Opts_to_Buffer(uint8_t * sendbuff);
 
 void base_pressedDONOTHING(Controller_Model *Model);
 
