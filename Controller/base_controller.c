@@ -835,67 +835,67 @@ void set_Options(uint8_t * optBuffer,uint8_t OpCode){
 
 uint8_t write_Opts_to_Buffer(uint8_t * sendbuff){
 	
-			uint8_t index = 0;
+	uint8_t index = 0;
 
 
-			if(LVM.options->transmit_slow_min)
-			{
-				sendbuff[index++] = LVM.options->transmit_slow>>8;
-				sendbuff[index++] = LVM.options->transmit_slow;
-			}
-			else
-			{
-				sendbuff[index++] = (LVM.options->transmit_slow*60)>>8;
-				sendbuff[index++] = LVM.options->transmit_slow*60;
-			}
-			if(LVM.options->transmit_fast_sec)
-			{
-				sendbuff[index++] = LVM.options->transmit_fast>>8;
-				sendbuff[index++] = LVM.options->transmit_fast;
-			}
-			else
-			{
-				sendbuff[index++] = (LVM.options->transmit_fast*60)>>8;
-				sendbuff[index++] = LVM.options->transmit_fast*60;
-			}
-			sendbuff[index++] = ((uint16_t)(LVM.options->res_min*10))>>8;
-			sendbuff[index++] = round(LVM.options->res_min*10);
-			sendbuff[index++] = ((uint16_t)(LVM.options->res_max*10))>>8;
-			sendbuff[index++] = round(LVM.options->res_max*10);
+	if(LVM.options->transmit_slow_min)
+	{
+		sendbuff[index++] = LVM.options->transmit_slow>>8;
+		sendbuff[index++] = LVM.options->transmit_slow;
+	}
+	else
+	{
+		sendbuff[index++] = (LVM.options->transmit_slow*60)>>8;
+		sendbuff[index++] = LVM.options->transmit_slow*60;
+	}
+	if(LVM.options->transmit_fast_sec)
+	{
+		sendbuff[index++] = LVM.options->transmit_fast>>8;
+		sendbuff[index++] = LVM.options->transmit_fast;
+	}
+	else
+	{
+		sendbuff[index++] = (LVM.options->transmit_fast*60)>>8;
+		sendbuff[index++] = LVM.options->transmit_fast*60;
+	}
+	sendbuff[index++] = ((uint16_t)(LVM.options->res_min*10))>>8;
+	sendbuff[index++] = round(LVM.options->res_min*10);
+	sendbuff[index++] = ((uint16_t)(LVM.options->res_max*10))>>8;
+	sendbuff[index++] = round(LVM.options->res_max*10);
 
-			sendbuff[index++] = ((uint16_t)(LVM.options->quench_time*1000))>>8;
-			sendbuff[index++] = round(LVM.options->quench_time*1000);
-			sendbuff[index++] = ((uint16_t)LVM.options->quench_current)>>8;
-			sendbuff[index++] = round(LVM.options->quench_current);
-			sendbuff[index++] = ((uint16_t)(LVM.options->wait_time*1000))>>8;
-			sendbuff[index++] = round(LVM.options->wait_time*1000);
-			sendbuff[index++] = ((uint16_t)LVM.options->meas_current)>>8;
-			sendbuff[index++] = round(LVM.options->meas_current);
+	sendbuff[index++] = ((uint16_t)(LVM.options->quench_time*1000))>>8;
+	sendbuff[index++] = round(LVM.options->quench_time*1000);
+	sendbuff[index++] = ((uint16_t)LVM.options->quench_current)>>8;
+	sendbuff[index++] = round(LVM.options->quench_current);
+	sendbuff[index++] = ((uint16_t)(LVM.options->wait_time*1000))>>8;
+	sendbuff[index++] = round(LVM.options->wait_time*1000);
+	sendbuff[index++] = ((uint16_t)LVM.options->meas_current)>>8;
+	sendbuff[index++] = round(LVM.options->meas_current);
 
-			sendbuff[index++] = LVM.options->meas_cycles;
-			sendbuff[index++] = LVM.options->fill_timeout;
-			
+	sendbuff[index++] = LVM.options->meas_cycles;
+	sendbuff[index++] = LVM.options->fill_timeout;
+	
 
-			
-			sendbuff[index++] = ((uint16_t)(LVM.options->span*10))>>8;
-			sendbuff[index++] = round(LVM.options->span*10);
+	
+	sendbuff[index++] = ((uint16_t)(LVM.options->span*10))>>8;
+	sendbuff[index++] = round(LVM.options->span*10);
 
-			
-			int16_t zero16 = (int16_t)(LVM.options->zero*10);
-			sendbuff[index++] = zero16 >> 8;
-			sendbuff[index++] = round(zero16) ;
+	
+	int16_t zero16 = (int16_t)(LVM.options->zero*10);
+	sendbuff[index++] = zero16 >> 8;
+	sendbuff[index++] = round(zero16) ;
 
-			sendbuff[index++] = LVM.options->he_min;
-			sendbuff[index++] = LVM.options->display_reversed;
+	sendbuff[index++] = LVM.options->he_min;
+	sendbuff[index++] = LVM.options->display_reversed;
 
-			sendbuff[index++] = ((uint16_t)(LVM.options->batt_min*10))>>8;
-			sendbuff[index++] = round(LVM.options->batt_min*10);
-			sendbuff[index++] = ((uint16_t)(LVM.options->batt_max*10))>>8;
-			sendbuff[index++] = round(LVM.options->batt_max*10);
-			sendbuff[index++] = LVM.options->critical_batt;
-			sendbuff[index++] =  get_status_byte_levelmeter();
-			
-			return index;
+	sendbuff[index++] = ((uint16_t)(LVM.options->batt_min*10))>>8;
+	sendbuff[index++] = round(LVM.options->batt_min*10);
+	sendbuff[index++] = ((uint16_t)(LVM.options->batt_max*10))>>8;
+	sendbuff[index++] = round(LVM.options->batt_max*10);
+	sendbuff[index++] = LVM.options->critical_batt;
+	sendbuff[index++] =  get_status_byte_levelmeter();
+	
+	return index;
 }
 
 uint8_t Options_Buonds_Check(optionsType * optBuff){
@@ -960,7 +960,7 @@ void handle_received_Messages(Controller_Model *Model){
 
 		switch(frameBuffer[reply_Id].type)
 		{
-			case TRIGGER_MEAS_MSG:	// (#24) Send levels and status to the database server.
+			case TRIGGER_MEAS_CMD:	// (#24) Send levels and status to the database server.
 
 
 			// Wake up XBee module
@@ -972,7 +972,7 @@ void handle_received_Messages(Controller_Model *Model){
 
 			measure(Model);
 
-			collect_and_send_MeasData(LVM.temp->buffer,TRIGGER_MEAS_MSG);
+			collect_and_send_MeasData(LVM.temp->buffer,TRIGGER_MEAS_CMD);
 
 			
 
@@ -1137,6 +1137,10 @@ void handle_received_Messages(Controller_Model *Model){
 				LVM.pos->StrLen[i_letters] = 0;
 
 				CLEAR_ERROR(LETTERS_ERROR);
+				
+				//Send Status Ack
+				LVM.temp->buffer[0] = 0;
+				xbee_send_message(SET_LETTERS_CMD,LVM.temp->buffer,1);
 
 				#ifdef ALLOW_DEBUG
 				paint_info_line(STR_POS_WRITTEN , 0);
@@ -1164,6 +1168,11 @@ void handle_received_Messages(Controller_Model *Model){
 			break;
 			case SET_PASSWORD_CMD:	// (#17) Set options password received from the database server. This password is required to access to settings pages.
 			LVM.vars->options_pw = (frameBuffer[reply_Id].data[0]<<8) + frameBuffer[reply_Id].data[1];
+			
+			//Send Status Ack
+			LVM.temp->buffer[0] = 0;
+			xbee_send_message(SET_PASSWORD_CMD,LVM.temp->buffer,1);
+			
 			#ifdef ALLOW_DEBUG
 			sprintf(LVM.temp->infostr,STR_NEW_PASSW ,LVM.vars->options_pw);
 			paint_info_line(LVM.temp->infostr, 0);
@@ -1190,6 +1199,12 @@ void handle_received_Messages(Controller_Model *Model){
 
 			case SET_XBEE_SLEEP_TIME_CMD:	// (#19) Set XBee sleeping period received from the database server
 			xbee_set_sleep_period(frameBuffer[reply_Id].data[0]);
+			
+			
+			//Send Status Ack
+			LVM.temp->buffer[0] = 0;
+			xbee_send_message(SET_XBEE_SLEEP_TIME_CMD,LVM.temp->buffer,1);
+			
 			#ifdef ALLOW_DEBUG
 			sprintf(LVM.temp->infostr,STR_XBEE_SLEEP ,xbee_get_sleep_period());
 			paint_info_line(LVM.temp->infostr, 0);
@@ -1228,9 +1243,12 @@ void handle_received_Messages(Controller_Model *Model){
 
 			case SET_XBEE_AWAKE_TIME_CMD:	// (#22) Set XBee awake period received from the database server
 			xbee_set_awake_period((frameBuffer[reply_Id].data[0]>10) ? frameBuffer[reply_Id].data[0] : 10);//minimum 10s
-			//sprintf(infostr,"Awake:%i",frameBuffer[reply_Id].data[0]);
-			//LCD_Print(infostr,100,100,2,2,2,red,BGC);
-			//_delay_ms(5000);
+			
+			
+			//Send Status Ack
+			LVM.temp->buffer[0] = 0;
+			xbee_send_message(SET_XBEE_AWAKE_TIME_CMD,LVM.temp->buffer,1);
+
 			#ifdef ALLOW_DEBUG
 			sprintf(LVM.temp->infostr,STR_AWAKE_s,xbee_get_awake_period());
 			paint_info_line(LVM.temp->infostr, 0);
@@ -1308,7 +1326,7 @@ void handle_received_Messages(Controller_Model *Model){
 				
 				break;
 			}
-			case ILM_SEND_DATA: // ILM messages are sent in broadcast mode and are ignored by other devices
+			case DEPRECATED_ILM_BROADCAST: // ILM messages are sent in broadcast mode and are ignored by other devices
 			break;
 
 			default:	// (#10) Unknown command, send error code to the database server

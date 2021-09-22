@@ -395,7 +395,7 @@ uint8_t collect_and_send_MeasData(uint8_t *meas_buffer,uint8_t Message_Code){
 	memcpy(LVM.temp->databuffer,meas_buffer,index);
 
 
-	if(Message_Code == TRIGGER_MEAS_MSG){
+	if(Message_Code == TRIGGER_MEAS_CMD){
 		// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
 		if (xbee_send_message(Message_Code, meas_buffer, index))
 		{
