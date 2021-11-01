@@ -162,7 +162,9 @@ extern EWindowOrientation ili_Orientation;
 #define DEVICE_ID_ALPHANUMERIC false
 #define MESSAGEFOPRMAT_IDENTIFIER 128	// Identifier used, to differentiate between old and new messageformat
 
-
+#define OPTIONS_PW_DEF 0
+#define OPTIONS_PW_MAX 999
+#define OPTIONS_PW_MIN 0
 
 // ILL Display Orientation
 #ifdef ILL
@@ -233,6 +235,7 @@ typedef struct{
 	uint8_t display_reversed;
 	_Bool Dev_ID_alpahnum;
 	uint8_t Dev_ID_Max_len;
+	uint16_t	options_pw;
 }optionsType;
 
 
@@ -328,7 +331,7 @@ typedef struct{
 	//diag pages
 
 	
-	uint16_t	options_pw;
+
 	uint16_t	entered_options_pw;
 	uint8_t     fill_meas_counter;
 	

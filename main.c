@@ -183,7 +183,6 @@ VarsType vars = {
 	.auto_fill_enabled = false,
 	.auto_fill_started = false,
 	.device_pos ="none",
-	.options_pw = OPTIONS_PASSWORD,
 	.entered_options_pw = 0,
 	.transmit_fast_changed = false,
 	.transmit_slow_changed = false,
@@ -291,7 +290,6 @@ uint8_t collect_and_send_MeasData(uint8_t *meas_buffer,uint8_t Message_Code){
 	{
 		Time.tm_sec = 0;
 		Time.tm_min = 0;
-		Time.tm_hour   = 0;
 		Time.tm_mday  = 0;
 		Time.tm_mon  = 0;
 		Time.tm_year   = 0;
@@ -601,7 +599,9 @@ void write_DEFS_to_EEPROM(void){
 		.critical_batt     = CRITICAL_BATT_DEF,
 		.display_reversed  = false,
 		.Dev_ID_alpahnum   = false,
-		.Dev_ID_Max_len    = DEV_ID_CHARS_DEF
+		.Dev_ID_Max_len    = DEV_ID_CHARS_DEF,
+		.options_pw        =  OPTIONS_PW_DEF
+		
 		
 	};
 	

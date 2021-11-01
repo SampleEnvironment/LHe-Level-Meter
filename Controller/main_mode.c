@@ -206,7 +206,7 @@ void main_pressedLEFT(Controller_Model *Model){
 	uint8_t status;	// Pressed "cancel" or "ok"
 	LVM.vars->entered_options_pw = get_Password(&status);
 
-	if(status || (LVM.vars->entered_options_pw != LVM.vars->options_pw))
+	if(status || (LVM.vars->entered_options_pw != LVM.options->options_pw))
 	{
 		// Canceled or wrong password, go back to the main mode
 		paint_main(Time, Model->mode->netstat, PAINT_ALL);
@@ -411,7 +411,7 @@ void main_pressedBOT(Controller_Model *Model){
 	LVM.vars->entered_options_pw = get_Password(&status);
 	not_ready_for_new_key();
 
-	if(status || (LVM.vars->entered_options_pw != LVM.vars->options_pw))
+	if(status || (LVM.vars->entered_options_pw != LVM.options->options_pw))
 	{
 		// Cancelled or wrong password, go back to the main mode
 		paint_main(Time, Model->mode->netstat, PAINT_ALL);

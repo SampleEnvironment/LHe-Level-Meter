@@ -802,7 +802,7 @@ void set_Options(uint8_t * optBuffer,uint8_t OpCode){
 		case LOGIN_MSG:
 		case FORCE_LOGIN_MSG:
 		
-		LVM.vars->options_pw =  (optBuffer[37]<<8) + optBuffer[38];
+		OptBuff.options_pw =  (optBuffer[37]<<8) + optBuffer[38];
 		
 		xbee_set_sleep_period(optBuffer[39]);
 		xbee_set_awake_period(optBuffer[40]);
@@ -941,6 +941,7 @@ uint8_t Options_Buonds_Check(optionsType * optBuff){
 	CHECK_BOUNDS(optBuff->Dev_ID_Max_len,DEV_ID_CHARS_MIN,DEV_ID_CHARS_MAX,DEV_ID_CHARS_DEF,Val_outof_Bounds)
 	
 	CHECK_BOUNDS(optBuff->Dev_ID_Max_len,DEV_ID_CHARS_MIN,DEV_ID_CHARS_MAX,DEV_ID_CHARS_DEF,Val_outof_Bounds)
+	CHECK_BOUNDS(optBuff->options_pw,OPTIONS_PW_MIN,OPTIONS_PW_MAX,OPTIONS_PW_DEF,Val_outof_Bounds)
 	
 	if(optBuff->r_span <= 0){
 		optBuff->r_span = R_SPAN_DEF;
@@ -1167,8 +1168,8 @@ void handle_received_Messages(Controller_Model *Model){
 			case GET_PASSWORD_CMD: ;	// (#16) Send options password to the database server. This password is required to access to settings pages.
 
 			index = 0;
-			LVM.temp->buffer[index++] = LVM.vars->options_pw >> 8;
-			LVM.temp->buffer[index++] = LVM.vars->options_pw;
+			LVM.temp->buffer[index++] = LVM.options->options_pw >> 8;
+			LVM.temp->buffer[index++] = LVM.options->options_pw;
 			LVM.temp->buffer[index++] =  get_status_byte_levelmeter();
 
 			// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
@@ -1182,14 +1183,14 @@ void handle_received_Messages(Controller_Model *Model){
 			#endif
 			break;
 			case SET_PASSWORD_CMD:	// (#17) Set options password received from the database server. This password is required to access to settings pages.
-			LVM.vars->options_pw = (frameBuffer[reply_Id].data[0]<<8) + frameBuffer[reply_Id].data[1];
+			LVM.options->options_pw = (frameBuffer[reply_Id].data[0]<<8) + frameBuffer[reply_Id].data[1];
 			
 			//Send Status Ack
 			LVM.temp->buffer[0] = 0;
 			xbee_send_message(SET_PASSWORD_CMD,LVM.temp->buffer,1);
 			
 			#ifdef ALLOW_DEBUG
-			sprintf(LVM.temp->infostr,STR_NEW_PASSW ,LVM.vars->options_pw);
+			sprintf(LVM.temp->infostr,STR_NEW_PASSW ,LVM.options->options_pw);
 			paint_info_line(LVM.temp->infostr, 0);
 			_delay_ms(1000);
 			#endif
