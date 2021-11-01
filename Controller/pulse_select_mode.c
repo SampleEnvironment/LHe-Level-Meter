@@ -209,7 +209,7 @@ void pulse_select_Init(void){
 	pselect_model.const_current = 100;  //constant current in pulse
 
 	pselect_model.delta_I = 5; // delta I in mA
-	pselect_model.delta_t = 1.0; // delta t in s
+	pselect_model.delta_t = 0.1; // delta t in s
 	pselect_model.I_min = 50; // I_min in mA
 	pselect_model.I_max = QUENCH_CURRENT_MAX;   //I_max in mA
 	

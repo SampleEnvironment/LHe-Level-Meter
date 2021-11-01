@@ -394,6 +394,7 @@ typedef struct
 	
 	int16_t active_point;
 	
+	
 	uint16_t u[DP_NUMBER_OF_POINTS_140];
 	uint16_t i[DP_NUMBER_OF_POINTS_140];
 	uint16_t r[DP_NUMBER_OF_POINTS_140];
@@ -431,7 +432,7 @@ typedef struct
 	
 	uint8_t pulse_type;
 	uint16_t points_in_plot;
-
+	uint16_t halfway_point;
 	
 	
 	

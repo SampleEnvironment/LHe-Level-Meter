@@ -563,7 +563,8 @@ void interval_slow_changed(Controller_Model *Model){
 
 }
 
-void Battery_check(Controller_Model *Model){
+void Battery_check(Controller_Model *Model)
+ {
 	//=========================================================================
 	// Battery checking
 	//=========================================================================
@@ -717,6 +718,12 @@ double get_he_level(double res_min, double res_max, double r_span, double r_zero
 }
 
 
+void addline_number(char * text,uint32_t number){
+	sprintf(LVM.temp->string,"%s: %lu",text,number);
+	
+	InitScreen_AddLine(LVM.temp->string,0);
+}
+
 void set_Options(uint8_t * optBuffer,uint8_t OpCode){
 
 	optionsType OptBuff;
@@ -734,6 +741,14 @@ void set_Options(uint8_t * optBuffer,uint8_t OpCode){
 
 		DS3231M_set_time(&newtime);
 	}
+	/*
+	addline_number("seconds",optBuffer[0]);
+	addline_number("min",optBuffer[1]);
+	addline_number("hour",optBuffer[2]);
+	addline_number("day",optBuffer[3]);
+	addline_number("mon",optBuffer[4]);
+	addline_number("year",optBuffer[5]);
+	*/
 	
 	OptBuff.transmit_slow    =   (optBuffer[6]<<8)  + optBuffer[7];
 	OptBuff.transmit_fast    =   (optBuffer[8]<<8)  + optBuffer[9];
@@ -746,7 +761,7 @@ void set_Options(uint8_t * optBuffer,uint8_t OpCode){
 	OptBuff.meas_cycles      =   optBuffer[22];
 	OptBuff.fill_timeout     =  optBuffer[23];
 	OptBuff.span             = ((optBuffer[24]<<8) + optBuffer[25])/10.0;
-	OptBuff.zero             = (optBuffer[26] < 128)? ((optBuffer[26] * 256) + optBuffer[27]) : ((optBuffer[26]-256) * 256 + optBuffer[27]);
+	OptBuff.zero             = ((double)(((int16_t) optBuffer[26] << 8) | optBuffer[27]))/10;
 	OptBuff.total_volume     = ((optBuffer[28]<<8) + optBuffer[29])/10.0;
 	OptBuff.he_min           =  optBuffer[30];
 	OptBuff.display_reversed = optBuffer[31];
@@ -829,7 +844,6 @@ void set_Options(uint8_t * optBuffer,uint8_t OpCode){
 	xoff = (!LVM.options->display_reversed)? 0 : XOffset;
 	memcpy(LVM.options,&OptBuff,sizeof(optionsType));
 
-	
 
 }
 
@@ -883,7 +897,7 @@ uint8_t write_Opts_to_Buffer(uint8_t * sendbuff){
 	
 	int16_t zero16 = (int16_t)(LVM.options->zero*10);
 	sendbuff[index++] = zero16 >> 8;
-	sendbuff[index++] = round(zero16) ;
+	sendbuff[index++] = (uint8_t) round(zero16) ;
 
 	sendbuff[index++] = LVM.options->he_min;
 	sendbuff[index++] = LVM.options->display_reversed;
@@ -1017,6 +1031,7 @@ void handle_received_Messages(Controller_Model *Model){
 				InitScreen_AddLine(STR_TO_CONTINUE, 0);
 				_delay_ms(1000);
 				LVM.message->Received = true;
+				break;
 			}
 
 			//BAD_OPTIONS:

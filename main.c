@@ -454,7 +454,7 @@ uint8_t xbee_send_login_msg(uint8_t db_cmd_type, uint8_t *buffer)
 		{
 			//				sprintf(ltemp, "...data received: %i", frameBuffer[reply_Id].data_len);
 			InitScreen_AddLine(STR_DATE_RECEIVED,0);
-
+			memcpy(LVM.temp->buffer,(uint8_t *)frameBuffer[reply_Id].data,NUMBER_LOGIN_BYTES);
 
 			if(frameBuffer[reply_Id].data_len == NUMBER_LOGIN_BYTES) 	return 0;	//good options
 			else {  switch (frameBuffer[reply_Id].data[0])
@@ -558,7 +558,7 @@ void write_opts_to_EEPROM(void){
 	
 	optionsType OptBuff;
 	
-	memcpy(LVM.options,&OptBuff,sizeof(optionsType));
+	memcpy(&OptBuff,LVM.options,sizeof(optionsType));
 	
 	
 	//transmit_ slow is saved in minutes in eeprom
@@ -1048,12 +1048,13 @@ int main(void)
 
 						set_Options(LVM.temp->buffer,LOGIN_MSG);
 						
-						
+						DS3231M_read_time();
 						// Message on screen
 						sprintf(LVM.temp->string,STR_NEW_DATE, Time.tm_mday, Time.tm_mon, Time.tm_year+2000);
 						InitScreen_AddLine(LVM.temp->string,0);
 						sprintf(LVM.temp->string,STR_NEW_TIME, Time.tm_hour, Time.tm_min, Time.tm_sec);
 						InitScreen_AddLine(LVM.temp->string,0);
+
 
 						// Save settings in EEPROM
 						#ifdef ALLOW_EEPROM_SAVING
@@ -1174,6 +1175,7 @@ int main(void)
 
 		InitScreen_AddLine(STR_1ST_MEASUREMENT,1);
 
+
 		measure(Model);
 
 		if (global_mode.netstat == online)
@@ -1220,6 +1222,7 @@ int main(void)
 	//=========================================================================
 	while(1)
 	{
+
 		
 
 		if (!connected.DS3231M)

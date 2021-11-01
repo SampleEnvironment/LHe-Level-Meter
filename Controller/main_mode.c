@@ -460,6 +460,7 @@ void main_pre_Switch_case_Tasks(Controller_Model *Model){
 	{
 		if(!set_timeout(0, TIMER_1, USE_TIMER))
 		{
+
 			// turn display on
 			display_on();
 

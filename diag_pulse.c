@@ -11,6 +11,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 #include "diag_pulse.h"
 #include "Controller/pulse_select_mode.h"
 #include "Controller/option_mode.h"
@@ -86,6 +87,7 @@ void diag_pulse_init(diag_pulseType* dp, _Bool headless, uint8_t pulse_type){
 		
 		dp->points_in_plot = DP_NUMBER_OF_POINTS_140;
 		
+		
 
 
 
@@ -110,7 +112,7 @@ void diag_pulse_init(diag_pulseType* dp, _Bool headless, uint8_t pulse_type){
 		dp->pulse_type = CONST;
 
 		dp->t_end_wait = UINT32_MAX-1;
-		
+
 		break;
 		case LINEAR:
 
@@ -133,8 +135,11 @@ void diag_pulse_init(diag_pulseType* dp, _Bool headless, uint8_t pulse_type){
 		dp->pulse_type = LINEAR;
 		dp->t_end_quench = UINT32_MAX-1;
 		dp->t_end_wait = UINT32_MAX-1;
+
 		break;
 	}
+	
+	dp->halfway_point = dp->points_in_plot/2;
 	
 
 
@@ -168,7 +173,7 @@ void diag_pulse_coords(diag_pulseType *dp){
 		
 		
 		#ifdef ili9341
-				LCD_Print("            ", xoff+X_DP_60_AVG, Y_DP_6, 1, 1, 1, FGC, BGC);
+		LCD_Print("            ", xoff+X_DP_60_AVG, Y_DP_6, 1, 1, 1, FGC, BGC);
 		#endif
 
 		
@@ -486,6 +491,9 @@ void diag_pulse_Measure(diag_pulseType *dp){
 		dp->delta_t_points = (((double) dp->elapsed_t / ((double)dp->active_point))*OVERFLOW_IN_MS_8_BIT);
 		
 		dp->quench_end_position = (uint16_t) (dp->heat_time*1000/dp->delta_t_points);
+		if(dp->quench_end_position > dp->points_in_plot - 5){
+			dp->quench_end_position = dp->points_in_plot -5;
+		}
 	}
 	
 
@@ -501,6 +509,61 @@ void diag_pulse_move_cursor(diag_pulseType *dp,int8_t direction){
 	uint16_t lenght = dp->cursor_len;
 
 	LCD_vline(x0,y0,lenght,BGC);
+	
+	//erase current annotation
+	if (dp->active_point == dp->halfway_point && direction == 1)
+	{
+		LCD_Print("      ",x0+3,dp->bot_zero-(FONT1_H+3),1,1,1,BGC,BGC);
+		LCD_Print("         ",x0+3,dp->top_zero-(FONT1_H+3),1,1,1,BGC,BGC);
+	}
+	if (dp->active_point == dp->halfway_point-1 && direction == -1)
+	{
+		
+		uint8_t nchars ;
+		nchars = dp->i[dp->active_point-direction]/100 >= 10 ? 5:4;
+		nchars = dp->i[dp->active_point-direction]/100 >= 100 ? 6:nchars;
+		draw_int_without_erasing(dp->i[dp->active_point-direction]/100,x0-(FONT1_W*nchars),dp->bot_zero-(FONT1_H+3),"mA",BGC,1);
+		if (dp->top_unit == dp->u_point)
+		{
+			draw_double_without_erasing(((double)dp->u[dp->active_point-direction])/100,x0-((FONT1_W*6)+3),dp->top_zero-(FONT1_H+3),1,"V",BGC,1);
+		}
+		else
+		{
+
+			nchars = dp->r[dp->active_point-direction]/100 >= 10 ? 8:8;
+			nchars = dp->r[dp->active_point-direction]/100 >= 100 ? 9:nchars;
+			draw_double_without_erasing(((double)dp->r[dp->active_point-direction])/100,x0-((FONT1_W*nchars)+3),dp->top_zero-(FONT1_H+3),1,"Ohm",BGC,1);
+		}
+	}
+	
+	if (dp->active_point < dp->halfway_point)
+	{
+		LCD_Print("       ",x0+3,dp->bot_zero-(FONT1_H+3),1,1,1,BGC,BGC);
+		LCD_Print("         ",x0+3,dp->top_zero-(FONT1_H+3),1,1,1,BGC,BGC);
+	}
+	
+	if (dp->active_point >= dp->halfway_point)
+	{
+		uint8_t nchars ;
+		nchars = dp->i[dp->active_point-direction]/100 >= 10 ? 5:4;
+		nchars = dp->i[dp->active_point-direction]/100 >= 100 ? 6:nchars;
+		draw_int_without_erasing(dp->i[dp->active_point-direction]/100,x0-(FONT1_W*nchars),dp->bot_zero-(FONT1_H+3),"mA",BGC,1);
+		if (dp->top_unit == dp->u_point)
+		{
+			draw_double_without_erasing(((double)dp->u[dp->active_point-direction])/100,x0-((FONT1_W*6)+3),dp->top_zero-(FONT1_H+3),1,"V",BGC,1);
+		}
+		else
+		{
+
+			nchars = dp->r[dp->active_point-direction]/100 >= 10 ? 8:8;
+			nchars = dp->r[dp->active_point-direction]/100 >= 100 ? 9:nchars;
+			draw_double_without_erasing(((double)dp->r[dp->active_point-direction])/100,x0-((FONT1_W*nchars)+3),dp->top_zero-(FONT1_H+3),1,"Ohm",BGC,1);
+			
+
+		}
+	}
+	
+	
 
 
 	//draw top Plot line segments
@@ -541,7 +604,44 @@ void diag_pulse_move_cursor(diag_pulseType *dp,int8_t direction){
 		draw_int_without_erasing((uint32_t) current_time, xoff+X_DP_75, Y_DP_6, "ms ", ERR, 1);
 	}
 	
+	//draw new vline annotations
+	
+	if (dp->active_point < dp->halfway_point)
+	{
+		draw_int_without_erasing(dp->i[dp->active_point]/100,x0+3,dp->bot_zero-(FONT1_H+3),"mA",white,1);
+		if (dp->top_unit == dp->u_point)
+		{
+			draw_double_without_erasing(((double)dp->u[dp->active_point])/100,x0+3,dp->top_zero-(FONT1_H+3),1,"V",white,1);
+		}
+		else
+		{
+			draw_double_without_erasing(((double)dp->r[dp->active_point])/100,x0+3,dp->top_zero-(FONT1_H+3),1,"Ohm",white,1);
+			
+		}
+	}
+	
+	if (dp->active_point >= dp->halfway_point)
+	{
+		uint8_t nchars ;
+		nchars = dp->i[dp->active_point]/100 >= 10 ? 5:4;
+		nchars = dp->i[dp->active_point]/100 >= 100 ? 6:nchars;
+		draw_int_without_erasing(dp->i[dp->active_point]/100,x0-(FONT1_W*nchars),dp->bot_zero-(FONT1_H+3),"mA",white,1);
+		if (dp->top_unit == dp->u_point)
+		{
+			draw_double_without_erasing(((double)dp->u[dp->active_point])/100,x0-((FONT1_W*6)+3),dp->top_zero-(FONT1_H+3),1,"V",white,1);
+		}
+		else
+		{
 
+			nchars = dp->r[dp->active_point]/100 >= 10 ? 8:8;
+			nchars = dp->r[dp->active_point]/100 >= 100 ? 9:nchars;
+			draw_double_without_erasing(((double)dp->r[dp->active_point])/100,x0-((FONT1_W*nchars)+3),dp->top_zero-(FONT1_H+3),1,"Ohm",white,1);
+			
+
+		}
+	}
+	
+	
 
 
 
@@ -550,29 +650,33 @@ void diag_pulse_move_cursor(diag_pulseType *dp,int8_t direction){
 
 	if (dp->top_unit == dp->u_point){
 		draw_int_without_erasing(dp->u_max, xoff+X_DP_3,dp->top_zero - dp->y_maxpixels + Y_DP_OFFS, "V", FGC, DP_AXIS_FONTNR);
-		
+		/*
 		if(dp->pulse_type == NORMAL){
-			#ifdef ili9341
+		#ifdef ili9341
 
-			LCD_Print("Avg:",xoff+X_DP_60_AVG,Y_DP_6,1,1,1,FGC,BGC);
-			#endif
-			draw_double_without_erasing(dp->diag_res, xoff+X_DP_60_NORMAL, Y_DP_6, 1, "Ohm", ERR, 1);
+		LCD_Print("Avg:",xoff+X_DP_60_AVG,Y_DP_6,1,1,1,FGC,BGC);
+		#endif
+		draw_double_without_erasing(dp->diag_res, xoff+X_DP_60_NORMAL, Y_DP_6, 1, "Ohm", ERR, 1);
 		}
 		else
 		{
-			LCD_Print("        ", xoff+X_DP_60, Y_DP_6, 1, 1, 1, FGC, BGC);
-			draw_double_without_erasing(((double)dp->u[dp->active_point])/100,xoff+X_DP_60, Y_DP_6,1, "V", ERR, 1);
+		LCD_Print("        ", xoff+X_DP_60, Y_DP_6, 1, 1, 1, FGC, BGC);
+		draw_double_without_erasing(((double)dp->u[dp->active_point])/100,xoff+X_DP_60, Y_DP_6,1, "V", ERR, 1);
 		}
+		*/
 	}
 
 	if (dp->top_unit == dp->r_point){
 		draw_int_without_erasing(dp->r_max, xoff+X_DP_3,dp->top_zero - dp->y_maxpixels+ Y_DP_OFFS, "Ohm", FGC, DP_AXIS_FONTNR);
+		
+		/*
 		#ifdef ili9341
 		LCD_Print("            ", xoff+X_DP_60_AVG, Y_DP_6, 1, 1, 1, FGC, BGC);
 		#else
 		LCD_Print("        ", xoff+X_DP_60_AVG, Y_DP_6, 1, 1, 1, FGC, BGC);
 		#endif
 		draw_double_without_erasing(((double)dp->r[dp->active_point])/100,xoff+X_DP_60, Y_DP_6,1, "Ohm", ERR, 1);
+		*/
 	}
 
 
@@ -745,25 +849,27 @@ void diag_pulse(diag_pulseType *dp){
 		}else{
 		draw_int_without_erasing((uint32_t) current_time, xoff+X_DP_75, Y_DP_6, "ms ", ERR, 1);
 	}
-
+	
+	/*
 	// Calculate Resistance
 	if ((dp->n_for_avg > 0) && !(dp->i_avg== 0) && (dp->pulse_type == NORMAL))
 	{
-		dp->u_avg = (double) dp->u_avg/ dp->n_for_avg;
-		dp->i_avg = (double) dp->i_avg / dp->n_for_avg;
+	dp->u_avg = (double) dp->u_avg/ dp->n_for_avg;
+	dp->i_avg = (double) dp->i_avg / dp->n_for_avg;
 
 
-		dp->diag_res = ((double) (dp->r_span* dp->u_avg* 1000 / dp->i_avg) + dp->r_zero);  // conversion from mA to A !!!!
-		#ifdef ili9341
-			LCD_Print("Avg:",xoff+X_DP_60_AVG,Y_DP_6,1,1,1,FGC,BGC);
-		#endif 
+	dp->diag_res = ((double) (dp->r_span* dp->u_avg* 1000 / dp->i_avg) + dp->r_zero);  // conversion from mA to A !!!!
+	#ifdef ili9341
+	LCD_Print("Avg:",xoff+X_DP_60_AVG,Y_DP_6,1,1,1,FGC,BGC);
+	#endif
 	
-		draw_double(dp->diag_res, xoff+X_DP_60_NORMAL, Y_DP_6, 1, "Ohm", ERR, 1);
+	draw_double(dp->diag_res, xoff+X_DP_60_NORMAL, Y_DP_6, 1, "Ohm", ERR, 1);
 
-		}else{
-		draw_double_without_erasing(((double)dp->u[dp->active_point])/100,xoff+X_DP_60, Y_DP_6,1, "V", ERR, 1);
+	}else{
+	draw_double_without_erasing(((double)dp->u[dp->active_point])/100,xoff+X_DP_60, Y_DP_6,1, "V", ERR, 1);
 	}
 
+	*/
 	// adjust the end of the quench pulse with the cursor
 	_Bool back = true;
 

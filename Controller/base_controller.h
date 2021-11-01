@@ -127,7 +127,7 @@ void base_display_extend_onTime(void);
 void set_Options(uint8_t * optBuffer,uint8_t OpCode);
 uint8_t Options_Buonds_Check(optionsType * optBuff);
 uint8_t write_Opts_to_Buffer(uint8_t * sendbuff);
-
+void addline_number(char * text,uint32_t number);
 void base_pressedDONOTHING(Controller_Model *Model);
 
 void measure(Controller_Model * Model);
