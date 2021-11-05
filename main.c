@@ -779,7 +779,8 @@ int main(void)
 
 
 
-	
+	DISPLAY_CONFIG
+	xoff = (!LVM.options->display_reversed)? 0 : XOffset;
 
 
 
@@ -1048,6 +1049,7 @@ int main(void)
 
 						set_Options(LVM.temp->buffer,LOGIN_MSG);
 						
+						
 						DS3231M_read_time();
 						// Message on screen
 						sprintf(LVM.temp->string,STR_NEW_DATE, Time.tm_mday, Time.tm_mon, Time.tm_year+2000);
@@ -1163,7 +1165,9 @@ int main(void)
 		#endif
 
 	} // end of if(ex_errorCode != ex_errorCode_Offline)
-
+	DISPLAY_CONFIG
+	xoff = (!LVM.options->display_reversed)? 0 : XOffset;
+	
 
 	//=========================================================================
 	//Initial setup
@@ -1215,7 +1219,7 @@ int main(void)
 
 	set_timeout(DISP_TIMEOUT_TIME, TIMER_2, USE_TIMER);
 	
-	
+
 	
 	//=========================================================================
 	// Main loop

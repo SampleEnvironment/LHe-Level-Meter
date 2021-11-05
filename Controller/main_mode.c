@@ -312,7 +312,7 @@ void main_pressedDOWN(Controller_Model *Model){
 				// Message on screen
 				sprintf(LVM.temp->string,STR_NEW_DATE, newtime2.tm_mday, newtime2.tm_mon, newtime2.tm_year+2000);
 				InitScreen_AddLine(LVM.temp->string,0);
-				sprintf(LVM.temp->string,STR_NEW_TIME, newtime2.tm_sec, newtime2.tm_min, newtime2.tm_hour);
+				sprintf(LVM.temp->string,STR_NEW_TIME, newtime2.tm_hour, newtime2.tm_min, newtime2.tm_sec);
 				InitScreen_AddLine(LVM.temp->string,0);
 
 				if (connected.DS3231M)
