@@ -334,7 +334,7 @@
 #define X_DP_60 50
 #define X_DP_60_AVG X_DP_60
 #define X_DP_60_NORMAL X_DP_60
-#define X_DP_75 103
+#define X_DP_75 97
 #define X_DP_147 147
 #define X_DP_147_SEND X_DP_147
 

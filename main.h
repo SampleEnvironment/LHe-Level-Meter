@@ -378,6 +378,9 @@ typedef struct
 	
 	uint32_t t_end_quench;
 	uint32_t t_end_wait;
+	uint32_t t_end_meas;
+	
+	uint8_t  meastime_factor;
 	
 	_Bool draw_all;
 	_Bool headless;
@@ -389,6 +392,7 @@ typedef struct
 	double quench_current;
 	double meas_current;
 	double wait_time;
+	double meas_time;
 	double r_span;
 	double r_zero;
 	

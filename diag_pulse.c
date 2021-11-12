@@ -61,13 +61,16 @@ void diag_pulse_init(diag_pulseType* dp, _Bool headless, uint8_t pulse_type){
 	{
 		case NORMAL:
 
+		dp->meastime_factor = 1;
 		
-		dp->x_fact = DP_X_FACTOR;
+
 		dp->heat_time = pselect_model->quench_time;
 		dp->wait_time = pselect_model->wait_time;
+		dp->meas_time = (dp->wait_time +dp->heat_time)*dp->meastime_factor;
 		dp->quench_current = pselect_model->quench_curr;
 		dp->meas_current = pselect_model->meas_curr;
 
+		dp->delta_t_timer_steps = (uint32_t)(((dp->meas_time+dp->heat_time+dp->wait_time)*1000/DP_NUMBER_OF_POINTS_140) /OVERFLOW_IN_MS_8_BIT);
 
 
 		dp->points_in_plot = DP_NUMBER_OF_POINTS_140;
@@ -75,7 +78,9 @@ void diag_pulse_init(diag_pulseType* dp, _Bool headless, uint8_t pulse_type){
 
 		dp->t_end_quench = (uint32_t) ((dp->heat_time*1000)/OVERFLOW_IN_MS_8_BIT);
 		dp->t_end_wait   = dp->t_end_quench + ((uint32_t) ((dp->wait_time*1000)/OVERFLOW_IN_MS_8_BIT));
-
+		dp->t_end_meas   = dp->t_end_wait + ((uint32_t) ((dp->meas_time*1000)/OVERFLOW_IN_MS_8_BIT));
+		
+		
 		dp->u_max =  round(LVM.options->res_max * dp->quench_current / 1000);  // in V
 		dp->i_max = (dp->quench_current > dp->meas_current) ? round(dp->quench_current) : round(dp->meas_current);
 
@@ -85,10 +90,34 @@ void diag_pulse_init(diag_pulseType* dp, _Bool headless, uint8_t pulse_type){
 		
 		dp->pulse_type = NORMAL;
 		
-		dp->points_in_plot = DP_NUMBER_OF_POINTS_140;
-		
+		uint16_t points_needed = (dp->meas_time+dp->heat_time+dp->wait_time)*40;
+		//dp->points_in_plot =   ((dp->meas_time+dp->heat_time+dp->wait_time)*20); //DP_NUMBER_OF_POINTS_140;
 		
 
+		
+		if(points_needed > DP_NUMBER_OF_POINTS_140){
+			points_needed = DP_NUMBER_OF_POINTS_140;
+		}
+		
+		
+		dp->x_fact = DP_X_FACTOR*(DP_NUMBER_OF_POINTS_140 / points_needed);
+		
+
+		
+		
+		#ifdef ili9341
+		dp->points_in_plot = DP_NUMBER_OF_POINTS_140 / (dp->x_fact/2);
+
+		#endif
+		
+		#ifdef DISP_3000
+		
+		dp->points_in_plot = (DP_NUMBER_OF_POINTS_140 / (dp->x_fact))-5;
+		#endif
+
+
+
+		
 
 
 		dp->diag_res = 0;
@@ -99,6 +128,8 @@ void diag_pulse_init(diag_pulseType* dp, _Bool headless, uint8_t pulse_type){
 		dp->heat_time = pselect_model->pulse_duration;
 		dp->quench_current = pselect_model->const_current;
 		dp->meas_current = pselect_model->const_current;
+		
+		
 		dp->I_increment = 0;
 		dp->u_max =  round(LVM.options->res_max * dp->quench_current / 1000);  // in V
 		dp->i_max = (dp->quench_current > dp->meas_current) ? round(dp->quench_current) : round(dp->meas_current);
@@ -301,15 +332,15 @@ void diag_pulse_measure_point(diag_pulseType *dp){
 
 
 	// Plot Color
-	if (dp->elapsed_t <= dp->t_end_quench) // red during quench
+	if (dp->elapsed_t < dp->t_end_quench) // red during quench
 	{
 		dp->color[dp->active_point] = bright_red;
 	}
-	else if ((dp->elapsed_t > dp->t_end_quench) &&(dp->elapsed_t <= dp->t_end_wait)) // blue
+	else if ((dp->elapsed_t >= dp->t_end_quench) &&(dp->elapsed_t < dp->t_end_wait)) // blue
 	{
 		dp->color[dp->active_point] = blue;
 	}
-	else if (dp->elapsed_t > dp->t_end_wait) // white for the rest
+	else if (dp->elapsed_t >= dp->t_end_wait) // white for the rest
 	{
 		dp->color[dp->active_point] = white;
 
@@ -386,7 +417,7 @@ void diag_pulse_Measure(diag_pulseType *dp){
 	set_timeout(0, TIMER_7, RESET_TIMER);
 	set_timeout(1, TIMER_7, USE_TIMER);
 
-	while(dp->active_point < DP_NUMBER_OF_POINTS_140)
+	while(dp->active_point < dp->points_in_plot)
 	{
 		
 		diag_pulse_measure_point(dp);
@@ -397,10 +428,19 @@ void diag_pulse_Measure(diag_pulseType *dp){
 		switch (dp->pulse_type)
 		{
 			case NORMAL:
-			if(dp->quench_on && (dp->elapsed_t >= dp->t_end_quench) ){
-				OCR2A = (uint8_t)round(dp->meas_current*(double)(SET_CURRENT_FACTOR)+(double)(SET_CURRENT_OFFSET));
-				dp->quench_on = false;
+			
+			while ((dp->elapsed_t - dp->elapsed_t_last) <= dp->delta_t_timer_steps)
+			{
+				if(dp->quench_on && (dp->elapsed_t >= dp->t_end_quench) ){
+					OCR2A = (uint8_t)round(dp->meas_current*(double)(SET_CURRENT_FACTOR)+(double)(SET_CURRENT_OFFSET));
+					dp->quench_on = false;
+				}
+				
+				dp->elapsed_t = set_timeout(0, TIMER_7, USE_TIMER);
 			}
+			dp->elapsed_t_last = dp->elapsed_t;
+			
+			
 			break;
 			
 			
@@ -721,7 +761,7 @@ void diag_pulse_send(diag_pulseType *dp){
 	//TODO
 	uint8_t Datatpoints_per_Packet = 30;
 	
-	uint8_t n_Packets = (dp->points_in_plot+(Datatpoints_per_Packet-1))/ Datatpoints_per_Packet; // ineger division rounded up
+	uint8_t n_Packets = (dp->points_in_plot+(Datatpoints_per_Packet-1))/ Datatpoints_per_Packet; // integer division rounded up
 	
 	// Number of Packets the Pulse is divided into
 	diag_send_buffer[6] = n_Packets;

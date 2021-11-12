@@ -367,23 +367,13 @@ uint8_t collect_and_send_MeasData(uint8_t *meas_buffer,uint8_t Message_Code){
 		LVM.vars->r_val_last_Meas = 650;
 	}
 
+		meas_buffer[index++] = ((uint16_t)(LVM.vars->r_val_last_Meas*10))>>8;  //18
+		meas_buffer[index++] = ((uint16_t)(LVM.vars->r_val_last_Meas*10));     //19
 
-	//TODO remove after fw 210 this is for testing p urposes only
-	if (FIRMWARE_VERSION > 209)
-	{
-		meas_buffer[index++] = ((uint16_t)(LVM.vars->r_val_last_Meas*100))>>8;  //17
-		meas_buffer[index++] = ((uint16_t)(LVM.vars->r_val_last_Meas*100));     //18
-
-		meas_buffer[index++] =  get_status_byte_levelmeter(); //19
-	}
-	
-	if (FIRMWARE_VERSION <= 209)
-	{
 		meas_buffer[index++] =  get_status_byte_levelmeter(); //17
 		
-		meas_buffer[index++] = ((uint16_t)(LVM.vars->r_val_last_Meas*100))>>8;  //18
-		meas_buffer[index++] = ((uint16_t)(LVM.vars->r_val_last_Meas*100));     //19
-	}
+
+
 
 
 

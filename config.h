@@ -9,15 +9,15 @@
 #ifndef CONFIG_H_
 
 
-#define ili9341
-//#define DISP_3000
+//#define ili9341
+#define DISP_3000
 
 
 #define HZB
 //#define ILL
 
 
-#define FIRMWARE_VERSION 210
+#define FIRMWARE_VERSION 211
 
 #define BRANCH_ID  1
 #define  LAST_FIRMWARE_EEPROM_CHANGED 206
