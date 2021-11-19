@@ -698,8 +698,8 @@
 #define STR_PULSE_CURRENT "Current:"
 
 #define STR_PULSE_DELTA_I "Delta I:"
-#define STR_PULSE_I_MIN "I min:"
-#define STR_PULSE_I_MAX "I max:"
+#define STR_PULSE_I_MIN "I Start:"
+#define STR_PULSE_I_MAX "I End:"
 #define STR_PULSE_DELTA_t "Delta t:"
 
 

@@ -38,8 +38,8 @@ typedef struct
 
 	double delta_I; // delta I in mA
 	double delta_t; // delta t in ms
-	double I_min ; // I_min in mA
-	double I_max ;   //I_max in mA
+	double I_start ; // I_min in mA
+	double I_end ;   //I_max in mA
 	
 	double quench_curr;
 	double quench_time;
@@ -56,7 +56,7 @@ void pulse_select_Init(void);
 Controller_Model_pulse_select* get_pulse_select_model(void);
 
 void pulse_select_set_Model(uint8_t page, uint8_t option, uint8_t value);
-_Bool pulse_seclect_set_linear_params(uint8_t i_min,uint8_t i_max,uint8_t delta_i, uint8_t delta_t);
+_Bool pulse_seclect_set_linear_params(diag_pulseType * dp, uint8_t i_start,uint8_t i_end,uint8_t delta_i, uint8_t delta_t, uint16_t pulse_duration);
 
 //void main_pressedFILL(Controller_Model *Model);
 //void main_pressedMeasure(Controller_Model *Model);

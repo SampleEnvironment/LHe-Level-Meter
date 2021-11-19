@@ -47,8 +47,8 @@ ValueOptionsDouble const_current;
 // Page3 (linear Pulse)
 //pulse_select (char)
 ValueOptionsDouble delta_I;
-ValueOptionsDouble I_min;
-ValueOptionsDouble I_max;
+ValueOptionsDouble I_start;
+ValueOptionsDouble I_end;
 ValueOptionsDouble delta_t;
 
 
@@ -145,8 +145,8 @@ Controller_Model_pulse_select pselect_model ={
 
 	.delta_I = 5, // delta I in mA
 	.delta_t = 1.0, // delta t in ms
-	.I_min = 50, // I_min in mA
-	.I_max = QUENCH_CURRENT_MAX   //I_max in mA
+	.I_start = 50, // I_min in mA
+	.I_end = QUENCH_CURRENT_MAX   //I_max in mA
 	
 	
 };
@@ -182,8 +182,8 @@ void pulse_select_Init(void){
 	//Page3
 	ValOptDouble_init(&delta_t,YcoordOfOptline[1],pulse_select[2].Page[1],&pselect_model.delta_t,0.1,0.1,5.0,0.1,1,"s",false);
 	ValOptDouble_init(&delta_I,YcoordOfOptline[2],pulse_select[2].Page[2],&pselect_model.delta_I,1,1,20,1,5,"mA",false);
-	ValOptDouble_init(&I_min,YcoordOfOptline[3],pulse_select[2].Page[3],&pselect_model.I_min,1,2,QUENCH_CURRENT_MAX,1,5,"mA",false);
-	ValOptDouble_init(&I_max,YcoordOfOptline[4],pulse_select[2].Page[4],&pselect_model.I_max,1,2,QUENCH_CURRENT_MAX,50,5,"mA",false);
+	ValOptDouble_init(&I_start,YcoordOfOptline[3],pulse_select[2].Page[3],&pselect_model.I_start,1,2,QUENCH_CURRENT_MAX,1,5,"mA",false);
+	ValOptDouble_init(&I_end,YcoordOfOptline[4],pulse_select[2].Page[4],&pselect_model.I_end,1,2,QUENCH_CURRENT_MAX,1,5,"mA",false);
 
 
 
@@ -202,16 +202,16 @@ void pulse_select_Init(void){
 	Pulse_select_Array[10]= (ValueOptions* )&pulse_type;
 	Pulse_select_Array[11]= (ValueOptions* )&delta_t;
 	Pulse_select_Array[12]= (ValueOptions* )&delta_I;
-	Pulse_select_Array[13]= (ValueOptions* )&I_min;
-	Pulse_select_Array[14]= (ValueOptions* )&I_max;
+	Pulse_select_Array[13]= (ValueOptions* )&I_start;
+	Pulse_select_Array[14]= (ValueOptions* )&I_end;
 	
 	pselect_model.pulse_duration = 10; //pulse duration in seconds
 	pselect_model.const_current = 100;  //constant current in pulse
 
 	pselect_model.delta_I = 5; // delta I in mA
 	pselect_model.delta_t = 0.1; // delta t in s
-	pselect_model.I_min = 50; // I_min in mA
-	pselect_model.I_max = QUENCH_CURRENT_MAX;   //I_max in mA
+	pselect_model.I_start = 50; // I_min in mA
+	pselect_model.I_end = QUENCH_CURRENT_MAX;   //I_max in mA
 	
 	pselect_model.quench_curr = LVM.options->quench_current;
 	pselect_model.quench_time = LVM.options->quench_time;
@@ -221,11 +221,24 @@ void pulse_select_Init(void){
 	Pulstetype_index = 0;
 }
 
-_Bool pulse_seclect_set_linear_params(uint8_t i_min,uint8_t i_max,uint8_t delta_i, uint8_t delta_t){
-	if(i_min > QUENCH_CURRENT_MAX ){
+_Bool pulse_seclect_set_linear_params(diag_pulseType * dp, uint8_t i_start,uint8_t i_end,uint8_t delta_i, uint8_t delta_t, uint16_t pulse_duration){
+	if (i_end == i_start)
+	{
+		pselect_model.pulse_duration = ((double)pulse_duration)/10;
+		
+		if(pselect_model.pulse_duration < 1 || pselect_model.pulse_duration > 200){
+			return false;
+		}
+		pselect_model.const_current = i_start;
+		
+		diag_pulse_init(dp,1,CONST);
+	}
+	
+	
+	if(i_start > QUENCH_CURRENT_MAX  ){
 		return false;
 	}
-	if(i_max > QUENCH_CURRENT_MAX ){
+	if(i_end > QUENCH_CURRENT_MAX ){
 		return false;
 	}
 	
@@ -238,16 +251,16 @@ _Bool pulse_seclect_set_linear_params(uint8_t i_min,uint8_t i_max,uint8_t delta_
 	}
 	
 	
-	if (i_min > i_max)
+	if (i_start > i_end)
 	{
 		return false;
 	}
 	
-	if((i_max - i_min) < delta_i ){
+	if((abs(i_end - i_start)) < delta_i ){
 		return false;
 	}
 	
-	uint16_t steps = (i_max -i_min)/delta_i;
+	uint16_t steps = (abs(i_end -i_start))/delta_i;
 	
 	
 	if (steps > DP_NUMBER_OF_POINTS_140)
@@ -256,10 +269,11 @@ _Bool pulse_seclect_set_linear_params(uint8_t i_min,uint8_t i_max,uint8_t delta_
 	}
 	
 	
-	pselect_model.I_min = i_min;
-	pselect_model.I_max = i_max;
+	pselect_model.I_start = i_start;
+	pselect_model.I_end = i_end;
 	pselect_model.delta_t = ((double) delta_t)/10;
 	pselect_model.delta_I = delta_i; 
+	diag_pulse_init(dp,1,LINEAR);
 	
 	return true;
 	
@@ -384,9 +398,10 @@ void pulse_select_pressedBOT(Controller_Model *Model){
 	
 	if (pselect_model.page == 3)
 	{
-		uint16_t steps = (pselect_model.I_max -pselect_model.I_min)/pselect_model.delta_I;
+		uint16_t steps = 3+((abs(pselect_model.I_end -pselect_model.I_start))/pselect_model.delta_I);
 		
-		if (pselect_model.I_min >= pselect_model.I_max)
+		/*
+		if (pselect_model.I_start >= pselect_model.I_end)
 		{
 			InitScreen_AddLine("Invalid Parameters",1);
 			InitScreen_AddLine("I min > I max",0);
@@ -395,7 +410,7 @@ void pulse_select_pressedBOT(Controller_Model *Model){
 			pulse_select_drawPage();
 			return;
 		}
-		
+		*/
 		if (steps > DP_NUMBER_OF_POINTS_140)
 		{
 			InitScreen_AddLine("Invalid Parameters",1);

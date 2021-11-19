@@ -1089,6 +1089,8 @@ void handle_received_Messages(Controller_Model *Model){
 			}
 			case SET_LETTERS_CMD:	// (#15) Set list of available device positions received from the database server.
 			{
+				
+	
 				// Get data length and data
 				uint8_t byte_number = frameBuffer[reply_Id].data_len;
 				uint8_t *ptr = (uint8_t*)frameBuffer[reply_Id].data;
@@ -1280,7 +1282,7 @@ void handle_received_Messages(Controller_Model *Model){
 				
 				
 				
-				diag_pulse_init(&dp ,1, 1);
+				diag_pulse_init(&dp ,1, NORMAL);
 				diag_pulse_Measure(&dp);
 				diag_pulse_send(&dp);
 
@@ -1314,15 +1316,15 @@ void handle_received_Messages(Controller_Model *Model){
 				uint8_t delta_i = frameBuffer[reply_Id].data[2];
 				uint8_t delta_t = frameBuffer[reply_Id].data[3];
 				
+				uint16_t pulse_duration = ((frameBuffer[reply_Id].data[2]<<8) + frameBuffer[reply_Id].data[3]);
 				
-				if (!pulse_seclect_set_linear_params(i_min,i_max,delta_i,delta_t))
+				if (!pulse_seclect_set_linear_params(&dp_u_i,i_min,i_max,delta_i, delta_t, pulse_duration))
 				{
 
 					break;
 				}
 				
 
-				diag_pulse_init(&dp_u_i,1, LINEAR);
 				diag_pulse_Measure(&dp_u_i);
 				diag_pulse_send(&dp_u_i);
 

@@ -146,20 +146,31 @@ void diag_pulse_init(diag_pulseType* dp, _Bool headless, uint8_t pulse_type){
 
 		break;
 		case LINEAR:
+		
+		if (pselect_model->I_end > pselect_model->I_start)
+		{
+			dp->u_max =  round(LVM.options->res_max * pselect_model->I_end / 1000);  // in V
+			dp->i_max = pselect_model->I_end;
+			dp->I_increment = pselect_model->delta_I;
+			}else{
+			dp->u_max =  round(LVM.options->res_max * pselect_model->I_start / 1000);  // in V
+			dp->i_max = pselect_model->I_start;
+			dp->I_increment = pselect_model->delta_I * -1;
+
+		}
 
 		dp->delta_t_timer_steps = (uint32_t)(pselect_model->delta_t*1000 /OVERFLOW_IN_MS_8_BIT);
 		dp->delta_t_points = pselect_model->delta_t* 1000;
-		dp->I_increment = pselect_model->delta_I;
-		dp->u_max =  round(LVM.options->res_max * pselect_model->I_max / 1000);  // in V
-		dp->i_max = pselect_model->I_max;
+
+
 		
 		dp->quench_end_position = 10;
 		
-		uint16_t steps = (pselect_model->I_max -pselect_model->I_min)/pselect_model->delta_I;
-		heattime_linear =  steps * pselect_model->delta_t;
+		uint16_t steps = 3+((abs(pselect_model->I_end -pselect_model->I_start))/pselect_model->delta_I);
+		heattime_linear =  (steps-3) * pselect_model->delta_t;
 		dp->points_in_plot = steps +1;
 		dp->heat_time = heattime_linear;
-		dp->quench_current = pselect_model->I_min;
+		dp->quench_current = pselect_model->I_start;
 		
 		dp->x_fact = DP_X_FACTOR*(DP_NUMBER_OF_POINTS_140 / dp->points_in_plot);
 		
@@ -446,13 +457,24 @@ void diag_pulse_Measure(diag_pulseType *dp){
 			
 			
 			case LINEAR:
-			if ( dp->quench_current <= dp->i_max)
+			if ( dp->quench_current <= dp->i_max && dp->active_point < (dp->points_in_plot-3))
 			{
+				
 				dp->quench_current += dp->I_increment;
-				if (dp->quench_current > dp->i_max)
+				
+
+				
+				if (dp->quench_current > dp->i_max )
 				{
 					dp->quench_current = dp->i_max;
+					
 				}
+				
+				if(dp->quench_current < 0){
+					dp->quench_current = 0;
+				}
+				
+				
 				OCR2A = (uint8_t)round(dp->quench_current*(double)(SET_CURRENT_FACTOR)+(double)(SET_CURRENT_OFFSET));
 			}
 			
