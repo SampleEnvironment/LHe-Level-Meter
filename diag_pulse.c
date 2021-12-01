@@ -49,7 +49,7 @@ void diag_pulse_init(diag_pulseType* dp, _Bool headless, uint8_t pulse_type){
 	
 	dp->top_zero = DP_U_ZEROLINE_70;
 	dp->bot_zero = DP_I_ZEROLINE_125;
-	dp->cursor_len = Y_DP_126 - Y_DP_curser;
+	dp->cursor_len = Y_DP_126 - Y_DP_cursor;
 	
 	dp->u_avg = 0;
 	dp->i_avg = 0;
@@ -166,13 +166,18 @@ void diag_pulse_init(diag_pulseType* dp, _Bool headless, uint8_t pulse_type){
 		
 		dp->quench_end_position = 10;
 		
-		uint16_t steps = 3+((abs(pselect_model->I_end -pselect_model->I_start))/pselect_model->delta_I);
-		heattime_linear =  (steps-3) * pselect_model->delta_t;
+		uint16_t steps = ((abs(pselect_model->I_end -pselect_model->I_start))/pselect_model->delta_I);
+		heattime_linear =  steps * pselect_model->delta_t;
 		dp->points_in_plot = steps +1;
 		dp->heat_time = heattime_linear;
 		dp->quench_current = pselect_model->I_start;
 		
 		dp->x_fact = DP_X_FACTOR*(DP_NUMBER_OF_POINTS_140 / dp->points_in_plot);
+		
+		if (dp->x_fact == 0)
+		{
+			dp->x_fact = DP_X_FACTOR;
+		}
 		
 		dp->pulse_type = LINEAR;
 		dp->t_end_quench = UINT32_MAX-1;
@@ -567,7 +572,7 @@ void diag_pulse_move_cursor(diag_pulseType *dp,int8_t direction){
 
 	// erase old cursor line
 	uint16_t x0 = xoff+X_DP_1 + dp->x_fact * (dp->active_point - direction);
-	uint16_t y0 = Y_DP_curser;
+	const uint16_t y0 = Y_DP_cursor;
 	uint16_t lenght = dp->cursor_len;
 
 	LCD_vline(x0,y0,lenght,BGC);
@@ -895,7 +900,7 @@ void diag_pulse(diag_pulseType *dp){
 
 	uint16_t x0 = xoff+X_DP_1 + dp->x_fact * dp->active_point;
 
-	uint16_t y0 = Y_DP_curser;
+	uint16_t y0 = Y_DP_cursor;
 
 	uint16_t lenght = dp->cursor_len;
 

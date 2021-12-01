@@ -360,17 +360,12 @@ void shutdown_LVM(Controller_Model *Model){
 			if (!LCD_Dialog("Unsent Meas.",LVM.temp->string,D_FGC, D_BGC,SHUTDOWN_TIMEOUT_TIME))
 			{
 				//user pressed no OR timer ran out
-				if(!set_timeout(0,TIMER_3, USE_TIMER) ){  //Timer ran out --> do noting --> shut down					{
-
-				}
-				else
-				{
 					Model->mode->next = ex_main;
 					paint_main(Time, 1, PAINT_ALL);
 					
 					xbee_sleep_plus();
 					return;
-				}
+				
 			}
 		}
 

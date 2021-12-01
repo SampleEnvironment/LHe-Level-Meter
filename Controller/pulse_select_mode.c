@@ -398,7 +398,7 @@ void pulse_select_pressedBOT(Controller_Model *Model){
 	
 	if (pselect_model.page == 3)
 	{
-		uint16_t steps = 3+((abs(pselect_model.I_end -pselect_model.I_start))/pselect_model.delta_I);
+		uint16_t steps = ((abs(pselect_model.I_end -pselect_model.I_start))/pselect_model.delta_I);
 		
 		/*
 		if (pselect_model.I_start >= pselect_model.I_end)
@@ -411,11 +411,11 @@ void pulse_select_pressedBOT(Controller_Model *Model){
 			return;
 		}
 		*/
-		if (steps > DP_NUMBER_OF_POINTS_140)
+		if (steps > (DP_NUMBER_OF_POINTS_140-1))
 		{
 			InitScreen_AddLine("Invalid Parameters",1);
 			InitScreen_AddLine("too many steps",0);
-			sprintf(LVM.temp->string,"Max allowed:%i",DP_NUMBER_OF_POINTS_140);
+			sprintf(LVM.temp->string,"Max allowed:%i",DP_NUMBER_OF_POINTS_140-1);
 			InitScreen_AddLine(LVM.temp->string,0);
 			sprintf(LVM.temp->string,"you entered:%i",steps);
 			InitScreen_AddLine(LVM.temp->string,0);

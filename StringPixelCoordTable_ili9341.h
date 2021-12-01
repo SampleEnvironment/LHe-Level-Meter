@@ -492,7 +492,7 @@
 #define Y_DP_2 2
 #define Y_DP_6 10
 #define Y_DP_OFFS 5
-#define Y_DP_curser 30
+#define Y_DP_cursor 30
 #define Y_DP_31 60
 #define Y_DP_71 (DP_U_ZEROLINE_70+1)
 #define Y_DP_85 Y_PB_77+13
