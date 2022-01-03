@@ -221,9 +221,9 @@ void pulse_select_Init(void){
 	Pulstetype_index = 0;
 }
 
-void pulse_select_set_custom_pulse(uint8_t I_quench, uint8_t I_meas, double quench_time, double wait_time){
-	pselect_model.quench_curr = (double) I_quench;
-	pselect_model.meas_curr   = (double) I_meas;
+void pulse_select_set_custom_pulse(double I_quench, double I_meas, double quench_time, double wait_time){
+	pselect_model.quench_curr =  I_quench;
+	pselect_model.meas_curr   =  I_meas;
 	pselect_model.quench_time = quench_time;
 	pselect_model.wait_time   = wait_time;
 }
@@ -238,8 +238,12 @@ _Bool pulse_seclect_set_linear_params(diag_pulseType * dp, uint8_t i_start,uint8
 		}
 		pselect_model.const_current = i_start;
 		
+		if(pselect_model.const_current < 20 || pselect_model.const_current > 250){
+			return false;
+		}
+		
 		diag_pulse_init(dp,1,CONST);
-		return true; 
+		return true;
 	}
 	
 	
@@ -280,7 +284,7 @@ _Bool pulse_seclect_set_linear_params(diag_pulseType * dp, uint8_t i_start,uint8
 	pselect_model.I_start = i_start;
 	pselect_model.I_end = i_end;
 	pselect_model.delta_t = ((double) delta_t)/10;
-	pselect_model.delta_I = delta_i; 
+	pselect_model.delta_I = delta_i;
 	diag_pulse_init(dp,1,LINEAR);
 	
 	return true;
@@ -411,12 +415,12 @@ void pulse_select_pressedBOT(Controller_Model *Model){
 		/*
 		if (pselect_model.I_start >= pselect_model.I_end)
 		{
-			InitScreen_AddLine("Invalid Parameters",1);
-			InitScreen_AddLine("I min > I max",0);
-			InitScreen_AddLine("returning to Pulse select",0);
-			_delay_ms(3000);
-			pulse_select_drawPage();
-			return;
+		InitScreen_AddLine("Invalid Parameters",1);
+		InitScreen_AddLine("I min > I max",0);
+		InitScreen_AddLine("returning to Pulse select",0);
+		_delay_ms(3000);
+		pulse_select_drawPage();
+		return;
 		}
 		*/
 		if (steps > (DP_NUMBER_OF_POINTS_140-1))

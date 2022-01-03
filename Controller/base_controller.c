@@ -1352,10 +1352,14 @@ void handle_received_Messages(Controller_Model *Model){
 				
 				pulse_select_Init();
 				
-				uint8_t I_quench = frameBuffer[reply_Id].data[0];
-				uint8_t I_meas   = frameBuffer[reply_Id].data[1];
-				double quench_time =  ((double)((frameBuffer[reply_Id].data[2]<<8) + frameBuffer[reply_Id].data[3]))/10;
-				double wait_time =    ((double)((frameBuffer[reply_Id].data[4]<<8) + frameBuffer[reply_Id].data[5]))/10;
+				double quench_time =  ((double)((frameBuffer[reply_Id].data[0]<<8) + frameBuffer[reply_Id].data[1]))/1000;
+				double I_quench =    ((double)((frameBuffer[reply_Id].data[2]<<8) + frameBuffer[reply_Id].data[3]));
+				
+				double wait_time =    ((double)((frameBuffer[reply_Id].data[4]<<8) + frameBuffer[reply_Id].data[5]))/1000;
+				
+				double I_meas =    ((double)((frameBuffer[reply_Id].data[6]<<8) + frameBuffer[reply_Id].data[7]));
+
+				
 				
 				pulse_select_set_custom_pulse(I_quench,I_meas,quench_time,wait_time);
 				
