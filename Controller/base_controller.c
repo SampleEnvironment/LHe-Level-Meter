@@ -360,11 +360,11 @@ void shutdown_LVM(Controller_Model *Model){
 			if (!LCD_Dialog("Unsent Meas.",LVM.temp->string,D_FGC, D_BGC,SHUTDOWN_TIMEOUT_TIME))
 			{
 				//user pressed no OR timer ran out
-					Model->mode->next = ex_main;
-					paint_main(Time, 1, PAINT_ALL);
-					
-					xbee_sleep_plus();
-					return;
+				Model->mode->next = ex_main;
+				paint_main(Time, 1, PAINT_ALL);
+				
+				xbee_sleep_plus();
+				return;
 				
 			}
 		}
@@ -559,7 +559,7 @@ void interval_slow_changed(Controller_Model *Model){
 }
 
 void Battery_check(Controller_Model *Model)
- {
+{
 	//=========================================================================
 	// Battery checking
 	//=========================================================================
@@ -1085,7 +1085,7 @@ void handle_received_Messages(Controller_Model *Model){
 			case SET_LETTERS_CMD:	// (#15) Set list of available device positions received from the database server.
 			{
 				
-	
+				
 				// Get data length and data
 				uint8_t byte_number = frameBuffer[reply_Id].data_len;
 				uint8_t *ptr = (uint8_t*)frameBuffer[reply_Id].data;
@@ -1231,6 +1231,9 @@ void handle_received_Messages(Controller_Model *Model){
 			memcpy(LVM.message->Str,(uint8_t*)&frameBuffer[reply_Id].data[1],19);
 			LVM.message->type = frameBuffer[reply_Id].data[0];
 			paint_Notification(LVM.message);
+			
+
+			
 			break;
 
 
@@ -1311,9 +1314,9 @@ void handle_received_Messages(Controller_Model *Model){
 				uint8_t delta_i = frameBuffer[reply_Id].data[2];
 				uint8_t delta_t = frameBuffer[reply_Id].data[3];
 				
-				uint16_t pulse_duration = ((frameBuffer[reply_Id].data[2]<<8) + frameBuffer[reply_Id].data[3]);
+
 				
-				if (!pulse_seclect_set_linear_params(&dp_u_i,i_min,i_max,delta_i, delta_t, pulse_duration))
+				if (!pulse_seclect_set_linear_params(&dp_u_i,i_min,i_max,delta_i, delta_t, 0))
 				{
 
 					break;
@@ -1339,6 +1342,85 @@ void handle_received_Messages(Controller_Model *Model){
 				
 				break;
 			}
+			
+			case TRIGGER_REMOTE_PULSE_CUSTOM_PARAMS_CMD:
+			
+			{
+				
+				
+				diag_pulseType dp_custom;
+				
+				pulse_select_Init();
+				
+				uint8_t I_quench = frameBuffer[reply_Id].data[0];
+				uint8_t I_meas   = frameBuffer[reply_Id].data[1];
+				double quench_time =  ((double)((frameBuffer[reply_Id].data[2]<<8) + frameBuffer[reply_Id].data[3]))/10;
+				double wait_time =    ((double)((frameBuffer[reply_Id].data[4]<<8) + frameBuffer[reply_Id].data[5]))/10;
+				
+				pulse_select_set_custom_pulse(I_quench,I_meas,quench_time,wait_time);
+				
+				diag_pulse_init(&dp_custom ,1, NORMAL);
+				diag_pulse_Measure(&dp_custom);
+				diag_pulse_send(&dp_custom);
+
+
+				// Update display
+				switch(Model->mode->curr)
+				{
+					case ex_main:
+					paint_main( Time, Model->mode->netstat, PAINT_ALL);
+					break;
+					case ex_filling:
+					paint_filling( Time, Model->mode->netstat, 0, 1);
+					break;
+					default:
+					break;
+				}	// End switch
+
+				break;
+				
+				
+			}
+			case TRIGGER_REMOTE_PULSE_CONSTANT_I:
+			{
+				
+				
+				_delay_ms(1000);
+				diag_pulseType dp_I_const;
+				
+				pulse_select_Init();
+				uint8_t const_curr = frameBuffer[reply_Id].data[0];
+				uint8_t pulse_dur = frameBuffer[reply_Id].data[1];
+
+
+				if (!pulse_seclect_set_linear_params(&dp_I_const,const_curr,const_curr,0, 0, pulse_dur))
+				{
+
+					break;
+				}
+
+
+				diag_pulse_Measure(&dp_I_const);
+				diag_pulse_send(&dp_I_const);
+
+
+				// Update display
+				switch(Model->mode->curr)
+				{
+					case ex_main:
+					paint_main(Time, Model->mode->netstat, PAINT_ALL);
+					break;
+					case ex_filling:
+					paint_filling(Time, Model->mode->netstat, 0, 1);
+					break;
+					default:
+					break;
+				}	// End switch
+
+				break;
+			}
+
+			
 			case DEPRECATED_ILM_BROADCAST: // ILM messages are sent in broadcast mode and are ignored by other devices
 			break;
 

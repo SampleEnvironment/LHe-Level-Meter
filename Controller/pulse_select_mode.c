@@ -221,17 +221,25 @@ void pulse_select_Init(void){
 	Pulstetype_index = 0;
 }
 
-_Bool pulse_seclect_set_linear_params(diag_pulseType * dp, uint8_t i_start,uint8_t i_end,uint8_t delta_i, uint8_t delta_t, uint16_t pulse_duration){
+void pulse_select_set_custom_pulse(uint8_t I_quench, uint8_t I_meas, double quench_time, double wait_time){
+	pselect_model.quench_curr = (double) I_quench;
+	pselect_model.meas_curr   = (double) I_meas;
+	pselect_model.quench_time = quench_time;
+	pselect_model.wait_time   = wait_time;
+}
+
+_Bool pulse_seclect_set_linear_params(diag_pulseType * dp, uint8_t i_start,uint8_t i_end,uint8_t delta_i, uint8_t delta_t, uint8_t pulse_duration){
 	if (i_end == i_start)
 	{
-		pselect_model.pulse_duration = ((double)pulse_duration)/10;
+		pselect_model.pulse_duration = ((double)pulse_duration);
 		
-		if(pselect_model.pulse_duration < 1 || pselect_model.pulse_duration > 200){
+		if(pselect_model.pulse_duration < 1 || pselect_model.pulse_duration > 250){
 			return false;
 		}
 		pselect_model.const_current = i_start;
 		
 		diag_pulse_init(dp,1,CONST);
+		return true; 
 	}
 	
 	

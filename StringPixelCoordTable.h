@@ -214,12 +214,15 @@
 
 //paint_main()
 #define FONTNR_PM_1 1
+#define AUTOFILL_BOX_WIDTH 7
+
 #define X_PM_1 1
 #define X_PM_4 4
 #define X_PM_25 25
 #define X_PM_65 65
 #define X_PM_100 100
 #define X_PM_148 148
+#define X_AUTOFFILL_INDICATOR  (LCD_WIDTH-(XOFFSET_32+AUTOFILL_BOX_WIDTH+5))
 
 #define Y_PM_2 2
 #define Y_PM_37 37

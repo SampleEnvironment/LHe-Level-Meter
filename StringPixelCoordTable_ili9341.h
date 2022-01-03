@@ -349,6 +349,7 @@
 //======================================================================================
 
 #define FONTNR_PM_1 2                                            // enlarge "conn" Font1 to Font2
+#define AUTOFILL_BOX_WIDTH 13
 
 #define X_PM_1 (BORDER_OFFSET + 3)                               // dist to buttons/left edge of STR_VESSEL_NR
 #define X_PM_4 (BORDER_OFFSET + 5)                               // "conn" in Landscape 180
@@ -356,6 +357,7 @@
 #define X_PM_25 (X_PHL_25)				     					 // HE-Level Large Number
 #define X_PM_65 (8*FONT2_W+BORDER_OFFSET+1)                      // Vessel# "Number"
 #define X_PM_100 (LCD_WIDTH-XOFFSET_32-BORDER_OFFSET-(4*FONT2_W))// 100 319-4*12 (4 char String top right corner)
+#define X_AUTOFFILL_INDICATOR  (LCD_WIDTH-(XOFFSET_32+BORDER_OFFSET+AUTOFILL_BOX_WIDTH+5))
 
 
 #define Y_PM_2 (BORDER_OFFSET + 3)                               // dist to buttons/upper edge of STR_VESSEL_NR

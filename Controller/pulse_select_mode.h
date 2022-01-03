@@ -56,7 +56,8 @@ void pulse_select_Init(void);
 Controller_Model_pulse_select* get_pulse_select_model(void);
 
 void pulse_select_set_Model(uint8_t page, uint8_t option, uint8_t value);
-_Bool pulse_seclect_set_linear_params(diag_pulseType * dp, uint8_t i_start,uint8_t i_end,uint8_t delta_i, uint8_t delta_t, uint16_t pulse_duration);
+_Bool pulse_seclect_set_linear_params(diag_pulseType * dp, uint8_t i_start,uint8_t i_end,uint8_t delta_i, uint8_t delta_t, uint8_t pulse_duration);
+void pulse_select_set_custom_pulse(uint8_t I_quench, uint8_t I_meas, double quench_time, double wait_time);
 
 //void main_pressedFILL(Controller_Model *Model);
 //void main_pressedMeasure(Controller_Model *Model);
