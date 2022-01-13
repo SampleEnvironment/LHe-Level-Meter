@@ -1020,11 +1020,15 @@ void opt_ValOpt_switch(){
 		{
 			strcpy(LVM.temp->string, "none");
 			if(update_filling_pos(LVM.pos, LVM.temp->string)) strcpy(LVM.vars->device_pos, LVM.temp->string);
-
-			display_on();    // otherwise the display would turn black just after returning
-			option_model.value = 0;  // focus goes back to the left side
-			option_model.valueLast =0;
+			
+		
+			set_OptionModel(1,2,0);
+					
 			opt_drawPage();
+			
+			// reset option exit timer otherwise Levelmeter goes back to main 				
+			set_timeout(0, TIMER_3, RESET_TIMER);
+			set_timeout(OPT_TIMEOUT_TIME, TIMER_3, USE_TIMER);
 			return;
 		}
 		Option_StrDraw(OptArray[OptarrIndex+OptNr],FGC);
