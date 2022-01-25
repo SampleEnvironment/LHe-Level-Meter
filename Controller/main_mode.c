@@ -516,12 +516,12 @@ void autofill_check(Controller_Model * Model){
 		//Vessel empty, back to main, no filling
 		if(LVM.vars->very_low_He_level)
 		{
-			LCD_Dialog(STR_HE_LEVEL,STR_FILLING_IS_DISABLE_LEVEL_TOO_LOW , D_FGC, D_BGC,0);
+			timed_dialog(STR_HE_LEVEL,STR_FILLING_IS_DISABLE_LEVEL_TOO_LOW ,10, D_FGC, D_BGC);
 			LVM.vars->auto_fill_enabled = false;
 			Model->mode->next= ex_main;
 			paint_main(Time,Model->mode->netstat,PAINT_ALL);
 		}
-		else
+		else 
 		{
 			_delay_ms(100);
 			//no external filling signal any more?
@@ -544,7 +544,7 @@ void autofill_check(Controller_Model * Model){
 				xbee_wake_up_plus();
 				
 
-				uint8_t indx = 0;
+				uint8_t indx = 0;  
 
 
 

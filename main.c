@@ -772,8 +772,12 @@ int main(void)
 	DISPLAY_CONFIG
 	xoff = (!LVM.options->display_reversed)? 0 : XOffset;
 
-
-
+	
+	
+	// Letters error is set on startup --> gets cleared as soon as device receives Letters from Server
+	// It is ent with everymeasurement as part of the status byte, so server can resend if po letters have not been set yet.
+	SET_ERROR(LETTERS_ERROR);
+	
 
 
 	//=========================================================================
@@ -796,9 +800,7 @@ int main(void)
 	}
 	
 
-	//=========================================================================
-	// Enable global interrupts
-	//========================================================================
+
 
 
 

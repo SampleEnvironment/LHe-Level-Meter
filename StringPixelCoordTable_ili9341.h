@@ -363,6 +363,9 @@
 #define Y_PM_2 (BORDER_OFFSET + 3)                               // dist to buttons/upper edge of STR_VESSEL_NR
 #define Y_PM_37 (Y_PHL_37)                                       // HE-Level Large Number
 #define Y_PM_83 152                                              // "conn" String in Button Field
+#define Y_AUTOFFILL_INDICATOR Y_PTP_20+5
+
+
 
 //======================================================================================
 //paint_time_pressure()
@@ -580,7 +583,7 @@
 #define STR_VESSEL_NOT_ON_CAMPUS "Vessel with ID\n%s not on campus,\nstill login?"
 #define STR_VESSEL_ALREADY_CONNECTED "Vessel with ID\n%s is already connected,\nstill login?"
 #define STR_VESSEL_WITH_ID_NOT_FOUND "No vessel with ID\n%s found,\nstill login?"
-#define STR_LEVEL_METER_NOT_KNOWN "Level meter not known!"
+#define STR_LEVEL_METER_NOT_KNOWN "Levelmeter not known!"
 
 //===============================================================================
 //-----Initial Setup-------------------------------------------------------------

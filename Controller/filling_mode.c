@@ -284,6 +284,7 @@ void filling_pressedNONE(Controller_Model *Model){
 				LVM.vars->auto_fill_started = false;
 				LVM.vars->auto_fill_enabled = false;		//disable autofill regardless any signals
 				
+				paint_filling(Time, Model->mode->netstat, 0, 0);
 				paint_filling_status();
 			}
 		}

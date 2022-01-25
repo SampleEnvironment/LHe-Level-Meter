@@ -277,6 +277,11 @@ void measure(Controller_Model * Model){
 		Time.tm_year = 0;
 	}
 
+	if(LVM.vars->last_he_level < LVM.options->he_min)
+	{
+		LVM.vars->very_low_He_level = true;
+	}
+
 	// enter pressure
 	LVM.vars->pressure_level = 0;
 	if (HoneywellSSC_status.connected)
