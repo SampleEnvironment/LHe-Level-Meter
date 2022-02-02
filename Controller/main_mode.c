@@ -182,6 +182,8 @@ void main_pressedMeasure(Controller_Model *Model){
 	if (Model->mode->netstat == online)
 	{
 		// Pack data in frame
+		xbee_reconnect();
+		
 		collect_and_send_MeasData(LVM.temp->buffer,STATUS_MSG);
 
 		// Free XBee module

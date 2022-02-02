@@ -302,12 +302,11 @@ void shutdown_LVM(Controller_Model *Model){
 		xbee_wake_up_plus();
 		
 
+
+
 		measure(Model);
-
-
-		if(!(CHECK_ERROR(NETWORK_ERROR) || CHECK_ERROR(NO_REPLY_ERROR))){
-			xbee_reconnect();
-		}
+		
+		xbee_reconnect();
 
 		// transmit old measurements that could not be sent (if available) to database server
 		if ((LVM.measbuff->numberStored) > 0)
