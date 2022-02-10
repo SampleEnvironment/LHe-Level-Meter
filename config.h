@@ -13,8 +13,8 @@
 //#define DISP_3000
 
 
-#define HZB
-//#define ILL
+//#define HZB
+#define ILL
 
 
 #define FIRMWARE_VERSION 213

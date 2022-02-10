@@ -320,7 +320,7 @@ void paint_time_pressure(struct tm ltime, double lpress, _Bool update)
 	if (!(ltime.tm_min < 10)) sprintf(temp,"%i:%i  ", ltime.tm_hour, ltime.tm_min);
 	LCD_Print(temp, xoff + X_PTP_2, Y_PTP_20, 2, 1, 1, ERR, BGC);
 
-	if (1)//lpress > 0)
+	if (lpress > 0)
 	{
 		draw_double_without_erasing(lpress, xoff + X_PTP_60, Y_PTP_20, 0, "mbar ", ERR, 2);
 		//draw_double_without_erasing(1013.3, xoff + X_PTP_60, Y_PTP_20, 0, "mbar ", ERR, 2);
