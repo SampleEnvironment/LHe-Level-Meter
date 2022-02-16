@@ -150,6 +150,8 @@ void main_pressedFILL(Controller_Model *Model){
 
 // make measurement
 void main_pressedMeasure(Controller_Model *Model){
+
+	
 	if (LVM.message->Received)
 	{
 
@@ -196,6 +198,8 @@ void main_pressedMeasure(Controller_Model *Model){
 	return;
 	
 }
+
+
 
 
 // request shutdown

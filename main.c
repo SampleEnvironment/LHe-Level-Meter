@@ -888,11 +888,15 @@ int main(void)
 		global_mode.netstat = offline;
 	}
 	#endif
+	
+	
+
 
 	//=========================================================================
 	// TRY TO CONNECT TO BASE STATION
 	// if not in offline mode
 	//=========================================================================
+	
 
 	if(global_mode.netstat == online)
 	{
@@ -1211,6 +1215,8 @@ int main(void)
 
 	set_timeout(DISP_TIMEOUT_TIME, TIMER_2, USE_TIMER);
 	
+
+
 
 	
 	//=========================================================================
