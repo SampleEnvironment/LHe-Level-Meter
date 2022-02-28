@@ -42,6 +42,7 @@
 #include "usart.h"
 #include "xbee.h"
 #include "xbee_utilities.h"
+#include "xbee_AT_comm.h"
 #include "DS3231M.h"
 #include "I2C_utilities.h"
 #include "module_globals.h"
