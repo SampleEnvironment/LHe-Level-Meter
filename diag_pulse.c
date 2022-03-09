@@ -159,7 +159,7 @@ void diag_pulse_init(diag_pulseType* dp, _Bool headless, uint8_t pulse_type){
 
 		}
 
-		dp->delta_t_timer_steps = (uint32_t)(pselect_model->delta_t*1000 /OVERFLOW_IN_MS_8_BIT);
+		dp->delta_t_timer_steps = (uint32_t)(((pselect_model->delta_t*1000)-TIME_TO_MEASURE) /OVERFLOW_IN_MS_8_BIT);
 		dp->delta_t_points = pselect_model->delta_t* 1000;
 
 
@@ -421,29 +421,31 @@ void diag_pulse_Measure(diag_pulseType *dp){
 	OCR2A = (uint8_t)round(dp->quench_current*(double)(SET_CURRENT_FACTOR)+(double)(SET_CURRENT_OFFSET));
 
 
-	diag_pulse_measure_point(dp); //measure first 0 point
+
 
 	
 	MEASURE_PIN_ON				// Switch on the current supply board
 
+
+	if(dp->pulse_type == LINEAR || dp->pulse_type == CONST){
+		_delay_ms(200);
+		}else{
+		_delay_ms(20);
+	}
+	
 
 	// measure first while quench current is applied
 	// then change to measurement current
 	
 	set_timeout(0, TIMER_7, RESET_TIMER);
 	set_timeout(1, TIMER_7, USE_TIMER);
-
-	while(dp->active_point < dp->points_in_plot)
-	{
-		
-		diag_pulse_measure_point(dp);
-		diag_pulse_plot_seg(dp->active_point-2,dp);
-
-		// change to measurement current
-		
+	
+	while(dp->active_point < dp->points_in_plot){
 		switch (dp->pulse_type)
 		{
 			case NORMAL:
+			
+			diag_pulse_measure_point(dp);
 			
 			while ((dp->elapsed_t - dp->elapsed_t_last) <= dp->delta_t_timer_steps)
 			{
@@ -457,12 +459,24 @@ void diag_pulse_Measure(diag_pulseType *dp){
 			dp->elapsed_t_last = dp->elapsed_t;
 			
 			
+
+			
+			
 			break;
 			
-			
-			
 			case LINEAR:
-			if ( dp->quench_current <= dp->i_max && dp->active_point < (dp->points_in_plot-3))
+			
+			
+			while ((dp->elapsed_t - dp->elapsed_t_last) <= dp->delta_t_timer_steps)
+			{
+				dp->elapsed_t = set_timeout(0, TIMER_7, USE_TIMER);
+			}
+			
+			dp->elapsed_t_last = dp->elapsed_t;
+			
+			diag_pulse_measure_point(dp);
+			
+			if ( dp->quench_current <= dp->i_max)
 			{
 				
 				dp->quench_current += dp->I_increment;
@@ -483,11 +497,7 @@ void diag_pulse_Measure(diag_pulseType *dp){
 				OCR2A = (uint8_t)round(dp->quench_current*(double)(SET_CURRENT_FACTOR)+(double)(SET_CURRENT_OFFSET));
 			}
 			
-			while ((dp->elapsed_t - dp->elapsed_t_last) <= dp->delta_t_timer_steps)
-			{
-				dp->elapsed_t = set_timeout(0, TIMER_7, USE_TIMER);
-			}
-			dp->elapsed_t_last = dp->elapsed_t;
+			
 			
 			if (dp->active_point > dp->points_in_plot)
 			{
@@ -502,11 +512,10 @@ void diag_pulse_Measure(diag_pulseType *dp){
 				
 			}
 			
-			
 			break;
 			
+			case  CONST:
 			
-			case CONST:
 			while ((dp->elapsed_t - dp->elapsed_t_last) <= dp->delta_t_timer_steps)
 			{
 				dp->elapsed_t = set_timeout(0, TIMER_7, USE_TIMER);
@@ -524,19 +533,18 @@ void diag_pulse_Measure(diag_pulseType *dp){
 					return;
 				}
 			}
+			diag_pulse_measure_point(dp);
 			dp->elapsed_t_last = dp->elapsed_t;
-			
 			break;
-			
 			default:
 			break;
 		}
 		dp->elapsed_t = set_timeout(0, TIMER_7, USE_TIMER);
-
-
-		
 		
 	}
+	
+
+	
 	dp->elapsed_t = set_timeout(0, TIMER_7, USE_TIMER);
 	set_timeout(0,TIMER_7,RESET_TIMER);
 	
@@ -545,6 +553,7 @@ void diag_pulse_Measure(diag_pulseType *dp){
 
 	// Stop PWM
 	DDRD &= (0 << PD7);			// Set PORTD.7 as input
+	
 	
 	
 	if(dp->pulse_type == CONST)
@@ -887,9 +896,19 @@ void diag_send_sub_packets(diag_pulseType *dp,uint8_t Message_code,uint8_t * dia
 void diag_pulse(diag_pulseType *dp){
 
 	diag_pulse_coords(dp); // draw Window
+	
+	LCD_Print("Measuring...",120,70,2,1,1,FGC,BGC);
+	LCD_Print("Measuring...",120,180,2,1,1,FGC,BGC);
+
 
 	diag_pulse_Measure(dp); // do Measurement --> draw plot
-
+	
+		LCD_Print("            ",120,70,2,1,1,FGC,BGC);
+		LCD_Print("            ",120,180,2,1,1,FGC,BGC);
+	
+	for(uint8_t i = 0; i< dp->points_in_plot-1; i++){
+		diag_pulse_plot_seg(i,dp);
+	}
 
 
 	// move active point to End of the quench pulse

@@ -22,6 +22,8 @@
 #define CONST  2
 #define LINEAR 3
 
+#define TIME_TO_MEASURE 11 // time it takes the Levelmeter to do a Measurement in ms
+
 extern globalModesType global_mode;
 
 
