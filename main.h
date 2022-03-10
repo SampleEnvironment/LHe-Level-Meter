@@ -102,7 +102,7 @@ extern EWindowOrientation ili_Orientation;
 #define QUENCH_TIME_MAX 		(9.9)		//
 
 #define QUENCH_CURRENT_DEF 		(120)		// Current in mA
-#define QUENCH_CURRENT_MIN 		(60)		// Minimum allowed value
+#define QUENCH_CURRENT_MIN 		(20)		// Minimum allowed value
 #define QUENCH_CURRENT_MAX 		(250)		// Maximum allowed value
 
 #define WAIT_TIME_DEF 			(2)			// Waiting time between end of quench and beginning of measurement of He probe (JG)
@@ -110,7 +110,7 @@ extern EWindowOrientation ili_Orientation;
 #define WAIT_TIME_MAX 			(30)		// Maximum allowed value
 
 #define MEAS_CURRENT_DEF 		(80)		// Current in mA
-#define MEAS_CURRENT_MIN 		(60)		// Minimum allowed value
+#define MEAS_CURRENT_MIN 		(20)		// Minimum allowed value
 #define MEAS_CURRENT_MAX 		(150)		// Maximum allowed value
 
 #define TOTAL_VOL_DEF 			(100)		// Total volume in liter

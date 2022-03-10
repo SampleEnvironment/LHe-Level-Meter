@@ -263,10 +263,6 @@ _Bool pulse_seclect_set_linear_params(diag_pulseType * dp, uint8_t i_start,uint8
 	}
 	
 	
-	if (i_start > i_end)
-	{
-		return false;
-	}
 	
 	if((abs(i_end - i_start)) < delta_i ){
 		return false;
