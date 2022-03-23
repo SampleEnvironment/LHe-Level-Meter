@@ -180,15 +180,16 @@ VarsType vars = {
 	.batt_level = 0,
 	.pressure_level = 0,
 	.eeprom_changed = 0,
-	.very_low_He_level = false,
-	.auto_fill_enabled = false,
-	.auto_fill_started = false,
+	.very_low_He_level = 0,
+	.auto_fill_enabled = 0,
+	.auto_fill_started = 0,
 	.device_pos ="none",
 	.entered_options_pw = 0,
-	.transmit_fast_changed = false,
-	.transmit_slow_changed = false,
-	.fill_meas_counter =false,
-	.Device_ID_Str=""
+	.transmit_fast_changed = 0,
+	.transmit_slow_changed = 0,
+	.fill_meas_counter =0,
+	.Device_ID_Str="",
+	.n_pulse_wakes = NUMBER_POST_PULSE_WAKES
 };
 
 
@@ -535,8 +536,16 @@ inline void xbee_sleep_plus(void)
 	xbee.sleeping = true;
 	// Clear then set the timeout for sleeping time
 	set_timeout(0, TIMER_5, RESET_TIMER);
-	set_timeout(xbee.sleep_period*60, TIMER_5, USE_TIMER);
-	//	LCD_Print("xbee_sleep_plus", 5, 40, 2, 1, 1, FGC, BGC);
+	
+	if (LVM.vars->n_pulse_wakes)
+	{
+		set_timeout(POST_PULSE_SLEEP_TIME, TIMER_5, USE_TIMER);
+		--LVM.vars->n_pulse_wakes;
+	}else{
+		set_timeout(xbee.sleep_period*60, TIMER_5, USE_TIMER);
+	}
+	
+	
 }
 
 

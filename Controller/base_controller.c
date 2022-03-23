@@ -397,6 +397,73 @@ void shutdown_LVM(Controller_Model *Model){
 	return;
 }
 
+void send_awake_message(Controller_Model *Model){
+	if(Model->mode->netstat == online){
+		// enter pressure
+		LVM.vars->pressure_level = 0;
+		if (HoneywellSSC_status.connected)
+		{
+			HoneywellSSC_read_pressure();
+			if (HoneywellSSC_status.status < 4) LVM.vars->pressure_level = HoneywellSSC_Pressure;
+		}
+
+		// wakes up the xbee and sets the timer
+		xbee_wake_up_plus();
+		
+
+		// Define frame
+
+		uint8_t index =  0;
+
+
+		LVM.temp->buffer[index++] = (uint16_t) LVM.vars->pressure_level >> 8;
+		LVM.temp->buffer[index++] = (uint16_t) LVM.vars->pressure_level;
+		LVM.temp->buffer[index++] =  get_status_byte_levelmeter();
+
+		// Try to reconnect to the network
+		xbee_reconnect();
+
+		//uint8_t status = 0;
+		struct tm  newtime2;
+
+		#ifdef ALLOW_COM
+		paint_info_line(STR_SEND_AWAKE_MSG,0);
+		_delay_ms(1000);
+
+		if(xbee_send_request(XBEE_ACTIVE_MSG, LVM.temp->buffer, index)!= 0xFF){
+
+
+			// set time
+			newtime2.tm_sec =	LVM.temp->buffer[0];
+			newtime2.tm_min =	LVM.temp->buffer[1];
+			newtime2.tm_hour =		LVM.temp->buffer[2];
+			newtime2.tm_mday =		LVM.temp->buffer[3];
+			newtime2.tm_mon =	LVM.temp->buffer[4];
+			newtime2.tm_year =		LVM.temp->buffer[5];
+
+			if (connected.DS3231M)
+			{
+				DS3231M_set_time(&newtime2);
+			}
+
+		}
+		#else
+		// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
+		if (xbee_send_message(XBEE_ACTIVE_MSG, LVM.temp->buffer, index))
+		{
+			CLEAR_ALL(); // Clear all errors
+		}
+		#endif
+		
+		// reset the timeout for awake time
+		set_timeout(0, TIMER_5, RESET_TIMER);
+		set_timeout(xbee_get_awake_period(), TIMER_5, USE_TIMER);		// Stay active for xbee_awake_period
+
+
+		
+	}
+}
+
 void manage_Xbee_sleep_cycles(Controller_Model *Model){
 	//=========================================================================
 	// Manage XBee module sleep cycles
@@ -410,63 +477,7 @@ void manage_Xbee_sleep_cycles(Controller_Model *Model){
 			if(!set_timeout(0, TIMER_5, USE_TIMER))		//timer5 not running and returns 0
 			{
 
-
-				// enter pressure
-				LVM.vars->pressure_level = 0;
-				if (HoneywellSSC_status.connected)
-				{
-					HoneywellSSC_read_pressure();
-					if (HoneywellSSC_status.status < 4) LVM.vars->pressure_level = HoneywellSSC_Pressure;
-				}
-
-				// wakes up the xbee and sets the timer
-				xbee_wake_up_plus();
-				
-
-				// Define frame
-
-				uint8_t index =  0;
-
-
-				LVM.temp->buffer[index++] = (uint16_t) LVM.vars->pressure_level >> 8;
-				LVM.temp->buffer[index++] = (uint16_t) LVM.vars->pressure_level;
-				LVM.temp->buffer[index++] =  get_status_byte_levelmeter();
-
-				// Try to reconnect to the network
-				xbee_reconnect();
-
-				//uint8_t status = 0;
-				struct tm  newtime2;
-
-				#ifdef ALLOW_COM
-				paint_info_line(STR_SEND_AWAKE_MSG,0);
-				_delay_ms(1000);
-
-				if(xbee_send_request(XBEE_ACTIVE_MSG, LVM.temp->buffer, index)!= 0xFF){
-
-
-					// set time
-					newtime2.tm_sec =	LVM.temp->buffer[0];
-					newtime2.tm_min =	LVM.temp->buffer[1];
-					newtime2.tm_hour =		LVM.temp->buffer[2];
-					newtime2.tm_mday =		LVM.temp->buffer[3];
-					newtime2.tm_mon =	LVM.temp->buffer[4];
-					newtime2.tm_year =		LVM.temp->buffer[5];
-
-					if (connected.DS3231M)
-					{
-						DS3231M_set_time(&newtime2);
-					}
-
-				}
-				#else
-				// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
-				if (xbee_send_message(XBEE_ACTIVE_MSG, LVM.temp->buffer, index))
-				{
-					CLEAR_ALL(); // Clear all errors
-				}
-				#endif
-
+				send_awake_message(Model);
 
 				// transmit old measurements that could not be sent (if available) to database server
 				if (!((CHECK_ERROR(NETWORK_ERROR)) || (CHECK_ERROR(NO_REPLY_ERROR))) && ((LVM.measbuff->numberStored) > 0))
@@ -1301,6 +1312,15 @@ void handle_received_Messages(Controller_Model *Model){
 					default:
 					break;
 				}	// End switch
+				
+				send_awake_message(Model);
+				
+				// reset the timeout for awake time
+				set_timeout(0, TIMER_5, RESET_TIMER);
+				set_timeout(xbee_get_awake_period(), TIMER_5, USE_TIMER);		// Stay active for xbee_awake_period
+
+				LVM.vars->n_pulse_wakes = NUMBER_POST_PULSE_WAKES;
+
 
 				break;
 			}
@@ -1344,6 +1364,16 @@ void handle_received_Messages(Controller_Model *Model){
 					break;
 				}	// End switch
 				
+				send_awake_message(Model);
+				
+				// reset the timeout for awake time
+				set_timeout(0, TIMER_5, RESET_TIMER);
+				set_timeout(xbee_get_awake_period(), TIMER_5, USE_TIMER);		// Stay active for xbee_awake_period
+
+				LVM.vars->n_pulse_wakes = NUMBER_POST_PULSE_WAKES;
+
+				
+				
 				break;
 			}
 			
@@ -1384,6 +1414,15 @@ void handle_received_Messages(Controller_Model *Model){
 					default:
 					break;
 				}	// End switch
+				
+				send_awake_message(Model);
+				
+				// reset the timeout for awake time
+				set_timeout(0, TIMER_5, RESET_TIMER);
+				set_timeout(xbee_get_awake_period(), TIMER_5, USE_TIMER);		// Stay active for xbee_awake_period
+
+				LVM.vars->n_pulse_wakes = NUMBER_POST_PULSE_WAKES;
+
 
 				break;
 				
@@ -1424,6 +1463,14 @@ void handle_received_Messages(Controller_Model *Model){
 					default:
 					break;
 				}	// End switch
+				
+				send_awake_message(Model);
+				
+				// reset the timeout for awake time
+				set_timeout(0, TIMER_5, RESET_TIMER);
+				set_timeout(xbee_get_awake_period(), TIMER_5, USE_TIMER);		// Stay active for xbee_awake_period
+
+				LVM.vars->n_pulse_wakes = NUMBER_POST_PULSE_WAKES;
 
 				break;
 			}

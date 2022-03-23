@@ -134,6 +134,7 @@ void measure(Controller_Model * Model);
 void shutdown_LVM(Controller_Model * Model);
 
 void manage_Xbee_sleep_cycles(Controller_Model *Model);
+void send_awake_message(Controller_Model *Model);
 
 void interval_slow_changed(Controller_Model *Model);
 void Battery_check(Controller_Model *Model);

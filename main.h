@@ -178,6 +178,9 @@ extern EWindowOrientation ili_Orientation;
 #endif // HZB
 
 
+#define POST_PULSE_SLEEP_TIME 60 //after a remote Pulse the Levelmter has a number of sleeep cycles that are shorter than usual to facilitate faster chaining of  multiple remote pulses
+#define NUMBER_POST_PULSE_WAKES 2
+
 #define EEPROM_CHANGED_DEF 0
 
 // Configuration
@@ -327,6 +330,7 @@ typedef struct{
 	// Device position (instruments or labs)
 	char 		device_pos[5];
 
+	uint8_t n_pulse_wakes;
 
 	//diag pages
 
