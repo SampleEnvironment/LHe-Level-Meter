@@ -1312,12 +1312,7 @@ void handle_received_Messages(Controller_Model *Model){
 					default:
 					break;
 				}	// End switch
-				
-				send_awake_message(Model);
-				
-				// reset the timeout for awake time
-				set_timeout(0, TIMER_5, RESET_TIMER);
-				set_timeout(xbee_get_awake_period(), TIMER_5, USE_TIMER);		// Stay active for xbee_awake_period
+
 
 				LVM.vars->n_pulse_wakes = NUMBER_POST_PULSE_WAKES;
 
@@ -1411,11 +1406,6 @@ void handle_received_Messages(Controller_Model *Model){
 					break;
 				}	// End switch
 				
-				send_awake_message(Model);
-				
-				// reset the timeout for awake time
-				set_timeout(0, TIMER_5, RESET_TIMER);
-				set_timeout(xbee_get_awake_period(), TIMER_5, USE_TIMER);		// Stay active for xbee_awake_period
 
 				LVM.vars->n_pulse_wakes = NUMBER_POST_PULSE_WAKES;
 
@@ -1460,11 +1450,7 @@ void handle_received_Messages(Controller_Model *Model){
 					break;
 				}	// End switch
 				
-				send_awake_message(Model);
-				
-				// reset the timeout for awake time
-				set_timeout(0, TIMER_5, RESET_TIMER);
-				set_timeout(xbee_get_awake_period(), TIMER_5, USE_TIMER);		// Stay active for xbee_awake_period
+
 
 				LVM.vars->n_pulse_wakes = NUMBER_POST_PULSE_WAKES;
 
