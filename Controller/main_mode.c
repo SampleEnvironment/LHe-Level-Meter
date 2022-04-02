@@ -20,6 +20,7 @@
 #include "../timer_utilities.h"
 
 #include "xbee.h"
+#include "xbee_AT_comm.h"
 #include "xbee_utilities.h"
 #include "I2C_utilities.h"
 #include "status.h"
@@ -289,6 +290,12 @@ void main_pressedDOWN(Controller_Model *Model){
 		(CHECK_ERROR(NETWORK_ERROR))? 	InitScreen_AddLine(STR_UN_SUCCESSFUL,0) : InitScreen_AddLine(STR_SUCCESSFUL,0) ;
 		
 		//_delay_ms(2000);
+
+		if(xbee_coordIdentifier()){
+			LCD_Print("NI received",50,100,2,1,1,red,BGC);
+			paint_info_line(xbee_get_coordID(),1);
+			_delay_ms(3000);
+		} 
 
 		if (!CHECK_ERROR(NETWORK_ERROR))
 		{

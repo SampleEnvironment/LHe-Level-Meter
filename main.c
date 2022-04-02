@@ -687,11 +687,11 @@ int main(void)
 
 	sprintf(LVM.temp->string,"%s ", STR_HZB_LEVELMETER);
 	glcd_led_on();
-	_delay_ms(3000);
+	_delay_ms(1000);
 	LCD_Print(LVM.temp->string,20,160,2,1,1,BGC,white);
 	sprintf(LVM.temp->string,"%s %iv%i", STR_FIRMWARE_VERSION,LVM.version->Branch_id,LVM.version->Fw_version);
 	LCD_Print(LVM.temp->string,20,185,2,1,1,BGC,white);
-	_delay_ms(3000);
+	_delay_ms(2000);
 	#endif
 
 	#ifdef DISP_3000
@@ -700,12 +700,12 @@ int main(void)
 	LCD_LOGO(5,20,white);
 
 	sprintf(LVM.temp->string,"%s ", STR_HZB_LEVELMETER);
-	_delay_ms(3000);
+	_delay_ms(1000);
 	LCD_Print(LVM.temp->string,10,90,2,1,1,BGC,white);
 
 	sprintf(LVM.temp->string,"Firmware %iv%i",LVM.version->Branch_id,LVM.version->Fw_version);
 	LCD_Print(LVM.temp->string,10,105,2,1,1,BGC,white);
-	_delay_ms(3000);
+	_delay_ms(2000);
 	#endif // DISP_3000
 
 

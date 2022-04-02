@@ -718,7 +718,7 @@
 #define STR_AUTFILL_IS_DISABLED_HE_LEVEL_TOO_LOW "Autofill is disabled.\nHe Level is too low."
 #define STR_FILLING_TERMINATED "Filling terminated"
 #define STR_OPTIONS "Options"
-#define STR_UPLOAD_CHANGES_TO_DATABASE  "Upload changed \noptions to \ndatabase?"
+#define STR_UPLOAD_CHANGES_TO_DATABASE   "Upload changed \noptions to \ndatabase? \nTo make changes permantent\nplease confirm them in the\nHelium Management System."
 #define STR_SAVING_SETTINGS "Saving settings"
 #define STR_ON "ON "
 
