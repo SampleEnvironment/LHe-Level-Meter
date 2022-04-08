@@ -179,7 +179,7 @@ extern EWindowOrientation ili_Orientation;
 
 
 #define POST_PULSE_SLEEP_TIME 60 //after a remote Pulse the Levelmter has a number of sleeep cycles that are shorter than usual to facilitate faster chaining of  multiple remote pulses
-#define NUMBER_POST_PULSE_WAKES 2
+#define NUMBER_POST_PULSE_WAKES 10
 
 #define EEPROM_CHANGED_DEF 0
 

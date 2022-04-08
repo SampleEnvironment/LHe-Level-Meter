@@ -487,6 +487,7 @@
 #define X_DP_2_SEND (X_PB_15-(3*LD_HALF_CHAR_WIDTH)-5)
 #define X_DP_3 (BORDER_OFFSET + 200)//(BORDER_OFFSET +3) 
 #define X_DP_20 (BORDER_OFFSET +3) 
+#define X_DP_25 59
 #define X_DP_60 90
 #define X_DP_60_AVG 74
 #define X_DP_60_NORMAL X_DP_60_AVG+4*FONT1_W
@@ -499,9 +500,12 @@
 #define Y_DP_OFFS 5
 #define Y_DP_cursor 30
 #define Y_DP_31 60
+#define Y_DP_40 70
 #define Y_DP_71 (DP_U_ZEROLINE_70+1)
 #define Y_DP_85 Y_PB_77+13
+#define Y_DP_100 180
 #define Y_DP_126 (DP_I_ZEROLINE_125+1)
+
 
 //======================================================================================
 //Pulse Select

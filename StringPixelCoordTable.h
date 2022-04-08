@@ -336,6 +336,7 @@
 #define X_DP_3 3
 
 #define X_DP_20 X_DP_2 
+#define X_DP_25 25
 #define X_DP_60 50
 #define X_DP_60_AVG X_DP_60
 #define X_DP_60_NORMAL X_DP_60
@@ -348,8 +349,10 @@
 #define Y_DP_OFFS 3
 #define Y_DP_cursor 20
 #define Y_DP_31 31
+#define Y_DP_40 40
 #define Y_DP_71 71
 #define Y_DP_85 85
+#define Y_DP_100 100
 #define Y_DP_126 126
 
 

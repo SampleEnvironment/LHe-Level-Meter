@@ -897,14 +897,19 @@ void diag_pulse(diag_pulseType *dp){
 
 	diag_pulse_coords(dp); // draw Window
 	
-	LCD_Print("Measuring...",120,70,2,1,1,FGC,BGC);
-	LCD_Print("Measuring...",120,180,2,1,1,FGC,BGC);
+	//LCD_Print("Measuring...",120,70,2,1,1,FGC,BGC);
+	//LCD_Print("Measuring...",120,180,2,1,1,FGC,BGC);
 
+	LCD_Print("Measuring...",X_DP_25+xoff,Y_DP_40,2,1,1,FGC,BGC);
+	LCD_Print("Measuring...",X_DP_25+xoff,Y_DP_100,2,1,1,FGC,BGC);
 
 	diag_pulse_Measure(dp); // do Measurement --> draw plot
 	
-		LCD_Print("            ",120,70,2,1,1,FGC,BGC);
-		LCD_Print("            ",120,180,2,1,1,FGC,BGC);
+		//LCD_Print("            ",120,70,2,1,1,FGC,BGC);
+		//LCD_Print("            ",120,180,2,1,1,FGC,BGC);
+			LCD_Print("            ",X_DP_25+xoff,Y_DP_40,2,1,1,FGC,BGC);
+			LCD_Print("            ",X_DP_25+xoff,Y_DP_100,2,1,1,FGC,BGC);
+	
 	
 	for(uint8_t i = 0; i< dp->points_in_plot-1; i++){
 		diag_pulse_plot_seg(i,dp);
