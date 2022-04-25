@@ -233,8 +233,11 @@
 //paint_time_pressure()
 #define X_PTP_2 2
 #define X_PTP_60 55
+#define X_PTP_COORDINATOR (LCD_WIDTH-(XOFFSET_32+3)) // x pos of coordinator string
 
 #define Y_PTP_20 20
+#define Y_PTP_COORDINATOR (Y_PTP_20+FONT1_H+7) // y position of coordinator string
+
 
 
 

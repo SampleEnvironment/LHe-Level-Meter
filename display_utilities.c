@@ -21,6 +21,8 @@
 #include "DS3231M.h"
 #include "xbee.h"
 #include "adwandler.h"
+#include "status.h"
+
 #ifdef DISP_3000
 #include "StringPixelCoordTable.h"
 #endif
@@ -240,19 +242,19 @@ void paint_he_level(double he_level, double total_volume, _Bool print_Percentage
 	char temp[10];
 	int16_t disp;
 	
-		#ifdef ili9341
-		//LCD_Print(temp, xoff + X_PHL_2, Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4, SCALE_PHL_4, ERR, BGC);
-		LCD_Print("   ",xoff+ (CENTER_LINE-((SCALE_PHL_4*3*FONT3_W)+FONT2_W*2)*0.5), Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4, SCALE_PHL_4, ERR, BGC);
+	#ifdef ili9341
+	//LCD_Print(temp, xoff + X_PHL_2, Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4, SCALE_PHL_4, ERR, BGC);
+	LCD_Print("   ",xoff+ (CENTER_LINE-((SCALE_PHL_4*3*FONT3_W)+FONT2_W*2)*0.5), Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4, SCALE_PHL_4, ERR, BGC);
 
-		LCD_Print(" ", xoff + (CENTER_LINE-((SCALE_PHL_4*3*FONT3_W)+FONT2_W*2)*0.5)+(FONT3_W *SCALE_PHL_4+FONT3_W1 *SCALE_PHL_4*2), Y_PHL_61, 2, 2, 2, ERR, BGC);
-		#endif
+	LCD_Print(" ", xoff + (CENTER_LINE-((SCALE_PHL_4*3*FONT3_W)+FONT2_W*2)*0.5)+(FONT3_W *SCALE_PHL_4+FONT3_W1 *SCALE_PHL_4*2), Y_PHL_61, 2, 2, 2, ERR, BGC);
+	#endif
 
-		#ifdef  DISP_3000
-		//LCD_Print(temp, xoff + X_PHL_2, Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4, SCALE_PHL_4, ERR, BGC);
-		LCD_Print("   ",xoff+ (CENTER_LINE-((SCALE_PHL_4*3*FONT3_W)+FONT2_W*2)*0.5), Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4, SCALE_PHL_4, ERR, BGC);
+	#ifdef  DISP_3000
+	//LCD_Print(temp, xoff + X_PHL_2, Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4, SCALE_PHL_4, ERR, BGC);
+	LCD_Print("   ",xoff+ (CENTER_LINE-((SCALE_PHL_4*3*FONT3_W)+FONT2_W*2)*0.5), Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4, SCALE_PHL_4, ERR, BGC);
 
-		LCD_Print(" ", xoff + (CENTER_LINE-((SCALE_PHL_4*3*FONT3_W)+FONT2_W*2)*0.5)+(3*FONT3_W*SCALE_PHL_4)-X_PHL_L_OFFSET, Y_PHL_61, 2, 2, 2, ERR, BGC);
-		#endif
+	LCD_Print(" ", xoff + (CENTER_LINE-((SCALE_PHL_4*3*FONT3_W)+FONT2_W*2)*0.5)+(3*FONT3_W*SCALE_PHL_4)-X_PHL_L_OFFSET, Y_PHL_61, 2, 2, 2, ERR, BGC);
+	#endif
 
 
 	
@@ -274,7 +276,7 @@ void paint_he_level(double he_level, double total_volume, _Bool print_Percentage
 		uint8_t digits = strlen(temp);
 		
 		
-//TODO this is terrible !!! redwork is in order  somehow font three has a different width for a single char (34), and for muutltiple chars (29) 
+		//TODO this is terrible !!! redwork is in order  somehow font three has a different width for a single char (34), and for muutltiple chars (29)
 		#ifdef ili9341
 		//LCD_Print(temp, xoff + X_PHL_2, Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4, SCALE_PHL_4, ERR, BGC);
 		LCD_Print(temp,xoff+ (CENTER_LINE-((SCALE_PHL_4*digits*FONT3_W)+FONT2_W*2)*0.5), Y_PHL_37, FONTNR_PHL_2, SCALE_PHL_4, SCALE_PHL_4, ERR, BGC);
@@ -320,6 +322,16 @@ void paint_time_pressure(struct tm ltime, double lpress, _Bool update)
 	if (!(ltime.tm_min < 10)) sprintf(temp,"%i:%i  ", ltime.tm_hour, ltime.tm_min);
 	LCD_Print(temp, xoff + X_PTP_2, Y_PTP_20, 2, 1, 1, ERR, BGC);
 
+
+	LCD_Print("           ",X_PTP_COORDINATOR +xoff-11*FONT1_W,Y_PTP_COORDINATOR,1,1,1,FGC,BGC);
+	
+	uint16_t color = FGC;
+	
+	if (CHECK_ERROR(NETWORK_ERROR))
+	{
+		color = red;
+	}
+	LCD_Print(xbee_get_coordID(),X_PTP_COORDINATOR +xoff-strlen(xbee_get_coordID())*FONT1_W,Y_PTP_COORDINATOR,1,1,1,color,BGC);
 	if (lpress > 0)
 	{
 		draw_double_without_erasing(lpress, xoff + X_PTP_60, Y_PTP_20, 0, "mbar ", ERR, 2);
@@ -548,11 +560,14 @@ void paint_main(struct tm ltime, _Bool netstat, _Bool update)
 		
 
 		
-		//time and pressure
-		paint_time_pressure(ltime, LVM.vars->pressure_level, update);
+	
 
 		//HE-Level
 		paint_he_level(LVM.vars->he_level, LVM.options->total_volume, 1);
+		
+		
+			//time and pressure
+			paint_time_pressure(ltime, LVM.vars->pressure_level, update);
 
 		paint_buttons(" ","opts",0);
 		//		LCD_Print("Fill",148,31,1,1,2,FGC, BGC);
@@ -567,12 +582,14 @@ void paint_main(struct tm ltime, _Bool netstat, _Bool update)
 	{
 		paint_info_line("",0);
 		clear_progress_bar(xoff+X_M_5, Y_M_105);
-		//time and pressure
-		paint_time_pressure(ltime, LVM.vars->pressure_level, update);
+
 
 		//HE-Level
 		//LCD_Print("   ", xoff+X_PM_25, Y_PM_37, 2, 4,4, ERR, BGC);
 		paint_he_level(LVM.vars->he_level, LVM.options->total_volume, 1);
+		
+				//time and pressure
+				paint_time_pressure(ltime, LVM.vars->pressure_level, update);
 
 		
 	}
@@ -584,11 +601,12 @@ void paint_main(struct tm ltime, _Bool netstat, _Bool update)
 	uint16_t y0 = Y_AUTOFFILL_INDICATOR;
 	if (LVM.vars->auto_fill_enabled)
 	{
-		LCD_Box(x0,y0,x0 +boxheight,y0+boxheight,green);
-	}else{
-		
-				LCD_Box(x0,y0,x0+boxheight,y0+boxheight,green);
-				LCD_Box(x0+1,y0+1,x0+boxheight-1,y0+boxheight-1,BGC);
+		LCD_Box(x0,y0,x0 +boxheight,y0+boxheight,green);		
+	}
+	else
+	{
+		LCD_Box(x0,y0,x0+boxheight,y0+boxheight,green);
+		LCD_Box(x0+1,y0+1,x0+boxheight-1,y0+boxheight-1,BGC);
 	}
 	
 }

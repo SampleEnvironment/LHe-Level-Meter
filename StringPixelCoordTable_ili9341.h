@@ -372,9 +372,11 @@
 //======================================================================================
 #define X_PTP_2  (X_PM_1)                      //Time: "hh:mm" same coord as STR_VESSEl_NR
 #define X_PTP_60 (X_PM_1 + 6 * FONT2_W)        //Pressure
+#define X_PTP_COORDINATOR (LCD_WIDTH-(XOFFSET_32+BORDER_OFFSET+4)) // x pos of coordinator string
+
 
 #define Y_PTP_20 (Y_PM_2+FONT2_H)              //Time + Pressure under STR_VESSEl_NR
-
+#define Y_PTP_COORDINATOR (Y_PTP_20+FONT1_H+5) // y position of coordinator string
 
 
 //======================================================================================

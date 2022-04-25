@@ -22,6 +22,7 @@
 #include "I2C_utilities.h"
 #include "status.h"
 #include "DS3231M.h"
+#include "xbee_AT_comm.h"
 
 
 #include <stdbool.h>
@@ -422,6 +423,8 @@ void send_awake_message(Controller_Model *Model){
 
 		// Try to reconnect to the network
 		xbee_reconnect();
+		
+		xbee_coordIdentifier();
 
 		//uint8_t status = 0;
 		struct tm  newtime2;

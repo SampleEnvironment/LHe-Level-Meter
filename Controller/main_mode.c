@@ -153,6 +153,8 @@ void main_pressedFILL(Controller_Model *Model){
 void main_pressedMeasure(Controller_Model *Model){
 
 	
+	
+	
 	if (LVM.message->Received)
 	{
 
@@ -189,6 +191,10 @@ void main_pressedMeasure(Controller_Model *Model){
 		
 		collect_and_send_MeasData(LVM.temp->buffer,STATUS_MSG);
 
+		xbee_coordIdentifier();
+		//time and pressure
+		paint_time_pressure(Time, LVM.vars->pressure_level, 1);
+		
 		// Free XBee module
 		
 
@@ -292,10 +298,10 @@ void main_pressedDOWN(Controller_Model *Model){
 		//_delay_ms(2000);
 
 		if(xbee_coordIdentifier()){
-			LCD_Print("NI received",50,100,2,1,1,red,BGC);
-			paint_info_line(xbee_get_coordID(),1);
-			_delay_ms(3000);
-		} 
+			sprintf(LVM.temp->string,"connected to: %s",xbee.CoordIdentifier);
+			InitScreen_AddLine(LVM.temp->string,0);
+
+		}
 
 		if (!CHECK_ERROR(NETWORK_ERROR))
 		{
@@ -534,7 +540,7 @@ void autofill_check(Controller_Model * Model){
 			Model->mode->next= ex_main;
 			paint_main(Time,Model->mode->netstat,PAINT_ALL);
 		}
-		else 
+		else
 		{
 			_delay_ms(100);
 			//no external filling signal any more?
@@ -557,7 +563,7 @@ void autofill_check(Controller_Model * Model){
 				xbee_wake_up_plus();
 				
 
-				uint8_t indx = 0;  
+				uint8_t indx = 0;
 
 
 

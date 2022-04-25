@@ -1062,7 +1062,9 @@ int main(void)
 						InitScreen_AddLine(LVM.temp->string,0);
 						sprintf(LVM.temp->string,STR_NEW_TIME, Time.tm_hour, Time.tm_min, Time.tm_sec);
 						InitScreen_AddLine(LVM.temp->string,0);
-
+						
+						xbee_coordIdentifier();
+						InitScreen_AddLine(xbee_get_coordID(),0);
 
 						// Save settings in EEPROM
 						#ifdef ALLOW_EEPROM_SAVING
@@ -1184,7 +1186,7 @@ int main(void)
 		//1. measurement
 
 		InitScreen_AddLine(STR_1ST_MEASUREMENT,1);
-
+		
 
 		measure(Model);
 
@@ -1193,7 +1195,8 @@ int main(void)
 			//Wake up xbee
 			xbee_wake_up_plus();
 			
-
+			xbee_coordIdentifier();
+			
 			collect_and_send_MeasData(LVM.temp->buffer,LONG_INTERVAL_MSG);
 			
 			
