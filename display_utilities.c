@@ -560,14 +560,14 @@ void paint_main(struct tm ltime, _Bool netstat, _Bool update)
 		
 
 		
-	
+		
 
 		//HE-Level
 		paint_he_level(LVM.vars->he_level, LVM.options->total_volume, 1);
 		
 		
-			//time and pressure
-			paint_time_pressure(ltime, LVM.vars->pressure_level, update);
+		//time and pressure
+		paint_time_pressure(ltime, LVM.vars->pressure_level, update);
 
 		paint_buttons(" ","opts",0);
 		//		LCD_Print("Fill",148,31,1,1,2,FGC, BGC);
@@ -588,8 +588,8 @@ void paint_main(struct tm ltime, _Bool netstat, _Bool update)
 		//LCD_Print("   ", xoff+X_PM_25, Y_PM_37, 2, 4,4, ERR, BGC);
 		paint_he_level(LVM.vars->he_level, LVM.options->total_volume, 1);
 		
-				//time and pressure
-				paint_time_pressure(ltime, LVM.vars->pressure_level, update);
+		//time and pressure
+		paint_time_pressure(ltime, LVM.vars->pressure_level, update);
 
 		
 	}
@@ -601,7 +601,7 @@ void paint_main(struct tm ltime, _Bool netstat, _Bool update)
 	uint16_t y0 = Y_AUTOFFILL_INDICATOR;
 	if (LVM.vars->auto_fill_enabled)
 	{
-		LCD_Box(x0,y0,x0 +boxheight,y0+boxheight,green);		
+		LCD_Box(x0,y0,x0 +boxheight,y0+boxheight,green);
 	}
 	else
 	{
@@ -681,11 +681,13 @@ void paint_filling(struct tm ltime, _Bool netstat, _Bool update, _Bool draw_wait
 		//position
 		LCD_Print(LVM.vars->device_pos, xoff+X_PM_100, Y_PM_2, 2, 1,1, ERR, BGC);
 		
-		//time and pressure
-		paint_time_pressure(ltime, LVM.vars->pressure_level, update);
+
 
 		//HE-Level
 		paint_he_level(LVM.vars->he_level, LVM.options->total_volume, 1);
+		
+		//time and pressure
+		paint_time_pressure(ltime, LVM.vars->pressure_level, update);
 		
 		paint_buttons("stop","more", 0xff);
 		paint_batt(LVM.vars->batt_level, LVM.options->critical_batt);
@@ -694,11 +696,13 @@ void paint_filling(struct tm ltime, _Bool netstat, _Bool update, _Bool draw_wait
 		//LCD_Print("more",148,20,1,1,2,FGC, BGC);
 	}
 	else {
-		//time and pressure
-		paint_time_pressure(ltime, LVM.vars->pressure_level, update);
+
 
 		//HE-Level
 		paint_he_level(LVM.vars->he_level, LVM.options->total_volume, 0);
+		
+				//time and pressure
+				paint_time_pressure(ltime, LVM.vars->pressure_level, update);
 
 		clear_progress_bar(xoff+X_M_5, Y_M_105);
 		
