@@ -11,8 +11,7 @@
 //#include "main.h"
 #include "keyboard.h"
 #include "timer_utilities.h"
-#include "display.h"
-#include "display_utilities.h"
+#include "main.h"
 
 // Variables for keyboard
 

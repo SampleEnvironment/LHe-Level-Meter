@@ -19,9 +19,9 @@
 #include <stdbool.h>
 
 #include "main.h"
-#include "display_driver.h"
+
 #include "adwandler.h"
-#include "display.h"
+#include "disp/display_lib.h"
 
 #include "display_utilities.h"
 #include "keyboard.h"

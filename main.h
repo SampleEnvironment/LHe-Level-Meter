@@ -9,7 +9,13 @@
 
 #include "module_globals.h"
 
+#ifdef ili9341
+#include "disp/ili9341_driver.h"
+#endif
 
+#ifdef DISP_3000
+#include "disp/DISP_3000_driver.h"
+#endif
 
 extern EWindowOrientation Orientation;
 extern EWindowOrientation ili_Orientation;

@@ -12,7 +12,7 @@
 #include "main_mode.h"
 #include "option_mode.h"
 #include "getCode_mode.h"
-#include "../display_driver.h"
+
 #include "../display_utilities.h"
 #include "../HoneywellSSC.h"
 #include "../main.h"

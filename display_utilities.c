@@ -13,8 +13,15 @@
 
 #include "main.h"
 
-#include "display_driver.h"
-#include "display.h"
+#ifdef ili9341
+#include "disp/ili9341_driver.h"
+#endif
+
+#ifdef DISP_3000
+#include "disp/DISP_3000_driver.h"
+#endif
+
+#include "disp/display_lib.h"
 #include "display_utilities.h"
 #include "keyboard.h"
 #include "timer_utilities.h"

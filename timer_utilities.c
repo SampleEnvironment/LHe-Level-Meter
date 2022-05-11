@@ -9,8 +9,8 @@
 #include <stdbool.h>
 #include <string.h>
 
-#include "display.h"
-#include "display_driver.h"
+#include "disp/display_lib.h"
+
 #include "keyboard.h"
 #include "timer_utilities.h"
 #ifdef DISP_3000

@@ -3,6 +3,7 @@
 #ifndef	KEYBOARD_H
 #define	KEYBOARD_H
 #include <avr/interrupt.h>
+#include "main.h"
 // Enumeration for keys
 enum {
 	KEY_FILL = 1,	// S1
@@ -15,6 +16,9 @@ enum {
 	KEY_DOWN_S9,
 	KEY_BOT_S10
 };
+
+extern LVM_ModelType LVM;
+
 
 
 // Add the following commands:
