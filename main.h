@@ -6,7 +6,7 @@
 #include <stdint.h>
 
 #include "config.h"
-#include "display_driver.h"
+
 #include "module_globals.h"
 
 

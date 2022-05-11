@@ -13,7 +13,6 @@
 #include "base_controller.h"
 #include "diagnostic_mode.h"
 #include "option_mode.h"
-#include "../display_driver.h"
 #include "../display_utilities.h"
 #include "../HoneywellSSC.h"
 #include "../main.h"

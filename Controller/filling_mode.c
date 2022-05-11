@@ -11,7 +11,6 @@
 
 #include "base_controller.h"
 #include "filling_mode.h"
-#include "../display_driver.h"
 #include "../display_utilities.h"
 #include "../HoneywellSSC.h"
 #include "../main.h"

@@ -4,8 +4,10 @@
 #define DISPLAY_UTILITIES_H
 
 #include <avr/io.h>
-#include "display_driver.h"
-#include "display.h"
+
+
+
+#include "disp/display_lib.h"
 #include "main.h"
 
 #include "DS3231M.h"
