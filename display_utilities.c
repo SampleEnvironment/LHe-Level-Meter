@@ -1067,3 +1067,129 @@ void InitScreen_AddLine(const char* Text, const char FirstLine)
 	_delay_ms(500);
 
 }
+
+//yes no dialog for Landscape
+//output a message with title and text
+//at last function waits for keypress
+_Bool LCD_Dialog(char *title, char *text, unsigned int BackColor, unsigned int ForeColor,uint8_t timeout)  {
+	uint8_t x0,x,y,i,len;
+	LCD_Cls(BackColor);
+
+	char temp[2];
+	temp[1] = '\0';
+
+	switch (Orientation)
+	{
+		case Landscape:
+		LCD_Box(X_LD_10,Y_LD_25,X_LD_160,Y_LD_120,ForeColor);
+		LCD_Print(title,LD_MID_LANDSCAPE-(strlen(title)*LD_HALF_CHAR_WIDTH),Y_LD_1,2,1,1,ForeColor,BackColor);
+		x0 = X_LD_13;
+		break;
+		case Landscape180:
+		LCD_Box(X_LD_17,Y_LD_25,X_LD_166,Y_LD_120,ForeColor);
+		LCD_Print(title,LD_MID_LANDSCAPE180-(strlen(title)*LD_HALF_CHAR_WIDTH),Y_LD_1,2,1,1,ForeColor,BackColor);
+		x0 = X_LD_20;
+		break;
+		default:
+		LCD_Box(X_LD_10,Y_LD_25,X_LD_120,Y_LD_165,ForeColor);
+		LCD_Print(title,65-(strlen(title)*LD_HALF_CHAR_WIDTH),Y_LD_1,2,1,1,ForeColor,BackColor);
+		x0 = X_LD_13;
+		break;
+	}
+
+	//for Landscape only
+	x = x0;
+	y = Y_LD_28;
+
+
+	len = strlen(text);
+	for(i=0;i<len;i++)  {
+		if(text[i] != '\n')
+		{
+			temp[0] = text[i];
+			LCD_Print(temp,x,y,1,1,1,BackColor,ForeColor);
+			x += CHAR_CELL_WIDTH_FONT_1;
+			if(x >= LD_Line_Length)
+			{
+				if(y>=LD_MAX_Height)
+				break;
+				y += LD_Line_Height;
+				x = x0;
+				continue;
+			}
+		}
+		else  {
+			if(y >= LD_MAX_Height)
+			break;
+			y += LD_Line_Height;
+			x = x0;
+			continue;
+		}
+	}
+
+
+
+
+	if(!LVM.options->display_reversed)
+	{
+		LCD_Print("Y",X_LD_165,Y_LD_1,2,1,1,ForeColor,BackColor);
+		LCD_Print("e",X_LD_165,Y_LD_17,2,1,1,ForeColor,BackColor);
+		LCD_Print("s",X_LD_165,Y_LD_33,2,1,1,ForeColor,BackColor);
+
+		LCD_Print("N",X_LD_165,Y_LD_99,2,1,1,ForeColor,BackColor);
+		LCD_Print("o",X_LD_165,Y_LD_115,2,1,1,ForeColor,BackColor);
+		}else{
+		LCD_Print("Y",X_LD_3,Y_LD_1,2,1,1,ForeColor,BackColor);
+		LCD_Print("e",X_LD_3,Y_LD_17,2,1,1,ForeColor,BackColor);
+		LCD_Print("s",X_LD_3,Y_LD_33,2,1,1,ForeColor,BackColor);
+
+		LCD_Print("N",X_LD_3,Y_LD_99,2,1,1,ForeColor,BackColor);
+		LCD_Print("o",X_LD_3,Y_LD_115,2,1,1,ForeColor,BackColor);
+	}
+
+
+
+
+
+	while (!(keyhit_block() == 0));  // wait until no key is pressed
+
+	// accept a new key to be pressed
+	ready_for_new_key();
+
+
+
+	// dialouge is only timed if timeout > 0
+	if(timeout){
+		set_timeout(0, TIMER_3, RESET_TIMER);
+		set_timeout(timeout, TIMER_3, USE_TIMER);
+	}
+
+
+	while(1)
+	{	//check for pressed Key
+		if (timeout)
+		{
+			if(!set_timeout(0,TIMER_3, USE_TIMER) )  //return false after shutdown_timout if no key was pressed
+			{
+				return 0;
+			}
+		}
+
+		switch(keyhit_block())
+		{
+			case KEY_TOP_S5:
+			set_timeout(0, TIMER_3, RESET_TIMER);
+			return 1;
+			case KEY_UP_S6:
+			set_timeout(0, TIMER_3, RESET_TIMER);
+			return 1;
+			case KEY_DOWN_S9:
+			set_timeout(0, TIMER_3, RESET_TIMER);
+			return 0;
+			case KEY_BOT_S10:
+			set_timeout(0, TIMER_3, RESET_TIMER);
+			return 0;
+			default:   ready_for_new_key();
+		}
+	}
+}

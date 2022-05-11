@@ -100,6 +100,7 @@ _Bool display_on(void);
 uint8_t get_Device_ID_old(uint8_t *status);
 
 void InitScreen_AddLine(const char* Text, const char first_line);
+_Bool LCD_Dialog(char *title, char *text, unsigned int BackColor, unsigned int ForeColor,uint8_t timeout);
 
 void paint_Dev_ID(void);
 void paint_get_password(void);
