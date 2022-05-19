@@ -64,7 +64,7 @@ extern EWindowOrientation ili_Orientation;
 
 #define MEASBUFFER_LENGTH      25
 
-#define COM_TIMEOUT_TIME 		10						//s
+//#define COM_TIMEOUT_TIME 		10						//s
 #define WAIT_TIMEOUT_TIME 		500						//ms
 #define DISP_TIMEOUT_TIME 		20						//s
 #define OPT_TIMEOUT_TIME         60						//s

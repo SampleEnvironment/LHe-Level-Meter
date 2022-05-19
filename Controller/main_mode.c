@@ -187,7 +187,7 @@ void main_pressedMeasure(Controller_Model *Model){
 	if (Model->mode->netstat == online)
 	{
 		// Pack data in frame
-		xbee_reconnect();
+		xbee_reconnect(0);
 		
 		collect_and_send_MeasData(LVM.temp->buffer,STATUS_MSG);
 
@@ -291,7 +291,7 @@ void main_pressedDOWN(Controller_Model *Model){
 
 
 		// Try to reconnect to the network
-		xbee_reconnect();
+		xbee_reconnect(0);
 
 		(CHECK_ERROR(NETWORK_ERROR))? 	InitScreen_AddLine(STR_UN_SUCCESSFUL,0) : InitScreen_AddLine(STR_SUCCESSFUL,0) ;
 		

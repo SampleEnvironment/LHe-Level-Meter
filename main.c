@@ -438,7 +438,7 @@ uint8_t xbee_send_login_msg(uint8_t db_cmd_type, uint8_t *buffer)
 
 	while(number_trials)
 	{
-		reply_Id = xbee_send_request_only(db_cmd_type, buffer, 0);
+		reply_Id = xbee_send_request(db_cmd_type, buffer, 0);
 		
 		if(reply_Id != 0xFF)
 		{
@@ -923,9 +923,11 @@ int main(void)
 		#ifdef ALLOW_LOGIN
 		int loop = 1;
 
+		xbee_Set_Scan_Channels(xbee.ScanChannels);
+
 		while(loop)
 		{
-			if(xbee_reset_connection())
+			if(xbee_reset_connection(0))
 			{
 				if(xbee_get_server_adrr())
 				{

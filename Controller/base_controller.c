@@ -307,7 +307,7 @@ void shutdown_LVM(Controller_Model *Model){
 
 		measure(Model);
 		
-		xbee_reconnect();
+		xbee_reconnect(0);
 
 		// transmit old measurements that could not be sent (if available) to database server
 		if ((LVM.measbuff->numberStored) > 0)
@@ -422,7 +422,7 @@ void send_awake_message(Controller_Model *Model){
 		LVM.temp->buffer[index++] =  get_status_byte_levelmeter();
 
 		// Try to reconnect to the network
-		xbee_reconnect();
+		xbee_reconnect(0);
 		
 		xbee_coordIdentifier();
 
