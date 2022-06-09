@@ -27,6 +27,7 @@
 #include "timer_utilities.h"
 #include "DS3231M.h"
 #include "xbee.h"
+#include "xbee_AT_comm.h"
 #include "adwandler.h"
 #include "status.h"
 
@@ -349,6 +350,8 @@ void paint_time_pressure(struct tm ltime, double lpress, _Bool update)
 		LCD_Print(temp, 60, 20, 2, 1, 1, ERR, BGC);
 		*/
 	}
+	
+	xbee_get_DB();
 	
 	if (global_mode.netstat == online)
 	{
