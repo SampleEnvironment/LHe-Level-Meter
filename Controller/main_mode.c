@@ -279,6 +279,12 @@ void main_pressedDOWN(Controller_Model *Model){
 
 		xbee_wake_up_plus();
 		
+		
+		if (xbee.netstat == NO_NETWORK)
+		{
+			xbee_Set_Scan_Channels(SC_MASK_DEFAULT);
+			xbee_WR();
+		}
 
 		// Define frame
 

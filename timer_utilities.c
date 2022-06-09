@@ -8,6 +8,7 @@
 //#include <math.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
 
 #include "disp/display_lib.h"
 
@@ -120,6 +121,7 @@ ISR(TIMER1_COMPA_vect)
 {
 	t16_1_overflow ++;
 	count_t_elapsed ++;
+	system_tick();
 }
 
 ISR(TIMER2_OVF_vect)

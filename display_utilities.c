@@ -330,7 +330,7 @@ void paint_time_pressure(struct tm ltime, double lpress, _Bool update)
 	LCD_Print(temp, xoff + X_PTP_2, Y_PTP_20, 2, 1, 1, ERR, BGC);
 
 
-	LCD_Print("           ",X_PTP_COORDINATOR +xoff-11*FONT1_W,Y_PTP_COORDINATOR,1,1,1,FGC,BGC);
+	LCD_Print("              ",X_PTP_COORDINATOR +xoff-14*FONT1_W,Y_PTP_COORDINATOR,1,1,1,FGC,BGC);
 	
 	uint16_t color = FGC;
 	
@@ -338,16 +338,55 @@ void paint_time_pressure(struct tm ltime, double lpress, _Bool update)
 	{
 		color = red;
 	}
-	LCD_Print(xbee_get_coordID(),X_PTP_COORDINATOR +xoff-strlen(xbee_get_coordID())*FONT1_W,Y_PTP_COORDINATOR,1,1,1,color,BGC);
+
+	draw_double_without_erasing(1013.3, xoff + X_PTP_60, Y_PTP_20, 0, "mbar ", ERR, 2);
 	if (lpress > 0)
 	{
-		draw_double_without_erasing(lpress, xoff + X_PTP_60, Y_PTP_20, 0, "mbar ", ERR, 2);
-		//draw_double_without_erasing(1013.3, xoff + X_PTP_60, Y_PTP_20, 0, "mbar ", ERR, 2);
+		//draw_double_without_erasing(lpress, xoff + X_PTP_60, Y_PTP_20, 0, "mbar ", ERR, 2);
+		
 		/*		dtostrf(lpress,4,0,temp);
 		strcat(temp,"mbar");
 		LCD_Print(temp, 60, 20, 2, 1, 1, ERR, BGC);
 		*/
 	}
+	
+	if (global_mode.netstat == online)
+	{
+		
+		switch (xbee.netstat)
+		{
+			case ONLINE:
+			LCD_conn_Stregth(0,xbee.RSSI,X_SIGSTRENGTH_INDICATOR+xoff,Y_SIGSTRENGTH_INDICATOR,green);
+			break;
+			
+			case NO_NETWORK:
+			LCD_conn_Stregth(1,xbee.RSSI,X_SIGSTRENGTH_INDICATOR+xoff,Y_SIGSTRENGTH_INDICATOR,red);
+			break;
+			
+			case NO_SERVER:
+			LCD_conn_Stregth(0,xbee.RSSI,X_SIGSTRENGTH_INDICATOR+xoff,Y_SIGSTRENGTH_INDICATOR,orange);
+			break;
+		}
+	}
+	
+		LCD_Print(xbee_get_coordID(),X_PTP_COORDINATOR +xoff-strlen(xbee_get_coordID())*FONT1_W,Y_PTP_COORDINATOR,1,1,1,color,BGC);
+	
+		//autofill indicator
+		uint8_t boxheight = AUTOFILL_BOX_WIDTH;
+		uint16_t x0 = X_AUTOFFILL_INDICATOR+xoff;
+		uint16_t y0 = Y_AUTOFFILL_INDICATOR;
+		if (LVM.vars->auto_fill_enabled)
+		{
+			LCD_Box(x0,y0,x0 +boxheight,y0+boxheight,green);
+		}
+		else
+		{
+			LCD_Box(x0,y0,x0+boxheight,y0+boxheight,green);
+			LCD_Box(x0+1,y0+1,x0+boxheight-1,y0+boxheight-1,BGC);
+		}
+		
+
+	
 	
 	/*	  draw_double(lpress, 55, 20, 0, " mbar ", ERR);
 	else draw_double(lpress, 55, 20, 0, " mbar", ERR);
@@ -602,20 +641,7 @@ void paint_main(struct tm ltime, _Bool netstat, _Bool update)
 	}
 	paint_batt(LVM.vars->batt_level, LVM.options->critical_batt);
 	
-	//autofill indicator
-	uint8_t boxheight = AUTOFILL_BOX_WIDTH;
-	uint16_t x0 = X_AUTOFFILL_INDICATOR+xoff;
-	uint16_t y0 = Y_AUTOFFILL_INDICATOR;
-	if (LVM.vars->auto_fill_enabled)
-	{
-		LCD_Box(x0,y0,x0 +boxheight,y0+boxheight,green);
-	}
-	else
-	{
-		LCD_Box(x0,y0,x0+boxheight,y0+boxheight,green);
-		LCD_Box(x0+1,y0+1,x0+boxheight-1,y0+boxheight-1,BGC);
-	}
-	
+
 }
 
 
@@ -708,8 +734,8 @@ void paint_filling(struct tm ltime, _Bool netstat, _Bool update, _Bool draw_wait
 		//HE-Level
 		paint_he_level(LVM.vars->he_level, LVM.options->total_volume, 0);
 		
-				//time and pressure
-				paint_time_pressure(ltime, LVM.vars->pressure_level, update);
+		//time and pressure
+		paint_time_pressure(ltime, LVM.vars->pressure_level, update);
 
 		clear_progress_bar(xoff+X_M_5, Y_M_105);
 		

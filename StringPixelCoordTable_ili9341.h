@@ -358,12 +358,15 @@
 #define X_PM_65 (8*FONT2_W+BORDER_OFFSET+1)                      // Vessel# "Number"
 #define X_PM_100 (LCD_WIDTH-XOFFSET_32-BORDER_OFFSET-(4*FONT2_W))// 100 319-4*12 (4 char String top right corner)
 #define X_AUTOFFILL_INDICATOR  (LCD_WIDTH-(XOFFSET_32+BORDER_OFFSET+AUTOFILL_BOX_WIDTH+5))
+#define X_SIGSTRENGTH_INDICATOR X_AUTOFFILL_INDICATOR-25
+
 
 
 #define Y_PM_2 (BORDER_OFFSET + 3)                               // dist to buttons/upper edge of STR_VESSEL_NR
 #define Y_PM_37 (Y_PHL_37)                                       // HE-Level Large Number
 #define Y_PM_83 152                                              // "conn" String in Button Field
 #define Y_AUTOFFILL_INDICATOR Y_PTP_20+5
+#define Y_SIGSTRENGTH_INDICATOR Y_PTP_20
 
 
 

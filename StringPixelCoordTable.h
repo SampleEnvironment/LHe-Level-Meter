@@ -223,7 +223,7 @@
 #define X_PM_100 100
 #define X_PM_148 148
 #define X_AUTOFFILL_INDICATOR  (LCD_WIDTH-(XOFFSET_32+AUTOFILL_BOX_WIDTH+4))
-
+#define X_SIGSTRENGTH_INDICATOR (X_PTP_COORDINATOR-(strlen(xbee_get_coordID())*FONT1_W)-2*FONT2_W)
 
 #define Y_PM_2 2
 #define Y_PM_37 37
@@ -237,6 +237,8 @@
 
 #define Y_PTP_20 20
 #define Y_PTP_COORDINATOR (Y_PTP_20+FONT1_H+7) // y position of coordinator string
+#define Y_SIGSTRENGTH_INDICATOR Y_PTP_COORDINATOR
+
 
 
 

@@ -874,6 +874,8 @@ int main(void)
 	}
 	#endif // ili9341
 
+	xbee_Set_Scan_Channels(SC_MASK_DEFAULT);
+	xbee_WR();
 
 	#if 1
 	unsigned char i;

@@ -9,13 +9,15 @@
 
 #include "disp/display_lib.h"
 #include "main.h"
-
+#include "Controller/base_controller.h"
 #include "DS3231M.h"
 
 // Variables for Display
 
 extern uint8_t XOffset;
 extern  uint8_t xoff;
+
+extern globalModesType global_mode;
 
 //Control PINs
 #define DISPLAY_ON 				(PINB & (1<<PB3))    	// Set PORTB.3 as true
