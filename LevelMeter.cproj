@@ -166,7 +166,7 @@
       <Value>DEBUG</Value>
       <Value>LEVELMETER</Value>
       <Value>USE_XBEE</Value>
-      <Value>DISP_3000</Value>
+      <Value>ili9341</Value>
     </ListValues>
   </avrgcc.compiler.symbols.DefSymbols>
   <avrgcc.compiler.directories.IncludePaths>

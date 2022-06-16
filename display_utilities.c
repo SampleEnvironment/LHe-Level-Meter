@@ -351,7 +351,7 @@ void paint_time_pressure(struct tm ltime, double lpress, _Bool update)
 		*/
 	}
 	
-	xbee_get_DB();
+
 	
 	if (global_mode.netstat == online)
 	{
