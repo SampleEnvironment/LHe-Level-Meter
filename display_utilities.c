@@ -340,10 +340,10 @@ void paint_time_pressure(struct tm ltime, double lpress, _Bool update)
 		color = red;
 	}
 
-	draw_double_without_erasing(1013.3, xoff + X_PTP_60, Y_PTP_20, 0, "mbar ", ERR, 2);
+	//draw_double_without_erasing(1013.3, xoff + X_PTP_60, Y_PTP_20, 0, "mbar ", ERR, 2);
 	if (lpress > 0)
 	{
-		//draw_double_without_erasing(lpress, xoff + X_PTP_60, Y_PTP_20, 0, "mbar ", ERR, 2);
+		draw_double_without_erasing(lpress, xoff + X_PTP_60, Y_PTP_20, 0, "mbar ", ERR, 2);
 		
 		/*		dtostrf(lpress,4,0,temp);
 		strcat(temp,"mbar");
