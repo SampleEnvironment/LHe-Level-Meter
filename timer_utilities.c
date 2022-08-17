@@ -8,21 +8,31 @@
 //#include <math.h>
 #include <stdbool.h>
 #include <string.h>
+#include <time.h>
 
-#include "display.h"
+#include "disp/display_lib.h"
+
 #include "keyboard.h"
 #include "timer_utilities.h"
+#ifdef DISP_3000
+#include "StringPixelCoordTable.h"
+#endif
+#ifdef ili9341
+#include "StringPixelCoordTable_ili9341.h"
+//#include "StringPixelCoordTable.h"
+#endif
 
-volatile uint16_t t8_0_overflow	= 0;
+volatile uint32_t t8_0_overflow	= 0;
 volatile uint16_t t16_1_overflow = 65500;
+volatile uint16_t t8_2_overflow	= 0;
 
 
 //volatile _Bool t_timeout=false;
 
- void init_0_timer8(void)
- {
- 	TIMSK0 |= (1<<TOIE0);		//enable Timer0 interrupts
- }
+void init_0_timer8(void)
+{
+	TIMSK0 |= (1<<TOIE0);		//enable Timer0 interrupts
+}
 
 void timer8_0_start(void)
 {
@@ -45,37 +55,62 @@ void timer8_0_stop(void)
 }
 
 //REF TIMER
- void init_1_timer16(void)
- {
- 	//CTCmode
- 	OCR1A = SEC; 			//1sec
- 	TIMSK1 |= (1<<OCIE1A);
- 	TCCR1B = (1<<WGM12);
- 	
- 	timer16_1_start();
- 	//normal mode
- 	//TIMSK1 |= (1<<TOIE1);		//enable Timer1 interrupts
- }
+void init_1_timer16(void)
+{
+	//CTCmode
+	OCR1A = SEC; 			//1sec
+	TIMSK1 |= (1<<OCIE1A);
+	TCCR1B = (1<<WGM12);
+	
+	timer16_1_start();
+	//normal mode
+	//TIMSK1 |= (1<<TOIE1);		//enable Timer1 interrupts
+}
 
- void timer16_1_start(void)
- {
- 	//enable module
- 	//PRR0 |= (0<<PRTIM1);
- 	
- 	//Frequency: F_CPU / 1024
- 	TCCR1B |= (1<<CS10)|(1<<CS12);
- }
- 
- void timer16_1_stop(void)
- {
- 	//stops the counter and resets counter value
- 	TCCR1B &= ~((1<<CS10)|(1<<CS11)|(1<<CS12));
- 	TCNT1 = 0;
- 	t16_1_overflow=0;
- 	
- 	//disable module
- 	//PRR0 |= (1<<PRTIM1);
- }
+void timer16_1_start(void)
+{
+	//enable module
+	//PRR0 |= (0<<PRTIM1);
+	
+	//Frequency: F_CPU / 1024
+	TCCR1B |= (1<<CS10)|(1<<CS12);
+}
+
+void timer16_1_stop(void)
+{
+	//stops the counter and resets counter value
+	TCCR1B &= ~((1<<CS10)|(1<<CS11)|(1<<CS12));
+	TCNT1 = 0;
+	t16_1_overflow=0;
+	
+	//disable module
+	//PRR0 |= (1<<PRTIM1);
+}
+
+void init_2_timer8(void)
+{
+	TIMSK2 |= (1<<TOIE2);		//enable Timer2 interrupts
+}
+
+void timer8_2_start(void)
+{
+	//enable module
+	//PRR0 |= (0<<PRTIM2);
+	
+	//Frequency: F_CPU / 1024
+	TCCR2B |= (1<<CS20)|(0<<CS21)|(1<<CS22);
+}
+
+void timer8_2_stop(void)
+{
+	//stops the counter and resets counter value
+	TCCR2B &= ~((1<<CS20)|(1<<CS21)|(1<<CS22));
+	TCNT2 = 0;
+	t8_2_overflow=0;
+	
+	//disable module
+	//PRR0 |= (1<<PRTIM2);
+}
 
 ISR(TIMER0_OVF_vect)
 {
@@ -85,11 +120,20 @@ ISR(TIMER0_OVF_vect)
 ISR(TIMER1_COMPA_vect)
 {
 	t16_1_overflow ++;
+	count_t_elapsed ++;
+	system_tick();
 }
+
+ISR(TIMER2_OVF_vect)
+{
+	t8_2_overflow ++;
+}
+
 
 ///sets, checks and resets given Timer
 ///use only 16bit_number-1 as max waittime or tweak implementation
-uint8_t set_timeout(uint16_t sec, uint8_t timer, uint8_t reset)
+///returns 1 when running, 0 when stopped
+uint32_t set_timeout(uint16_t sec, uint8_t timer, uint8_t reset)
 {
 	static uint16_t timer0_waittime = 0;
 	static uint16_t timer1_waittime = 0;
@@ -97,12 +141,15 @@ uint8_t set_timeout(uint16_t sec, uint8_t timer, uint8_t reset)
 	static uint16_t timer3_waittime = 0;
 	static uint16_t timer4_waittime = 0;
 	static uint16_t timer5_waittime = 0;
+	static uint16_t timer6_waittime = 0;
+
 	
 	static _Bool ovf_flag1 = false;
 	static _Bool ovf_flag2 = false;
 	static _Bool ovf_flag3 = false;
 	static _Bool ovf_flag4 = false;
 	static _Bool ovf_flag5 = false;
+	//static _Bool ovf_flag6 = false;
 	
 	
 	static uint16_t start_time = 0;		//nur fuer timer 4/ filling
@@ -141,7 +188,7 @@ uint8_t set_timeout(uint16_t sec, uint8_t timer, uint8_t reset)
 			ovf_flag1=false;
 		}
 		else {
-			if(!timer1_waittime && sec)				//0 -> Timer läuft nicht
+			if(!timer1_waittime && sec)				//0 -> Timer lï¿½uft nicht
 			{
 				uint16_t diff_time = UINT16_MAX - current_time;
 				
@@ -164,7 +211,7 @@ uint8_t set_timeout(uint16_t sec, uint8_t timer, uint8_t reset)
 			ovf_flag2=false;
 		}
 		else {
-			if(!timer2_waittime && sec)				//0 -> Timer läuft nicht
+			if(!timer2_waittime && sec)				//0 -> Timer lï¿½uft nicht
 			{
 				uint16_t diff_time = UINT16_MAX - current_time;
 				
@@ -189,7 +236,7 @@ uint8_t set_timeout(uint16_t sec, uint8_t timer, uint8_t reset)
 			ovf_flag3=false;
 		}
 		else {
-			if(!timer3_waittime && sec)				//0 -> Timer läuft nicht
+			if(!timer3_waittime && sec)				//0 -> Timer lï¿½uft nicht
 			{
 				uint16_t diff_time = UINT16_MAX - current_time;
 				
@@ -214,7 +261,7 @@ uint8_t set_timeout(uint16_t sec, uint8_t timer, uint8_t reset)
 			ovf_flag4=false;
 		}
 		else {
-			if(!timer4_waittime && sec)// timer läuft nicht -> setzen
+			if(!timer4_waittime && sec)// timer lï¿½uft nicht -> setzen
 			{
 				uint16_t diff_time = UINT16_MAX - current_time;
 				
@@ -244,7 +291,7 @@ uint8_t set_timeout(uint16_t sec, uint8_t timer, uint8_t reset)
 			ovf_flag5=false;
 		}
 		else {
-			if(!timer5_waittime && sec)				//0 -> Timer läuft nicht
+			if(!timer5_waittime && sec)				//0 -> Timer lï¿½uft nicht
 			{
 				uint16_t diff_time = UINT16_MAX - current_time;
 				
@@ -262,6 +309,52 @@ uint8_t set_timeout(uint16_t sec, uint8_t timer, uint8_t reset)
 			else return 1;
 		}
 		break;
+		case TIMER_6:	//difference between two valid pressed keys / in ms
+		if(reset)
+		{
+			timer8_2_stop();
+			timer6_waittime = 0;
+		}
+		else {
+			if(!timer6_waittime && sec)				// Init. timer
+			{
+				timer6_waittime = sec;				//setzen
+				timer8_2_start();					//starten
+			}
+			
+			if(t8_2_overflow >= ((timer6_waittime)/OVERFLOW_IN_MS_8_BIT))
+			{
+				timer8_2_stop();
+				timer6_waittime = 0;
+				return 0;
+			}
+			else if(t8_2_overflow) return t8_2_overflow; else return 1;
+			//else return 1;
+		}
+		break;
+		case TIMER_7:	//measurement/ sec wert in ms!
+		if(reset)
+		{
+			timer8_0_stop();
+			timer0_waittime = 0;
+		}
+		else {
+			if( sec)				// Init. timer
+			{
+				timer8_0_start();					//starten
+			}
+			if(t8_0_overflow)
+			{
+				return t8_0_overflow;
+			}
+			else
+			{
+				return 1;
+			}
+			
+		}
+		break;
+
 		default:
 		break;
 	}
@@ -271,25 +364,33 @@ uint8_t set_timeout(uint16_t sec, uint8_t timer, uint8_t reset)
 //dialog timer is the slow transmission timer! used only on shut down (slow transmit doesn't matter there)
 void timed_dialog(char *title, char *text, uint8_t timeout, unsigned int ForeColor, unsigned int BackColor)
 {
-	uint8_t x,y,i,len;
+	uint8_t x,y,i,len,x0;
 	LCD_Cls(BackColor);
 	
 	char temp[2];
 	temp[1] = '\0';
-	
-	if (Orientation == Landscape)
+	switch (Orientation)
 	{
-		LCD_Box(10,25,160,120,ForeColor);
-		LCD_Print(title,87-(strlen(title)*5),1,2,1,1,ForeColor,BackColor);
-	}
-	else {
-		LCD_Box(10,25,120,165,ForeColor);
-		LCD_Print(title,65-(strlen(title)*5),1,2,1,1,ForeColor,BackColor);
+		case Landscape:
+		LCD_Box(X_LD_10,Y_LD_25,X_LD_160,Y_LD_120,ForeColor);
+		LCD_Print(title,LD_MID_LANDSCAPE-(strlen(title)*LD_HALF_CHAR_WIDTH),Y_LD_1,2,1,1,ForeColor,BackColor);
+		x0 = X_LD_13;
+		break;
+		case Landscape180:
+		LCD_Box(X_LD_17,Y_LD_25,X_LD_166,Y_LD_120,ForeColor);
+		LCD_Print(title,LD_MID_LANDSCAPE180-(strlen(title)*LD_HALF_CHAR_WIDTH),Y_LD_1,2,1,1,ForeColor,BackColor);
+		x0 = X_LD_20;
+		break;
+		default:
+		LCD_Box(X_LD_10,Y_LD_25,X_LD_120,Y_LD_165,ForeColor);
+		LCD_Print(title,65-(strlen(title)*LD_HALF_CHAR_WIDTH),Y_LD_1,2,1,1,ForeColor,BackColor);
+		x0 = X_LD_13;
+		break;
 	}
 	
 	//for Landscape only
-	x = 13;
-	y = 28;
+	x = x0;
+	y = Y_LD_28 ;//Y_TD_28;
 	len = strlen(text);
 	for(i=0;i<len;i++)
 	{
@@ -297,34 +398,36 @@ void timed_dialog(char *title, char *text, uint8_t timeout, unsigned int ForeCol
 		{
 			temp[0] = text[i];
 			LCD_Print(temp,x,y,1,1,1,BackColor,ForeColor);
-			x += 6;
-			if(x >= 160)
+			x += CHAR_CELL_WIDTH_FONT_1;
+			if(x >= LD_Line_Length)
 			{
-				if(y>=110)
+				if(y>=LD_MAX_Height)
 				break;
-				y += 10;
-				x = 13;
+				y += LD_Line_Height;
+				x = x0;
 				continue;
 			}
 		}
 		else  {
-			if(y >= 110)
+			if(y >= LD_MAX_Height)
 			break;
-			y += 10;
-			x = 13;
+			y += LD_Line_Height;
+			x = x0;
 			continue;
 		}
 	}
+	
+	ready_for_new_key();
 	
 	while(1)
 	{	//check for pressed Key or wait timeout
 		
 		set_timeout(timeout, TIMER_3, USE_TIMER);
-		while(!(keyhit() == 0));
+		while(!(keyhit_cont() == 0));                  // wait until button is released
 		while(set_timeout(0, TIMER_3, USE_TIMER))
 		{
 			//delay_ms(200);
-			if(keyhit() > 0)  {set_timeout(0, TIMER_1, RESET_TIMER);break;}
+			if(keyhit_cont() > 0)  {set_timeout(0, TIMER_1, RESET_TIMER);break;}
 		}
 		return;
 	}

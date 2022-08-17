@@ -1,0 +1,440 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="14.0">
+  <PropertyGroup>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectVersion>7.0</ProjectVersion>
+    <ToolchainName>com.Atmel.AVRGCC8.C</ToolchainName>
+    <ProjectGuid>dce6c7e3-ee26-4d79-826b-08594b9ad897</ProjectGuid>
+    <avrdevice>ATmega1284P</avrdevice>
+    <avrdeviceseries>none</avrdeviceseries>
+    <OutputType>Executable</OutputType>
+    <Language>C</Language>
+    <OutputFileName>$(MSBuildProjectName)</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
+    <OutputDirectory>$(MSBuildProjectDirectory)\$(Configuration)</OutputDirectory>
+    <AssemblyName>LHe LevelMeter</AssemblyName>
+    <Name>LevelMeter</Name>
+    <RootNamespace>LHe LevelMeter</RootNamespace>
+    <ToolchainFlavour>Native</ToolchainFlavour>
+    <KeepTimersRunning>true</KeepTimersRunning>
+    <OverrideVtor>false</OverrideVtor>
+    <CacheFlash>true</CacheFlash>
+    <ProgFlashFromRam>true</ProgFlashFromRam>
+    <RamSnippetAddress>0x20000000</RamSnippetAddress>
+    <UncachedRange />
+    <preserveEEPROM>true</preserveEEPROM>
+    <OverrideVtorValue>exception_table</OverrideVtorValue>
+    <BootSegment>2</BootSegment>
+    <eraseonlaunchrule>0</eraseonlaunchrule>
+    <AsfFrameworkConfig>
+      <framework-data>
+        <options />
+        <configurations />
+        <files />
+        <documentation help="" />
+        <offline-documentation help="" />
+        <dependencies>
+          <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.42.0" />
+        </dependencies>
+      </framework-data>
+    </AsfFrameworkConfig>
+    <avrtool>com.atmel.avrdbg.tool.powerdebugger</avrtool>
+    <avrtoolserialnumber>J50200002200</avrtoolserialnumber>
+    <avrdeviceexpectedsignature>0x1E9705</avrdeviceexpectedsignature>
+    <com_atmel_avrdbg_tool_stk500>
+      <ToolOptions>
+        <InterfaceProperties>
+          <IspClock>125000</IspClock>
+        </InterfaceProperties>
+        <InterfaceName>ISP</InterfaceName>
+      </ToolOptions>
+      <ToolType>com.atmel.avrdbg.tool.stk500</ToolType>
+      <ToolNumber>
+      </ToolNumber>
+      <ToolName>STK500</ToolName>
+    </com_atmel_avrdbg_tool_stk500>
+    <avrtoolinterface>ISP</avrtoolinterface>
+    <avrtoolinterfaceclock>930509</avrtoolinterfaceclock>
+    <com_atmel_avrdbg_tool_simulator>
+      <ToolOptions>
+        <InterfaceProperties>
+        </InterfaceProperties>
+        <InterfaceName>ISP</InterfaceName>
+      </ToolOptions>
+      <ToolType>com.atmel.avrdbg.tool.simulator</ToolType>
+      <ToolNumber>
+      </ToolNumber>
+      <ToolName>Simulator</ToolName>
+    </com_atmel_avrdbg_tool_simulator>
+    <com_atmel_avrdbg_tool_powerdebugger>
+      <ToolOptions>
+        <InterfaceProperties>
+          <IspClock>930509</IspClock>
+          <JtagDbgClock>220000</JtagDbgClock>
+          <JtagEnableExtResetOnStartSession>true</JtagEnableExtResetOnStartSession>
+          <JtagInChain>false</JtagInChain>
+          <JtagDevicesBefore>0</JtagDevicesBefore>
+          <JtagDevicesAfter>0</JtagDevicesAfter>
+          <JtagInstrBitsBefore>0</JtagInstrBitsBefore>
+          <JtagInstrBitsAfter>0</JtagInstrBitsAfter>
+          <JtagSelectedDeviceIndexInChain>
+          </JtagSelectedDeviceIndexInChain>
+          <JtagDaisyChainDevices>
+          </JtagDaisyChainDevices>
+        </InterfaceProperties>
+        <InterfaceName>ISP</InterfaceName>
+      </ToolOptions>
+      <ToolType>com.atmel.avrdbg.tool.powerdebugger</ToolType>
+      <ToolNumber>J50200002200</ToolNumber>
+      <ToolName>Power Debugger</ToolName>
+    </com_atmel_avrdbg_tool_powerdebugger>
+    <ResetRule>0</ResetRule>
+    <EraseKey />
+    <custom>
+      <ToolOptions xmlns="">
+        <InterfaceProperties>
+        </InterfaceProperties>
+        <InterfaceName>ISP</InterfaceName>
+      </ToolOptions>
+      <ToolType xmlns="">custom</ToolType>
+      <ToolNumber xmlns="">
+      </ToolNumber>
+      <ToolName xmlns="">Custom Programming Tool</ToolName>
+    </custom>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <ToolchainSettings>
+      <AvrGcc>
+        <avrgcc.common.Device>-mmcu=atmega1284p -B "%24(PackRepoDir)\atmel\ATmega_DFP\1.3.300\gcc\dev\atmega1284p"</avrgcc.common.Device>
+        <avrgcc.common.optimization.RelaxBranches>True</avrgcc.common.optimization.RelaxBranches>
+        <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+        <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+        <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+        <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+        <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+        <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+        <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+        <avrgcc.compiler.symbols.DefSymbols>
+          <ListValues>
+            <Value>F_CPU=6144000UL</Value>
+            <Value>NDEBUG</Value>
+          </ListValues>
+        </avrgcc.compiler.symbols.DefSymbols>
+        <avrgcc.compiler.directories.IncludePaths>
+          <ListValues>
+            <Value>%24(PackRepoDir)\atmel\ATmega_DFP\1.3.300\include</Value>
+          </ListValues>
+        </avrgcc.compiler.directories.IncludePaths>
+        <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
+        <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+        <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+        <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcc.compiler.miscellaneous.Verbose>True</avrgcc.compiler.miscellaneous.Verbose>
+        <avrgcc.linker.libraries.Libraries>
+          <ListValues>
+            <Value>libm</Value>
+          </ListValues>
+        </avrgcc.linker.libraries.Libraries>
+        <avrgcc.assembler.general.IncludePaths>
+          <ListValues>
+            <Value>%24(PackRepoDir)\atmel\ATmega_DFP\1.0.98\include</Value>
+            <Value>%24(PackRepoDir)\atmel\ATmega_DFP\1.3.300\include</Value>
+          </ListValues>
+        </avrgcc.assembler.general.IncludePaths>
+      </AvrGcc>
+    </ToolchainSettings>
+    <UsesExternalMakeFile>False</UsesExternalMakeFile>
+    <BuildTarget>all</BuildTarget>
+    <CleanTarget>clean</CleanTarget>
+    <ExternalMakeFilePath>MakefileOrg</ExternalMakeFilePath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+    <ToolchainSettings>
+      <AvrGcc>
+  <avrgcc.common.Device>-mmcu=atmega1284p -B "%24(PackRepoDir)\atmel\ATmega_DFP\1.3.300\gcc\dev\atmega1284p"</avrgcc.common.Device>
+  <avrgcc.common.optimization.RelaxBranches>True</avrgcc.common.optimization.RelaxBranches>
+  <avrgcc.common.outputfiles.hex>True</avrgcc.common.outputfiles.hex>
+  <avrgcc.common.outputfiles.lss>True</avrgcc.common.outputfiles.lss>
+  <avrgcc.common.outputfiles.eep>True</avrgcc.common.outputfiles.eep>
+  <avrgcc.common.outputfiles.srec>True</avrgcc.common.outputfiles.srec>
+  <avrgcc.common.outputfiles.usersignatures>False</avrgcc.common.outputfiles.usersignatures>
+  <avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>True</avrgcc.compiler.general.ChangeDefaultCharTypeUnsigned>
+  <avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>True</avrgcc.compiler.general.ChangeDefaultBitFieldUnsigned>
+  <avrgcc.compiler.symbols.DefSymbols>
+    <ListValues>
+      <Value>F_CPU=6144000UL</Value>
+      <Value>DEBUG</Value>
+      <Value>LEVELMETER</Value>
+      <Value>USE_XBEE</Value>
+      <Value>DISP_3000</Value>
+    </ListValues>
+  </avrgcc.compiler.symbols.DefSymbols>
+  <avrgcc.compiler.directories.IncludePaths>
+    <ListValues>
+      <Value>%24(PackRepoDir)\atmel\ATmega_DFP\1.3.300\include</Value>
+      <Value>../avr-util-library</Value>
+    </ListValues>
+  </avrgcc.compiler.directories.IncludePaths>
+  <avrgcc.compiler.optimization.level>Optimize most (-O3)</avrgcc.compiler.optimization.level>
+  <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
+  <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
+  <avrgcc.compiler.optimization.DebugLevel>Default (-g2)</avrgcc.compiler.optimization.DebugLevel>
+  <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+  <avrgcc.compiler.miscellaneous.Verbose>True</avrgcc.compiler.miscellaneous.Verbose>
+  <avrgcc.linker.libraries.Libraries>
+    <ListValues>
+      <Value>libm</Value>
+    </ListValues>
+  </avrgcc.linker.libraries.Libraries>
+  <avrgcc.assembler.general.AssemblerFlags>-DLEVELMETER</avrgcc.assembler.general.AssemblerFlags>
+  <avrgcc.assembler.general.IncludePaths>
+    <ListValues>
+      <Value>%24(PackRepoDir)\atmel\ATmega_DFP\1.0.98\include</Value>
+      <Value>%24(PackRepoDir)\atmel\ATmega_DFP\1.3.300\include</Value>
+    </ListValues>
+  </avrgcc.assembler.general.IncludePaths>
+  <avrgcc.assembler.debugging.DebugLevel>Default (-Wa,-g)</avrgcc.assembler.debugging.DebugLevel>
+</AvrGcc>
+    </ToolchainSettings>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="avr-util-library\adwandler.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\adwandler.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\Bitmaps_and_fonts\font_consolas-30x40.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\Bitmaps_and_fonts\font_f-5x8.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\Bitmaps_and_fonts\font_f-8x14.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\Bitmaps_and_fonts\font_inconsolata-27x40.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\Bitmaps_and_fonts\font_inconsolataf-12x24.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\Bitmaps_and_fonts\font_inconsolataf-8x16.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\Bitmaps_and_fonts\font_Lucida_Console-27x40.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\Bitmaps_and_fonts\font_Lucida_Console_AlpaNum-29x40.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\Bitmaps_and_fonts\font_source_code_pro-31x40.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\Bitmaps_and_fonts\HZB_logo_DISP_3000.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\Bitmaps_and_fonts\HZB_logo_ili9341.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\BMP085.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\BMP085.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\disp\display_lib.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\disp\display_lib.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\disp\DISP_3000_driver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\disp\DISP_3000_driver.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\disp\fontConfig.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\disp\gcm_old_lcd_driver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\disp\gcm_old_lcd_driver.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\disp\ili9341cmd.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\disp\ili9341_driver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\disp\ili9341_driver.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\disp\spi.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\disp\spi.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\DS3231M.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\DS3231M.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\i2cmaster.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\i2cmaster.S">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\I2C_utilities.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\I2C_utilities.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\module_globals.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\module_globals.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\printInfo_strings.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\status.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\status.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\usart.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\usart.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\xbee.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\xbee.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\xbee_AT_comm.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\xbee_AT_comm.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\xbee_utilities.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="avr-util-library\xbee_utilities.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="config.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Controller\base_controller.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Controller\base_controller.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Controller\diagnostic_mode.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Controller\diagnostic_mode.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Controller\error_mode.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Controller\error_mode.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Controller\filling_mode.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Controller\filling_mode.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Controller\getCode_mode.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Controller\getCode_mode.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Controller\main_mode.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Controller\main_mode.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Controller\option_mode.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Controller\option_mode.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Controller\pulse_select_mode.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Controller\pulse_select_mode.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="diag_pulse.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="diag_pulse.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="display_utilities.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="display_utilities.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="HoneywellSSC.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="HoneywellSSC.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="keyboard.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="keyboard.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="main.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="main.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="StringPixelCoordTable.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="StringPixelCoordTable_ili9341.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="timer_utilities.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="timer_utilities.h">
+      <SubType>compile</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="avr-util-library\disp" />
+    <Folder Include="avr-util-library\Bitmaps_and_fonts" />
+    <Folder Include="Controller" />
+    <Folder Include="avr-util-library" />
+  </ItemGroup>
+  <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
+</Project>
