@@ -422,7 +422,7 @@ void paint_batt(uint8_t batt, uint8_t critical_batt)
 	//draw borders
 	LCD_Rect(xoff+X_PBATT_38,Y_PBATT_120,xoff+X_PBATT_140,Y_PBATT_130,0, FGC);
 	
-	//if lower then BATT_LOW draw in ERROR-color
+	//if lower then critBatt draw in ERROR-color
 	(batt < critical_batt)?
 	LCD_Box(xoff+X_PBATT_39,Y_PBATT_121,barlen+xoff+X_PBATT_39,Y_PBATT_129,red)
 	:	LCD_Box(xoff+X_PBATT_39,Y_PBATT_121,barlen+xoff+X_PBATT_39,Y_PBATT_129,green);

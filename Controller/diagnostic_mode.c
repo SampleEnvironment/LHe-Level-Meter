@@ -46,6 +46,7 @@ struct Controller_Model_Vtable diag_Vtable ={
 Controller_Model_diagnostic diag_model ={
 	.super.mode = &global_mode,
 	.super.vtable = &diag_Vtable,
+	.super.batt_check = true,
 	.page_Nr = 1,
 	.temp_r_span = 0,
 	.temp_r_zero = 0,

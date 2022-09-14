@@ -55,7 +55,8 @@ struct Controller_Model_Vtable main_Vtable ={
 
 Controller_Model_main main_model ={
 	.super.mode = &global_mode,
-	.super.vtable = &main_Vtable
+	.super.vtable = &main_Vtable,
+	.super.batt_check = true
 };
 
 

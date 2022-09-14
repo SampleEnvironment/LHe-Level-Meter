@@ -637,7 +637,9 @@
 #define STR_INTERVAL_MIN "interval: %i min"
 
 #define STR_THE_BATTERY_IS_CRITTICALLY_LOW_SYSTEM_WILL_SHUT_DOWN "The battery is\ncritically low (%d%%).\nSystem will shut down!\nLast He Level:\n%d%%"
+#define STR_THE_BATTERY_WARNING_CHANGE_PARAMS "The battery is\ncritically low (%d%%).\nCheck options if\nparameters are faulty"
 #define STR_SHUTTING_DOWN "Shutting down..."
+#define STR_BATTERY_WARNING "Battery Warning"
 #define STR_GOOD_OPTIONS_RECEIVED "Good options received"
 #define STR_PRESS_MEASURE_X2 "press MEASURE"
 #define STR_TO_CONTINUE "to continue"

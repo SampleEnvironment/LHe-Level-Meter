@@ -581,6 +581,8 @@ void Battery_check(Controller_Model *Model)
 	//=========================================================================
 	// Battery checking
 	//=========================================================================
+	if (!Model->batt_check) return;
+	
 	if(LVM.options->batt_min >= map_to_batt(readChannel(BATTERY, 10*ADC_LOOPS)))
 	{
 		

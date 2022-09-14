@@ -64,7 +64,7 @@ typedef struct Controller_Model
 {
 	struct Controller_Model_Vtable const *vtable;
 	globalModesType * mode;
-	
+	_Bool batt_check;
 	
 }Controller_Model;
 
