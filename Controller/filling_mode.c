@@ -48,6 +48,7 @@ struct Controller_Model_Vtable filling_Vtable ={
 Controller_Model_filling filling_model ={
 	.super.mode = &global_mode,
 	.super.vtable = &filling_Vtable,
+	.super.batt_check = true,
 	.meas_progress = 0
 };
 

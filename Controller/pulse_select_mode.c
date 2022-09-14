@@ -132,6 +132,7 @@ struct Controller_Model_Vtable pulse_select_Vtable ={
 Controller_Model_pulse_select pselect_model ={
 	.super.mode = &global_mode,
 	.super.vtable = &pulse_select_Vtable,
+	.super.batt_check = true,
 	.option = 1,
 	.optionLast = 1,
 	.page =1,

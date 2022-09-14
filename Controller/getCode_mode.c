@@ -56,6 +56,7 @@ struct Controller_Model_Vtable GetPw_Vtable ={
 Controller_Model_getCode getCode_model ={
 	.super.mode = &global_mode,
 	.super.vtable = &GetDevID_Vtable,
+	.super.batt_check = false,
 	.Code_Str="",
 	.digits = {0,0,0,0,0,0},
 	.xCoords = {0,0,0,0,0,0},

@@ -129,6 +129,7 @@ struct Controller_Model_Vtable option_Vtable ={
 Controller_Model_options option_model ={
 	.super.mode = &global_mode,
 	.super.vtable = &option_Vtable,
+	.super.batt_check = true,
 	.batt_max_buff = BATT_MAX_DEF,
 	.batt_min_buff = BATT_MIN_DEF,
 	.display_reversed_buff = false,

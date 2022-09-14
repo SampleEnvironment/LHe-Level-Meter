@@ -581,7 +581,10 @@ void Battery_check(Controller_Model *Model)
 	//=========================================================================
 	// Battery checking
 	//=========================================================================
-	if(LVM.options->batt_min >= map_to_batt(readChannel(BATTERY, 10*ADC_LOOPS)))
+	if (!Model->batt_check) return;
+	
+	LVM.vars->batt_level = get_batt_level(LVM.options->batt_min,LVM.options->batt_max);
+	if(LVM.options->critical_batt >= LVM.vars->batt_level)
 	{
 		
 		if(Model->mode->netstat == online)

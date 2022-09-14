@@ -38,7 +38,8 @@ struct Controller_Model_Vtable error_Vtable ={
 
 Controller_Model_error error_model ={
 	.super.mode = &global_mode,
-	.super.vtable = &error_Vtable
+	.super.vtable = &error_Vtable,
+	.super.batt_check = true
 };
 
 Controller_Model_error* get_error_model(){
