@@ -1218,9 +1218,43 @@ int main(void)
 			}else{
 			xbee_sleep();
 		}
-		
-		//paint screen
-		paint_main(Time, global_mode.netstat, PAINT_ALL);
+		// Batterycheck offline mode if battery low --> go to optioins 
+		if(global_mode.netstat == offline && LVM.options->critical_batt >= get_batt_level(LVM.options->batt_min,LVM.options->batt_max)){
+				// Set options mode
+				global_mode.next = ex_options;
+				global_mode.curr = ex_options;
+				
+				Model = option_model;
+				
+				if (Model->mode->netstat == offline)
+				{
+					make_he_vol_changable();
+
+
+				}
+
+				sprintf(LVM.temp->string,STR_THE_BATTERY_WARNING_CHANGE_PARAMS ,((uint8_t) LVM.vars->batt_level));
+				timed_dialog(STR_BATTERY_WARNING , LVM.temp->string, 10, D_FGC, D_BGC);
+
+
+				set_timeout(0, TIMER_3, RESET_TIMER);
+				set_timeout(OPT_TIMEOUT_TIME, TIMER_3, USE_TIMER);
+
+				
+				set_OptionModel(4,3,0);
+				set_bufferVars(false);	
+				opt_drawPage();
+							
+				keyhit_block();
+				
+				option_model->batt_check = false;
+			
+			
+		}else{
+			//paint screen
+			paint_main(Time, global_mode.netstat, PAINT_ALL);
+		}
+
 
 
 		break;
