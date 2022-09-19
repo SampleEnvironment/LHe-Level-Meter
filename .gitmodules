@@ -1,0 +1,3 @@
+[submodule "avr-util-library"]
+	path = avr-util-library
+	url = git@github.com:SampleEnvironment/avr-util-library.git

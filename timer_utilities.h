@@ -5,6 +5,7 @@
 #define TIMER_UTILITIES_H
 
 #include <math.h>
+#include <avr/interrupt.h>
 
 #define OVERFLOW_IN_MS_8_BIT				((pow(2,8)*1000.0)*(1.0/(F_CPU/1024.0)))
 #define OVERFLOW_IN_MS_16_BIT				((pow(2,16)*1000.0)*(1.0/(F_CPU/1024.0)))
@@ -25,11 +26,14 @@ enum  {
 	TIMER_2,
 	TIMER_3,
 	TIMER_4,
-	TIMER_5
+	TIMER_5,
+	TIMER_6,
+	TIMER_7
 };
 
-extern volatile uint16_t t8_0_overflow;
+extern volatile uint32_t t8_0_overflow;
 extern volatile uint16_t t16_1_overflow;		///< TIMER1 overflow indicator
+extern volatile uint16_t t8_2_overflow;
 
 //==============================================================
 // Timer utilities commands
@@ -39,18 +43,25 @@ void init_0_timer8(void);
 void timer8_0_start(void);
 void timer8_0_stop(void);
 
-//8 bit Timer overflow
-ISR(TIMER0_OVF_vect);
-//16 bit Timer overflow
-ISR(TIMER1_COMPA_vect);
-
 void init_1_timer16(void);
 void timer16_1_start(void);
 void timer16_1_stop(void);
 
+void init_2_timer8(void);
+void timer8_2_start(void);
+void timer8_2_stop(void);
+
+//8 bit Timer overflow
+ISR(TIMER0_OVF_vect);
+//16 bit Timer overflow
+ISR(TIMER1_COMPA_vect);
+//8 bit Timer overflow
+ISR(TIMER2_OVF_vect);
+
+
 ///sets, checks and resets given Timer
 ///use only 16bit_number-1 as max waittime or tweak implementation
-uint8_t set_timeout(uint16_t sec, uint8_t timer, uint8_t reset);
+uint32_t set_timeout(uint16_t sec, uint8_t timer, uint8_t reset);
 
 //dialog timer is the slow transmission timer! used only on shut down (slow transmit doesn't matter there)
 void timed_dialog(char *title, char *text, uint8_t timeout, unsigned int ForeColor, unsigned int BackColor);
