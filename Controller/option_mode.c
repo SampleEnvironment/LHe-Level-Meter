@@ -17,11 +17,11 @@
 #include "../display_utilities.h"
 #include "../HoneywellSSC.h"
 #include "../main.h"
-#include "xbee.h"
-#include "xbee_utilities.h"
+#include "../avr-util-library/xbee.h"
+#include "../avr-util-library/xbee_utilities.h"
 #include "../timer_utilities.h"
 #include "../keyboard.h"
-#include "status.h"
+#include "../avr-util-library/status.h"
 
 #ifdef DISP_3000
 #include "../StringPixelCoordTable.h"

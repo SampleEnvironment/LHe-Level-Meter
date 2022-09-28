@@ -12,7 +12,7 @@
 #include "base_controller.h"
 #include "getCode_mode.h"
 #include "../timer_utilities.h"
-#include "disp/display_lib.h"
+#include "../avr-util-library/disp/display_lib.h"
 #include "../display_utilities.h"
 
 

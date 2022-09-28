@@ -7,10 +7,10 @@
 
 
 
-#include "disp/display_lib.h"
+#include "avr-util-library/disp/display_lib.h"
 #include "main.h"
 #include "Controller/base_controller.h"
-#include "DS3231M.h"
+#include "avr-util-library/DS3231M.h"
 
 // Variables for Display
 

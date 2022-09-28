@@ -20,8 +20,8 @@
 
 #include "main.h"
 
-#include "adwandler.h"
-#include "disp/display_lib.h"
+#include "avr-util-library/adwandler.h"
+#include "avr-util-library/disp/display_lib.h"
 
 #include "display_utilities.h"
 #include "keyboard.h"
@@ -38,15 +38,15 @@
 
 
 #include "diag_pulse.h"
-#include "i2cmaster.h"
-#include "usart.h"
-#include "xbee.h"
-#include "xbee_utilities.h"
-#include "xbee_AT_comm.h"
-#include "DS3231M.h"
-#include "I2C_utilities.h"
-#include "module_globals.h"
-#include "status.h"
+#include "avr-util-library/i2cmaster.h"
+#include "avr-util-library/usart.h"
+#include "avr-util-library/xbee.h"
+#include "avr-util-library/xbee_utilities.h"
+#include "avr-util-library/xbee_AT_comm.h"
+#include "avr-util-library/DS3231M.h"
+#include "avr-util-library/I2C_utilities.h"
+#include "avr-util-library/module_globals.h"
+#include "avr-util-library/status.h"
 
 
 

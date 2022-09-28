@@ -10,7 +10,7 @@
 #include <string.h>
 #include <time.h>
 
-#include "disp/display_lib.h"
+#include "avr-util-library/disp/display_lib.h"
 
 #include "keyboard.h"
 #include "timer_utilities.h"
