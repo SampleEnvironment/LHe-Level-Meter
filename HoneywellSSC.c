@@ -1,5 +1,5 @@
 #include "HoneywellSSC.h"
-#include "avr-util-library/i2cmaster.h"
+#include "i2cmaster.h"
 
  volatile stats4 HoneywellSSC_status = {
 	.connected = 0,  // not connected

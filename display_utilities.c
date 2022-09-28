@@ -14,22 +14,22 @@
 #include "main.h"
 
 #ifdef ili9341
-#include "avr-util-library/disp/ili9341_driver.h"
+#include "disp/ili9341_driver.h"
 #endif
 
 #ifdef DISP_3000
-#include "avr-util-library/disp/DISP_3000_driver.h"
+#include "disp/DISP_3000_driver.h"
 #endif
 
-#include "avr-util-library/disp/display_lib.h"
+#include "disp/display_lib.h"
 #include "display_utilities.h"
 #include "keyboard.h"
 #include "timer_utilities.h"
-#include "avr-util-library/DS3231M.h"
-#include "avr-util-library/xbee.h"
-#include "avr-util-library/xbee_AT_comm.h"
-#include "avr-util-library/adwandler.h"
-#include "avr-util-library/status.h"
+#include "DS3231M.h"
+#include "xbee.h"
+#include "xbee_AT_comm.h"
+#include "adwandler.h"
+#include "status.h"
 
 #ifdef DISP_3000
 #include "StringPixelCoordTable.h"

@@ -10,8 +10,8 @@
 
 
 // Choose flag for the correct Display Hardware present on your Levelmeter
-//#define ili9341
-#define DISP_3000
+#define ili9341
+//#define DISP_3000
 
 #define HZB
 //#define ILL

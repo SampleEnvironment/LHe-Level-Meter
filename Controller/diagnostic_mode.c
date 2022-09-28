@@ -16,10 +16,10 @@
 #include "../display_utilities.h"
 #include "../HoneywellSSC.h"
 #include "../main.h"
-#include "../avr-util-library/xbee.h"
-#include "../avr-util-library/xbee_utilities.h"
+#include "xbee.h"
+#include "xbee_utilities.h"
 #include "../timer_utilities.h"
-#include "../avr-util-library/adwandler.h"
+#include "adwandler.h"
 #include "../diag_pulse.h"
 #include "pulse_select_mode.h"
 

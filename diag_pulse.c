@@ -16,8 +16,8 @@
 #include "Controller/pulse_select_mode.h"
 #include "Controller/option_mode.h"
 #include "timer_utilities.h"
-#include "avr-util-library/I2C_utilities.h"
-#include "avr-util-library/DS3231M.h"
+#include "I2C_utilities.h"
+#include "DS3231M.h"
 
 // 1. legacy diag Pulse
 
