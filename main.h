@@ -174,13 +174,13 @@ extern EWindowOrientation ili_Orientation;
 #define OPTIONS_PW_MIN 0
 
 // ILL Display Orientation
-#ifdef ILL
+#ifdef ILL_DISP_CONFIG
 #define DISPLAY_CONFIG Orientation = (LVM.options->display_reversed)? Landscape : Landscape180;
 #endif // ILL
 
 
 // HZB Display Orientation
-#ifdef HZB
+#ifdef DEFAULT_DISP_CONFIG
 #define DISPLAY_CONFIG Orientation = (!LVM.options->display_reversed)? Landscape : Landscape180;
 #endif // HZB
 
