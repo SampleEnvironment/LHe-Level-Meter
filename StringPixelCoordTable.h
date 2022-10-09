@@ -323,7 +323,7 @@
 
 
 //diag_pulse()
-#define DP_NUMBER_OF_POINTS_140 140
+#define DP_NUMBER_OF_POINTS_140 125
 #define DP_POINTS_IN_PULSE_80 80 
 #define DP_U_ZEROLINE_70 70
 #define DP_I_ZEROLINE_125 125

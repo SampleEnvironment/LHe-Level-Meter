@@ -26,6 +26,7 @@
 // 3. incrementally increasing current delta I each delta t
 
 double heattime_linear;
+uint8_t diag_send_buffer[SINGLE_FRAME_LENGTH];
 
 
 void diag_pulse_init(diag_pulseType* dp, _Bool headless, uint8_t pulse_type){
@@ -762,7 +763,7 @@ void diag_pulse_move_cursor(diag_pulseType *dp,int8_t direction){
 
 
 void diag_pulse_send(diag_pulseType *dp){
-	uint8_t diag_send_buffer[SINGLE_FRAME_LENGTH];
+
 
 
 
@@ -795,7 +796,7 @@ void diag_pulse_send(diag_pulseType *dp){
 	diag_send_buffer[5] = Time.tm_year;
 
 	//TODO
-	uint8_t Datatpoints_per_Packet = 30;
+	uint8_t Datatpoints_per_Packet = 25;
 	
 	uint8_t n_Packets = (dp->points_in_plot+(Datatpoints_per_Packet-1))/ Datatpoints_per_Packet; // integer division rounded up
 	
@@ -807,14 +808,14 @@ void diag_pulse_send(diag_pulseType *dp){
 
 
 	InitScreen_AddLine("Sending I data...",0);
-	diag_send_sub_packets(dp,GET_PULSE_I,diag_send_buffer,n_Packets);
+	diag_send_sub_packets(dp,GET_PULSE_I,n_Packets);
 	
 
 	_delay_ms(2000);
 
 
 	InitScreen_AddLine("Sending U data...",0);
-	diag_send_sub_packets(dp,GET_PULSE_U,diag_send_buffer,n_Packets);
+	diag_send_sub_packets(dp,GET_PULSE_U,n_Packets);
 
 	
 
@@ -833,7 +834,7 @@ void diag_pulse_send(diag_pulseType *dp){
 }
 
 
-void diag_send_sub_packets(diag_pulseType *dp,uint8_t Message_code,uint8_t * diag_send_buffer,uint8_t n_Packets){
+void diag_send_sub_packets(diag_pulseType *dp,uint8_t Message_code,uint8_t n_Packets){
 	uint16_t points_sent =  0;
 	uint8_t header_offset = 11;
 	
@@ -843,7 +844,7 @@ void diag_send_sub_packets(diag_pulseType *dp,uint8_t Message_code,uint8_t * dia
 		diag_send_buffer[7]= i+1;
 		
 		//number of Datapoints in fragment
-		uint8_t datapoints_in_fragment = ((dp->points_in_plot - points_sent) > 30) ? 30 : (dp->points_in_plot - points_sent);
+		uint8_t datapoints_in_fragment = ((dp->points_in_plot - points_sent) > 25) ? 25 : (dp->points_in_plot - points_sent);
 		diag_send_buffer[8] =  ((uint16_t)dp->delta_t_points)>>8;
 		diag_send_buffer[9] =  (uint16_t)dp->delta_t_points;
 		diag_send_buffer[10] = datapoints_in_fragment;

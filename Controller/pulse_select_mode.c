@@ -635,6 +635,7 @@ void pulse_select_drawPage(void){
 	activeOpt--;
 	OptarrIndex = PageNr * 5;
 	
+	// small coordinate system top right corner
 	switch(PageNr){
 		case 0:
 		pulseSelect_paintNormal(PLOT_X-XOFFSET_32+xoff,PLOT_Y);
@@ -646,7 +647,7 @@ void pulse_select_drawPage(void){
 		pulseSelect_paintLinear(PLOT_X-XOFFSET_32+xoff,PLOT_Y);
 		break;
 	}
-
+	
 	for (uint8_t i = 0; i < 5; i++ )
 	{
 		if (activeOpt == i && pselect_model.value == 0)
@@ -669,6 +670,7 @@ void pulse_select_drawPage(void){
 		}
 
 	}
+	
 
 }
 
