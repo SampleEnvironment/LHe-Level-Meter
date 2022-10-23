@@ -283,7 +283,7 @@ void main_pressedDOWN(Controller_Model *Model){
 		
 		if (xbee.netstat == NO_NETWORK)
 		{
-			xbee_Set_Scan_Channels(SC_MASK_DEFAULT);
+			xbee_Set_Scan_Channels(LVM.options->SC_mask);
 			xbee_WR();
 		}
 

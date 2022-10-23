@@ -245,7 +245,9 @@ typedef struct{
 	uint8_t display_reversed;
 	_Bool Dev_ID_alpahnum;
 	uint8_t Dev_ID_Max_len;
-	uint16_t	options_pw;
+	uint16_t options_pw;
+	uint16_t SC_mask;
+	uint8_t    SC_mask_alerady_received;
 }optionsType;
 
 

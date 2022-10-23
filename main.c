@@ -106,7 +106,10 @@ eememType  EEMEM eeVars = {
 	.eeOptions.display_reversed = false,
 	.eeOptions.Dev_ID_alpahnum = DEVICE_ID_ALPHANUMERIC ,
 	.eeOptions.Dev_ID_Max_len = DEVICE_ID_UI_MAX_LEN,
+	.eeOptions.SC_mask = SC_MASK_DEFAULT,
+	.eeOptions.SC_mask_alerady_received = 0,
 	.eeprom_changed = EEPROM_CHANGED_DEF
+	
 };
 
 #endif
@@ -143,8 +146,9 @@ optionsType Options ={
 	.total_volume = TOTAL_VOL_DEF,
 	.display_reversed = false,
 	.Dev_ID_alpahnum = DEVICE_ID_ALPHANUMERIC ,
-	.Dev_ID_Max_len = DEVICE_ID_UI_MAX_LEN
-
+	.Dev_ID_Max_len = DEVICE_ID_UI_MAX_LEN,
+	.SC_mask = SC_MASK_DEFAULT,
+	.SC_mask_alerady_received = 0
 };
 
 
@@ -600,8 +604,9 @@ void write_DEFS_to_EEPROM(void){
 		.display_reversed  = false,
 		.Dev_ID_alpahnum   = false,
 		.Dev_ID_Max_len    = DEV_ID_CHARS_DEF,
-		.options_pw        =  OPTIONS_PW_DEF
-		
+		.options_pw        =  OPTIONS_PW_DEF,
+		.SC_mask = SC_MASK_DEFAULT,
+		.SC_mask_alerady_received = 0		
 		
 	};
 	
@@ -659,13 +664,27 @@ int main(void)
 	//=========================================================================
 	#ifdef ALLOW_EEPROM_SAVING
 	LVM.options->display_reversed 	= eeprom_read_byte(&eeVars.eeOptions.display_reversed);
+	uint8_t SC_already_received 	= eeprom_read_byte(&eeVars.eeOptions.SC_mask_alerady_received);
+	uint8_t SC_EEPROM				= eeprom_read_word(&eeVars.eeOptions.SC_mask);
+
 	#endif
 
 	version_INIT(FIRMWARE_VERSION,BRANCH_ID,LAST_FIRMWARE_EEPROM_CHANGED);
-	xbee_init(&paint_info_line,LVM.vars->Device_ID_Str,DEV_ID_CHARS_MAX);
+	
+	if (SC_already_received == SC_already_received_Pattern)
+	{
+		xbee_init(&paint_info_line,LVM.vars->Device_ID_Str,DEV_ID_CHARS_MAX,SC_EEPROM);
+		LVM.options->SC_mask = SC_EEPROM;
+	}else
+	{
+		xbee_init(&paint_info_line,LVM.vars->Device_ID_Str,DEV_ID_CHARS_MAX,SC_MASK_DEFAULT);
+		LVM.options->SC_mask = SC_MASK_DEFAULT;
+	}
 
 
 	LCD_Init();
+	
+
 
 
 	// XBee module (PORTA.6)
@@ -874,7 +893,7 @@ int main(void)
 	}
 	#endif // ili9341
 
-	xbee_Set_Scan_Channels(SC_MASK_DEFAULT);
+	xbee_Set_Scan_Channels(xbee.ScanChannels);
 	xbee_WR();
 
 	#if 1
