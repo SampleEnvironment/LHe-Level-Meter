@@ -193,7 +193,7 @@ VarsType vars = {
 	.transmit_slow_changed = 0,
 	.fill_meas_counter =0,
 	.Device_ID_Str="",
-	.n_pulse_wakes = NUMBER_POST_PULSE_WAKES
+	.n_pulse_wakes = 0
 };
 
 

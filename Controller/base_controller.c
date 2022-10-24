@@ -1475,6 +1475,11 @@ void handle_received_Messages(Controller_Model *Model){
 			xbee_init(&paint_info_line,LVM.vars->Device_ID_Str,DEV_ID_CHARS_MAX,LVM.options->SC_mask);
 			xbee_Set_Scan_Channels(xbee.ScanChannels);
 			xbee_WR();
+			
+			//Send Status Ack
+			LVM.temp->buffer[0] = 0;
+			xbee_send_message(SET_SC_XBEE_MASK,LVM.temp->buffer,1);
+			break;
 
 			
 			case DEPRECATED_ILM_BROADCAST: // ILM messages are sent in broadcast mode and are ignored by other devices
