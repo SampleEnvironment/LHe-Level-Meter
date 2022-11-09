@@ -1463,25 +1463,51 @@ void handle_received_Messages(Controller_Model *Model){
 			}
 			
 			case SET_SC_XBEE_MASK:
+			;
+			uint16_t SC_mask = (frameBuffer[reply_Id].data[0]<<8) + frameBuffer[reply_Id].data[1];
 			
-			LVM.options->SC_mask = (frameBuffer[reply_Id].data[0]<<8) + frameBuffer[reply_Id].data[1];
-			LVM.options->SC_mask_alerady_received = SC_already_received_Pattern;
-			
-			// write new sc mask to eeprom
-			eeprom_update_word(&LVM.eeprom->eeOptions.SC_mask,LVM.options->SC_mask);
-			eeprom_update_byte(&LVM.eeprom->eeOptions.SC_mask_alerady_received,LVM.options->SC_mask_alerady_received);
-			
-			//refresh xbee  parameters
-			xbee_init(&paint_info_line,LVM.vars->Device_ID_Str,DEV_ID_CHARS_MAX,LVM.options->SC_mask);
-			xbee_Set_Scan_Channels(xbee.ScanChannels);
-			xbee_WR();
-			
-			//Send Status Ack
-			LVM.temp->buffer[0] = 0;
-			xbee_send_message(SET_SC_XBEE_MASK,LVM.temp->buffer,1);
+			// check if received Mask is valid:
+			if(!(SC_mask & 0xE001)){
+				LVM.options->SC_mask = SC_mask;
+				LVM.options->SC_mask_alerady_received = SC_already_received_Pattern;
+				
+				// write new sc mask to eeprom
+				eeprom_update_word(&LVM.eeprom->eeOptions.SC_mask,LVM.options->SC_mask);
+				eeprom_update_byte(&LVM.eeprom->eeOptions.SC_mask_alerady_received,LVM.options->SC_mask_alerady_received);
+				
+				//refresh xbee  parameters
+				xbee_init(&paint_info_line,LVM.vars->Device_ID_Str,DEV_ID_CHARS_MAX,LVM.options->SC_mask);
+				xbee_Set_Scan_Channels(xbee.ScanChannels);
+				xbee_WR();
+				
+				//Send Status Ack
+				LVM.temp->buffer[0] = 0;
+				xbee_send_message(SET_SC_XBEE_MASK,LVM.temp->buffer,1);
+			}
+			else{
+				//Send Status Ack
+				LVM.temp->buffer[0] = 1;
+				xbee_send_message(SET_SC_XBEE_MASK,LVM.temp->buffer,1);
+				
+			}
 			break;
-
 			
+			case GET_SC_XBEE_MASK:
+				;
+				index = 0;
+				LVM.temp->buffer[index++] = LVM.options->SC_mask>> 8;
+				LVM.temp->buffer[index++] = LVM.options->SC_mask;
+				LVM.temp->buffer[index++] =  get_status_byte_levelmeter();
+
+				// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
+				if (xbee_send_message(GET_SC_XBEE_MASK, LVM.temp->buffer, index))
+				{
+					CLEAR_ALL(); // Clear all errors
+				}
+				
+				
+			break;
+		
 			case DEPRECATED_ILM_BROADCAST: // ILM messages are sent in broadcast mode and are ignored by other devices
 			break;
 
