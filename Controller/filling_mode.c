@@ -49,7 +49,8 @@ Controller_Model_filling filling_model ={
 	.super.mode = &global_mode,
 	.super.vtable = &filling_Vtable,
 	.super.batt_check = true,
-	.meas_progress = 0
+	.meas_progress = 0,
+	.t_last_presss_meas = 0
 };
 
 Controller_Model_filling * get_fill_model(){
@@ -318,12 +319,18 @@ void filling_pressedNONE(Controller_Model *Model){
 		:						draw_current_wait_time(X_M_60+xoff, Y_M_90, LVM.options->transmit_fast*60, filling_model.meas_progress, ERR);
 
 		// enter pressure
-		if (HoneywellSSC_status.connected)
+		if (/*HoneywellSSC_status.connected && */(count_t_elapsed%3 == 0) && (count_t_elapsed != filling_model.t_last_presss_meas ) )
 		{
-			LVM.vars->pressure_level = 0;
-			HoneywellSSC_read_pressure();
-			if (HoneywellSSC_status.status < 4) LVM.vars->pressure_level = HoneywellSSC_Pressure;
+			
+
+			filling_model.t_last_presss_meas = count_t_elapsed;
+			//LVM.vars->pressure_level = 0;
+			//HoneywellSSC_read_pressure();
+			//if (HoneywellSSC_status.status < 4) LVM.vars->pressure_level = HoneywellSSC_Pressure;
+			
+			LVM.vars->pressure_level++;
 			paint_time_pressure(Time, LVM.vars->pressure_level, 1);  // update mode
+			
 		}
 
 	}

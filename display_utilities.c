@@ -322,6 +322,7 @@ void paint_he_level(double he_level, double total_volume, _Bool print_Percentage
 void paint_time_pressure(struct tm ltime, double lpress, _Bool update)
 {
 
+
 	char temp[15];
 
 	if (!update) LCD_Print("               ", xoff + X_PTP_2, Y_PTP_20, 2, 1, 1, FGC, BGC);  // clears line (not necessary if in update mode)
@@ -331,8 +332,12 @@ void paint_time_pressure(struct tm ltime, double lpress, _Bool update)
 	LCD_Print(temp, xoff + X_PTP_2, Y_PTP_20, 2, 1, 1, ERR, BGC);
 
 
-	LCD_Print("              ",X_PTP_COORDINATOR +xoff-14*FONT1_W,Y_PTP_COORDINATOR,1,1,1,FGC,BGC);
-	
+
+	if (xbee.CoordIdChanged)
+	{
+		LCD_Print("              ",X_PTP_COORDINATOR +xoff-14*FONT1_W,Y_PTP_COORDINATOR,1,1,1,FGC,BGC);
+	}
+		
 	uint16_t color = FGC;
 	
 	if (CHECK_ERROR(NETWORK_ERROR))
@@ -374,6 +379,10 @@ void paint_time_pressure(struct tm ltime, double lpress, _Bool update)
 	
 		LCD_Print(xbee_get_coordID(),X_PTP_COORDINATOR +xoff-strlen(xbee_get_coordID())*FONT1_W,Y_PTP_COORDINATOR,1,1,1,color,BGC);
 	
+
+		if (!update)
+		{
+		
 		//autofill indicator
 		uint8_t boxheight = AUTOFILL_BOX_WIDTH;
 		uint16_t x0 = X_AUTOFFILL_INDICATOR+xoff;
@@ -386,6 +395,7 @@ void paint_time_pressure(struct tm ltime, double lpress, _Bool update)
 		{
 			LCD_Box(x0,y0,x0+boxheight,y0+boxheight,green);
 			LCD_Box(x0+1,y0+1,x0+boxheight-1,y0+boxheight-1,BGC);
+		}
 		}
 		
 

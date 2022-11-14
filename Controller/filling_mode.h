@@ -19,6 +19,7 @@ typedef struct
 {
 	Controller_Model super;
 	uint8_t meas_progress;
+	uint32_t t_last_presss_meas;
 }Controller_Model_filling;
 
 
