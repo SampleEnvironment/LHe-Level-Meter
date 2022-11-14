@@ -329,6 +329,7 @@ void filling_pressedNONE(Controller_Model *Model){
 			if (HoneywellSSC_status.status < 4) LVM.vars->pressure_level = HoneywellSSC_Pressure;
 			paint_time_pressure(Time, LVM.vars->pressure_level, 1);  // update mode
 			
+			
 		}
 
 	}
