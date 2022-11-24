@@ -15,4 +15,4 @@ Buildconfigurations have the following Format:
 | Display Configuration | Description                                                                                         |
 |-------------------|---------------------------------------------------------------------------------------------------------|
 | Default           | Default Display Configuration                                                                           |
-| ILL               | Disply is rotated 180° in ILL Levelmeters                                                               |
+| ILL               | Disply is rotated 180° in ILL Levelmeters, because a different Case is used                             |
