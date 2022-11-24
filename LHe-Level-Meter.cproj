@@ -54,7 +54,7 @@
       <ToolName>STK500</ToolName>
     </com_atmel_avrdbg_tool_stk500>
     <avrtoolinterface>ISP</avrtoolinterface>
-    <avrtoolinterfaceclock>999946</avrtoolinterfaceclock>
+    <avrtoolinterfaceclock>944399</avrtoolinterfaceclock>
     <com_atmel_avrdbg_tool_simulator>
       <ToolOptions>
         <InterfaceProperties>
@@ -69,7 +69,7 @@
     <com_atmel_avrdbg_tool_powerdebugger>
       <ToolOptions>
         <InterfaceProperties>
-          <IspClock>999946</IspClock>
+          <IspClock>944399</IspClock>
           <JtagDbgClock>220000</JtagDbgClock>
           <JtagEnableExtResetOnStartSession>true</JtagEnableExtResetOnStartSession>
           <JtagInChain>false</JtagInChain>

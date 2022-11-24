@@ -265,10 +265,10 @@ void option_pre_Switch_case_Tasks(Controller_Model *Model){
 		set_timeout(OPT_TIMEOUT_TIME, TIMER_3, USE_TIMER);
 	}
 
-	if(!set_timeout(0,TIMER_3, USE_TIMER))  //shutdown after shutdown_timout if no key was pressed
+	if(!set_timeout(0,TIMER_3, USE_TIMER))  //exit options  if no key was pressed
 	{
 		option_model.options_changed = false;
-		option_exit(Model);
+		option_exit(Model, 0);
 	}
 }
 
@@ -280,7 +280,7 @@ void option_post_Switch_case_Tasks(Controller_Model *Model){
 		if ((option_model.page == 0)||(option_model.page ==  7))
 		{
 			set_OptionModel(1,1,0);
-			option_exit(Model);
+			option_exit(Model, 0);
 			ready_for_new_key();
 			return;
 		}
@@ -387,9 +387,11 @@ void Bool_valueChange (ValueOptions *optEntry, int key)
 void Bool_valueChange_Shutdown(ValueOptions *optEntry, int key){
 	if(LCD_Dialog(STR_SHUTDOWN_OPT,STR_DO_YOU_REALLY_WANT_SHUTDOWN, D_FGC, D_BGC,SHUTDOWN_TIMEOUT_TIME))
 	{
+		Controller_Model * Model = (Controller_Model *) &option_model;
+		option_exit(Model,1);
 		LCD_Cls(BGC);
 		
-		Controller_Model * Model = (Controller_Model *) &option_model;
+
 		shutdown_LVM(Model);
 	}
 	else {
@@ -1115,7 +1117,7 @@ void opt_ValueChange(){
 
 
 
-void option_exit(Controller_Model * Model){
+void option_exit(Controller_Model * Model, uint8_t headless){
 	// Set buffered variables
 	LVM.options->display_reversed = option_model.display_reversed_buff;
 	LVM.options->batt_min = option_model.batt_min_buff;
@@ -1166,7 +1168,11 @@ void option_exit(Controller_Model * Model){
 		}
 
 	}
-	paint_main(Time, Model->mode->netstat, PAINT_ALL);
+	if (!headless)
+	{
+		paint_main(Time, Model->mode->netstat, PAINT_ALL);
+	}
+
 	Model->mode->next = ex_main;
 	option_model.options_changed = false;
 

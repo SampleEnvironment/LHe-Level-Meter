@@ -213,7 +213,7 @@ void opt_drawPage(void);
 
 void opt_ValueChange(void);
 
-void option_exit(Controller_Model * Model);
+void option_exit(Controller_Model * Model, uint8_t headless);
 
 
 

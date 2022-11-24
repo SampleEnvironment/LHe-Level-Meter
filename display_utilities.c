@@ -380,8 +380,6 @@ void paint_time_pressure(struct tm ltime, double lpress, _Bool update)
 		LCD_Print(xbee_get_coordID(),X_PTP_COORDINATOR +xoff-strlen(xbee_get_coordID())*FONT1_W,Y_PTP_COORDINATOR,1,1,1,color,BGC);
 	
 
-		if (!update)
-		{
 		
 		//autofill indicator
 		uint8_t boxheight = AUTOFILL_BOX_WIDTH;
@@ -396,7 +394,7 @@ void paint_time_pressure(struct tm ltime, double lpress, _Bool update)
 			LCD_Box(x0,y0,x0+boxheight,y0+boxheight,green);
 			LCD_Box(x0+1,y0+1,x0+boxheight-1,y0+boxheight-1,BGC);
 		}
-		}
+		
 		
 
 	

@@ -822,7 +822,7 @@ int main(void)
 	if (((LVM.vars->eeprom_changed != LVM.version->Fw_version) && LVM.version->FW_eeprom_changed > LVM.vars->eeprom_changed) || LVM.vars->eeprom_changed > LVM.version->Fw_version ){
 		// DIALOG --> eeprom values might be undefined pls recalibrate
 		if(LCD_Dialog(STR_EEPROM_UNDEFINED,STR_VALUES_MIGHT_BE_UNDEFINED,D_BGC,D_FGC,30)){
-			eeprom_write_word(&LVM.eeprom->eeprom_changed,LVM.version->Fw_version);
+			
 		}
 		
 		ready_for_new_key();

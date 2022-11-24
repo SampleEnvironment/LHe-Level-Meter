@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdio.h>
+#include <avr/eeprom.h>
 
 #include "base_controller.h"
 #include "diagnostic_mode.h"
@@ -173,6 +174,10 @@ void diag_pressedNONE(Controller_Model *Model){
 
 void calibration(Controller_Model *Model){
 	LCD_Cls(BGC);
+	
+	// User entered calibration --> this disables warning on startup
+	eeprom_write_word(&LVM.eeprom->eeprom_changed,LVM.version->Fw_version);
+	
 	if(LCD_Dialog(STR_CALIBRATION, STR_SET_RESISTANCE_OR_NZERO_TO_DEFAULT , D_FGC, D_BGC,CALIBRATE_TIMEOUT_TIME))
 	{
 		// User answered "Yes"
