@@ -169,7 +169,7 @@ extern EWindowOrientation ili_Orientation;
 #define DEVICE_ID_ALPHANUMERIC false
 #define MESSAGEFOPRMAT_IDENTIFIER 128	// Identifier used, to differentiate between old and new messageformat
 
-#define OPTIONS_PW_DEF 0
+#define OPTIONS_PW_DEF 1
 #define OPTIONS_PW_MAX 999
 #define OPTIONS_PW_MIN 0
 
@@ -483,6 +483,6 @@ int I2C_ClearBus(void);
 uint8_t collect_and_send_MeasData(uint8_t *meas_buffer,uint8_t Message_Code);
 _Bool auto_fill_pin_on(void);
 void write_opts_to_EEPROM(void);
-
+void write_DEFS_to_EEPROM(void);
 
 #endif  // main.h

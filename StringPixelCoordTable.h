@@ -547,8 +547,9 @@
 #define STR_FLIP_DISP 				"FlipDisp:"
 
 //page 6
-#define STR_ALPHANUM					"Alphanum:"
-#define STR_NLOGINCHARS 				"ID len:"
+#define STR_ALPHANUM				"Alphanum:"
+#define STR_NLOGINCHARS 			"ID len:"
+#define STR_RESET_TO_DEFAULTS		"Reset"
 //-----------------
 
 //pulse_select_Mode-----------------

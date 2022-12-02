@@ -110,6 +110,7 @@ void Bool_valueDraw ( ValueOptions *optEntry, unsigned int color);
 void Bool_valueChange (ValueOptions *optEntry, int key);
 void Bool_valueChange_Shutdown(ValueOptions *optEntry, int key);
 void Bool_valueChange_diagmode( ValueOptions *optEntry, int key);
+void Bool_valueChange_Reset( ValueOptions *optEntry, int key);
 void ValOptBool_init( ValueOptionsBool *optEntry, struct ValueOptVtable *bool_vtable, uint16_t lineYcoord,char *OptName, _Bool *bValue, _Bool isUploaded);
 
 //===================================================================================

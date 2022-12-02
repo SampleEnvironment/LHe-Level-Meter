@@ -75,7 +75,7 @@ ValueOptionsBool   display_reversed_opt;
 
 ValueOptionsBool alphanum_opt;
 ValueOptionsuInt8 dev_id_max_len_opt;
-ValueOptionsNull Null3;
+ValueOptionsBool ResetToDefaults;
 ValueOptionsNull Null4;
 ValueOptionsNull Null5;
 
@@ -97,6 +97,7 @@ uint8_t pos_str_arr_ind = 0;
 //dummy variables neded for object structure
 _Bool shutdown = false;
 _Bool diagmode = false;
+_Bool Reset    = false;
 
 
 optPageStrType optionStrings[]={
@@ -105,7 +106,7 @@ optPageStrType optionStrings[]={
 	{.Page[0]=STR_RES_MIN,.Page[1]=STR_RES_MAX,.Page[2]=STR_ENABLE_PR,.Page[3]=STR_SPAN,.Page[4]=STR_ZERO},
 	{.Page[0]=STR_TRANSMIT_SLOW,.Page[1]=STR_TRANSMIT_FAST,.Page[2]=STR_BATTMIN,.Page[3]=STR_BATTMAX,.Page[4]=STR_CRITVOLT},
 	{.Page[0]=STR_ADCSPAN,.Page[1]=STR_ADCZERO,.Page[2]=STR_MEASUREMENT_CYCLES,.Page[3]=STR_TOTAL_VOL,.Page[4]=STR_FLIP_DISP},
-	{.Page[0]=STR_ALPHANUM,.Page[1]=STR_NLOGINCHARS,.Page[2]="",.Page[3]="",.Page[4]=""}
+	{.Page[0]=STR_ALPHANUM,.Page[1]=STR_NLOGINCHARS,.Page[2]=STR_RESET_TO_DEFAULTS,.Page[3]="",.Page[4]=""}
 };
 
 
@@ -149,7 +150,7 @@ Controller_Model_options* get_option_model(){
 }
 
 void set_options_changed(){
-		option_model.options_changed = true;
+	option_model.options_changed = true;
 }
 
 void set_bufferVars(_Bool   options_changed){
@@ -191,7 +192,7 @@ void option_pressedUP(Controller_Model *Model){
 		}
 		
 		if((option_model.page == 6)&&(option_model.option == 0)){
-			option_model.option = 2;
+			option_model.option = 3;
 		}
 
 
@@ -236,7 +237,7 @@ void option_pressedDOWN(Controller_Model *Model){
 			option_model.option = 1; // Skips the last two options if Press is not set to analog
 		}
 		
-		if((option_model.page == 6)&&(option_model.option == 3)){
+		if((option_model.page == 6)&&(option_model.option == 4)){
 			option_model.option = 1;
 		}
 
@@ -407,6 +408,32 @@ void Bool_valueChange_diagmode(ValueOptions*optEntry, int key){
 	option_model.super.mode->next= ex_diagnostic;
 }
 
+void Bool_valueChange_Reset(ValueOptions*optEntry, int key){
+	ValueOptionsBool *optEntry_ = (ValueOptionsBool *) optEntry;
+	if (!*optEntry_->bValue)
+	{
+		*optEntry_->bValue = true;
+	}
+	write_DEFS_to_EEPROM();
+	eeprom_read_block(LVM.options,&LVM.eeprom->eeOptions,sizeof(optionsType));
+	// Set display orientation
+	DISPLAY_CONFIG
+	xoff = (!LVM.options->display_reversed)? 0 : XOffset;
+	LCD_Cls(BGC);
+	option_model.option = 1;
+	option_model.value = 0;
+	option_model.valueLast = 0;
+	option_model.options_changed = true;
+	
+	option_model.display_reversed_buff = LVM.options->display_reversed;
+	option_model.batt_min_buff = LVM.options->batt_min;
+	option_model.batt_max_buff = LVM.options->batt_max;
+	option_model.critical_batt_buff = LVM.options->critical_batt;
+	opt_drawPageChange();
+	paint_buttons("prev","esc",3);
+}
+
+
 //Boolean Vtable
 struct ValueOptVtable ValueOptBoolVtable =
 {
@@ -422,6 +449,11 @@ struct ValueOptVtable ValueOptBoolVtable_shutdown = {
 struct ValueOptVtable ValueOptBoolVtable_diagmode= {
 	&Bool_valueDraw,
 	&Bool_valueChange_diagmode
+};
+
+struct ValueOptVtable ValueOptBoolVtable_Reset= {
+	&Bool_valueDraw,
+	&Bool_valueChange_Reset
 };
 
 void ValOptBool_init( ValueOptionsBool *optEntry, struct ValueOptVtable *bool_vtable, uint16_t lineYcoord,char *OptName, _Bool *bValue, _Bool isUploaded){
@@ -873,7 +905,7 @@ void  OptentrysInit(){
 	//page6
 	ValOptBool_init(&alphanum_opt,&ValueOptBoolVtable,YcoordOfOptline[0],optionStrings[5].Page[0],&LVM.options->Dev_ID_alpahnum,false);
 	ValOptInt8_init(&dev_id_max_len_opt,YcoordOfOptline[1],optionStrings[5].Page[1],&LVM.options->Dev_ID_Max_len,1,DEV_ID_CHARS_MAX,DEV_ID_CHARS_MIN,"");
-	ValOptNull_init(&Null3,YcoordOfOptline[2],optionStrings[5].Page[2],"");
+	ValOptBool_init(&ResetToDefaults,&ValueOptBoolVtable_Reset,YcoordOfOptline[2],optionStrings[5].Page[2],&Reset,false);
 	ValOptNull_init(&Null4,YcoordOfOptline[3],optionStrings[5].Page[3],"");
 	ValOptNull_init(&Null5,YcoordOfOptline[4],optionStrings[5].Page[4],"");
 	
@@ -910,7 +942,7 @@ void  OptentrysInit(){
 	
 	OptArray[25]= (ValueOptions* )&alphanum_opt;
 	OptArray[26]= (ValueOptions* )&dev_id_max_len_opt;
-	OptArray[27]= (ValueOptions* )&Null3;
+	OptArray[27]= (ValueOptions* )&ResetToDefaults;
 	OptArray[28]= (ValueOptions* )&Null4;
 	OptArray[29]= (ValueOptions* )&Null5;
 
@@ -1024,12 +1056,12 @@ void opt_ValOpt_switch(){
 			strcpy(LVM.temp->string, "none");
 			if(update_filling_pos(LVM.pos, LVM.temp->string)) strcpy(LVM.vars->device_pos, LVM.temp->string);
 			
-		
+			
 			set_OptionModel(1,2,0);
-					
+			
 			opt_drawPage();
 			
-			// reset option exit timer otherwise Levelmeter goes back to main 				
+			// reset option exit timer otherwise Levelmeter goes back to main
 			set_timeout(0, TIMER_3, RESET_TIMER);
 			set_timeout(OPT_TIMEOUT_TIME, TIMER_3, USE_TIMER);
 			return;
@@ -1187,10 +1219,10 @@ void option_exit(Controller_Model * Model, uint8_t headless){
 void make_he_vol_changable(void)
 {
 
-		total_volume_opt.increment= 0.1;
-		total_volume_opt.continuousInc = 1;
-		total_volume_opt.MIN = TOTAL_VOL_MIN;
-		total_volume_opt.MAX = TOTAL_VOL_MAX;
+	total_volume_opt.increment= 0.1;
+	total_volume_opt.continuousInc = 1;
+	total_volume_opt.MIN = TOTAL_VOL_MIN;
+	total_volume_opt.MAX = TOTAL_VOL_MAX;
 }
 
 void paint_opt_model(){
