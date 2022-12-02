@@ -1239,6 +1239,7 @@ int main(void)
 			xbee_sleep();
 		}
 		// Batterycheck offline mode if battery low --> go to optioins 
+
 		if(global_mode.netstat == offline && LVM.options->batt_min >= map_to_batt(readChannel(BATTERY, 10*ADC_LOOPS))){
 				// Set options mode
 				global_mode.next = ex_options;

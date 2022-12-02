@@ -51,6 +51,7 @@ Controller_Model_filling filling_model ={
 	.super.batt_check = true,
 	.meas_progress = 0,
 	.t_last_presss_meas = 0
+
 };
 
 Controller_Model_filling * get_fill_model(){
