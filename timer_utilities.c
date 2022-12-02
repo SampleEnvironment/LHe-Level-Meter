@@ -373,17 +373,17 @@ void timed_dialog(char *title, char *text, uint8_t timeout, unsigned int ForeCol
 	{
 		case Landscape:
 		LCD_Box(X_LD_10,Y_LD_25,X_LD_160,Y_LD_120,ForeColor);
-		LCD_Print(title,LD_MID_LANDSCAPE-(strlen(title)*LD_HALF_CHAR_WIDTH),Y_LD_1,2,1,1,ForeColor,BackColor);
+		LCD_Print(title,LD_MID_LANDSCAPE-((strlen(title)*FONT2_W)/2),Y_LD_1,2,1,1,ForeColor,BackColor);
 		x0 = X_LD_13;
 		break;
 		case Landscape180:
 		LCD_Box(X_LD_17,Y_LD_25,X_LD_166,Y_LD_120,ForeColor);
-		LCD_Print(title,LD_MID_LANDSCAPE180-(strlen(title)*LD_HALF_CHAR_WIDTH),Y_LD_1,2,1,1,ForeColor,BackColor);
+		LCD_Print(title,LD_MID_LANDSCAPE-((strlen(title)*FONT2_W)/2),Y_LD_1,2,1,1,ForeColor,BackColor);
 		x0 = X_LD_20;
 		break;
 		default:
 		LCD_Box(X_LD_10,Y_LD_25,X_LD_120,Y_LD_165,ForeColor);
-		LCD_Print(title,65-(strlen(title)*LD_HALF_CHAR_WIDTH),Y_LD_1,2,1,1,ForeColor,BackColor);
+		LCD_Print(title,LD_MID_LANDSCAPE-((strlen(title)*FONT2_W)/2),Y_LD_1,2,1,1,ForeColor,BackColor);
 		x0 = X_LD_13;
 		break;
 	}

@@ -469,9 +469,9 @@
 
 //paint_offline()
 #define STR_OFF "OFF"
-
-#define STR_EEPROM_UNDEFINED "EEPROM undef."
-#define STR_VALUES_MIGHT_BE_UNDEFINED "Values stored in EEPROM\nmight be undefined,\nplease recalibrate!\nPress YES to not show\nthis message again."
+							 
+#define STR_EEPROM_UNDEFINED "Calibration faulty"	
+#define STR_VALUES_MIGHT_BE_UNDEFINED "Values stored in EEPROM\nmight be undefined,\nplease recalibrate!"
 
 //===============================================================================
 //-----Main loop-------------------------------------------------------------

@@ -321,8 +321,6 @@ void filling_pressedNONE(Controller_Model *Model){
 		// enter pressure
 		if (HoneywellSSC_status.connected && (count_t_elapsed%3 == 0) && (count_t_elapsed != filling_model.t_last_presss_meas ) )
 		{
-			
-
 			filling_model.t_last_presss_meas = count_t_elapsed;
 			LVM.vars->pressure_level = 0;
 			HoneywellSSC_read_pressure();
