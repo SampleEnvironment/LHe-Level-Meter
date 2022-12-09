@@ -1106,70 +1106,75 @@ void handle_received_Messages(Controller_Model *Model){
 			}
 			case SET_LETTERS_CMD:	// (#15) Set list of available device positions received from the database server.
 			{
+				uint8_t index = 0;
+				uint8_t data_len = frameBuffer[reply_Id].data_len;
 				
+				uint8_t data[data_len];
 				
-				// Get data length and data
-				uint8_t byte_number = frameBuffer[reply_Id].data_len;
-				uint8_t *ptr = (uint8_t*)frameBuffer[reply_Id].data;
-
-				// Init. variables
-				uint8_t i_letters = 1;
-				uint8_t j_letters = 0;
-				uint8_t j_ranges = 1;
-
+				memcpy(data,(uint8_t*) frameBuffer[reply_Id].data,sizeof(uint8_t)*data_len);
+				
+				// Position index (first dimension)
+				uint8_t PositionIndex = 0;
+				
+				// Letter and Range Index (second dimension)
+				uint8_t PositionLetterIndex = 0;
+				uint8_t PositionRangeIndex  = 0;
+				
 				// Init. arrays
 				LVM.pos->Strings[0][0] ='\r';
 				LVM.pos->Strings[0][1] ='\0';
 				LVM.pos->RangeNums[0][0] = END;
 				LVM.pos->StrLen[0] = 0;
-
+				
+				
 				// Example for a position string: 'A;'#1#2#3'/AB;'#1#2'/ABC;/ISI;/P;'#1#2#5'/PPMS;/QWR;/R;'#2#$17#3#4'/T;'#1#$A#$B#2#4'/'
-
-				while(byte_number)
+				
+				while (index < data_len)
 				{
-					LVM.pos->Strings[i_letters][j_letters] = ((char)(*ptr));
-					j_letters++;
-					ptr++;
-					byte_number--;
-					LVM.pos->StrLen[i_letters] = 0;    // no composed position string until now
-					//							draw_int(fill_pos_tonumbersindex[i_letters], 65, 20, "", ERR);
-					//							_delay_ms(200);
-
-					if(*ptr == ';') //ranges
+					// Pos Letters
+					LVM.pos->Strings[PositionIndex][PositionLetterIndex] = (char) data[index];
+					index++;
+					PositionLetterIndex++;
+					
+					if(data[index] == DEL) //End of Pos Letters
 					{
-						LVM.pos->Strings[i_letters][j_letters] = '\0';
-						LVM.pos->RangeNums[i_letters][0] = END;
-						ptr++;
-						byte_number--;
+						LVM.pos->Strings[PositionIndex][PositionLetterIndex] = '\0';
+						LVM.pos->RangeNums[PositionIndex][0] = END;
+						index++;
+						
 
-						while(*ptr != SEP)
+						while(data[index] != SEP) //Enter Range Nums until SEP
 						{
-							LVM.pos->RangeNums[i_letters][j_ranges] = *ptr;
-							LVM.pos->StrLen[i_letters] = j_letters;   // composed position string detected, enter number of letters in the composed position string
+							LVM.pos->RangeNums[PositionIndex][PositionRangeIndex] = data[index];
+							LVM.pos->StrLen[PositionIndex] = PositionLetterIndex;   // composed position string detected, enter number of letters in the composed position string
 							//									draw_int(fill_pos_tonumbersindex[i_letters], 65, 20, "", ERR);
 							//									_delay_ms(200);
-							j_ranges++;
-							ptr++;
-							byte_number--;
+							PositionRangeIndex++;
+							index++;
 							// If ranges index is higher than the maximum value, break
-							if(j_ranges == FILL_RANGES_LENGTH-1)
+							if(PositionRangeIndex == FILL_RANGES_LENGTH-1)
 							break;
 						}
-						LVM.pos->RangeNums[i_letters][j_ranges] = END;
+						LVM.pos->RangeNums[PositionIndex][PositionRangeIndex] = END;
 
-						ptr++;
-						byte_number--;
-						i_letters++;
+						index++;
+						PositionIndex++;
 						// If letters index is higher than the maximum value, break
-						if(i_letters == FILL_RANGES_COUNT-1)
+						if(PositionIndex == FILL_RANGES_COUNT-1)
 						break;
-						j_letters = 0;
-						j_ranges = 1;
+						PositionLetterIndex = 0;
+						PositionRangeIndex = 1;
 					}
 				}
-				LVM.pos->Strings[i_letters][0] ='\r';
-				LVM.pos->RangeNums[i_letters][0] = END;
-				LVM.pos->StrLen[i_letters] = 0;
+				
+				LVM.pos->Strings[PositionIndex][0] ='\r';
+				LVM.pos->RangeNums[PositionIndex][0] = END;
+				LVM.pos->StrLen[PositionIndex] = 0;
+						
+				
+				
+				
+
 
 				CLEAR_ERROR(LETTERS_ERROR);
 				
@@ -1495,21 +1500,21 @@ void handle_received_Messages(Controller_Model *Model){
 			break;
 			
 			case GET_SC_XBEE_MASK:
-				;
-				index = 0;
-				LVM.temp->buffer[index++] = LVM.options->SC_mask>> 8;
-				LVM.temp->buffer[index++] = LVM.options->SC_mask;
-				LVM.temp->buffer[index++] =  get_status_byte_levelmeter();
+			;
+			index = 0;
+			LVM.temp->buffer[index++] = LVM.options->SC_mask>> 8;
+			LVM.temp->buffer[index++] = LVM.options->SC_mask;
+			LVM.temp->buffer[index++] =  get_status_byte_levelmeter();
 
-				// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
-				if (xbee_send_message(GET_SC_XBEE_MASK, LVM.temp->buffer, index))
-				{
-					CLEAR_ALL(); // Clear all errors
-				}
-				
-				
+			// Pack full frame with 64-bit address (neither acknowledgment nor response frame), then send to the database server
+			if (xbee_send_message(GET_SC_XBEE_MASK, LVM.temp->buffer, index))
+			{
+				CLEAR_ALL(); // Clear all errors
+			}
+			
+			
 			break;
-		
+			
 			case DEPRECATED_ILM_BROADCAST: // ILM messages are sent in broadcast mode and are ignored by other devices
 			break;
 

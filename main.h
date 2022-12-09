@@ -46,6 +46,7 @@ extern EWindowOrientation ili_Orientation;
 // Device position constants
 #define END 					0x7E		// '~' Start and end marker for ranges array
 #define SEP						0x2F		// '/' Separator marker
+#define DEL						0x3B		// ';' Delimiter 
 
 #define FILL_RANGES_COUNT 		40
 #define FILL_RANGES_LENGTH 		30
