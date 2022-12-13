@@ -699,6 +699,7 @@
 //page 6
 #define STR_ALPHANUM					"Alphanumeric:"
 #define STR_NLOGINCHARS 				"N Login Chars:"
+#define STR_RESET_TO_DEFAULTS		    "Reset"
 
 //-----------------
 
