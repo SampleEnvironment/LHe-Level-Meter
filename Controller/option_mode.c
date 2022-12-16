@@ -429,8 +429,16 @@ void Bool_valueChange_Reset(ValueOptions*optEntry, int key){
 	option_model.batt_min_buff = LVM.options->batt_min;
 	option_model.batt_max_buff = LVM.options->batt_max;
 	option_model.critical_batt_buff = LVM.options->critical_batt;
-	opt_drawPageChange();
-	paint_buttons("prev","esc",3);
+
+	Controller_Model * Model = (Controller_Model *) &option_model;
+	
+	paint_main(Time, Model->mode->netstat, PAINT_ALL);
+
+
+	Model->mode->next = ex_main;
+	option_model.options_changed = false;
+	
+	base_display_extend_onTime();
 }
 
 
