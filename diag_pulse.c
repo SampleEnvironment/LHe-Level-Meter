@@ -771,6 +771,10 @@ void diag_pulse_send(diag_pulseType *dp){
 	xbee_wake_up_plus();
 	
 
+	InitScreen_AddLine("Sending Pulse Data:",1);	
+
+	
+	diag_send_r_calibration(dp);
 	
 
 	if (connected.DS3231M)
@@ -804,9 +808,7 @@ void diag_pulse_send(diag_pulseType *dp){
 	diag_send_buffer[6] = n_Packets;
 	
 	
-	InitScreen_AddLine("Sending Pulse Data:",1);
-	
-	diag_send_r_calibration(dp);
+
 
 
 	InitScreen_AddLine("Sending I data...",0);
