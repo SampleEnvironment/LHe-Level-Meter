@@ -21,6 +21,7 @@
 
 #include "xbee.h"
 #include "xbee_AT_comm.h"
+#include "printInfo_strings.h"
 #include "xbee_utilities.h"
 #include "I2C_utilities.h"
 #include "status.h"
@@ -265,8 +266,16 @@ void main_pressedDOWN(Controller_Model *Model){
 
 	if (Model->mode->netstat == online)
 	{
+		
+		xbee_wake_up_plus();
+		
 		InitScreen_AddLine(STR_NETWORK_CONN,1);
 		InitScreen_AddLine(STR_IN_PROGRESS,0);
+		
+		if (xbee.netstat == NO_NETWORK)
+		{
+			xbee_reset_SC();
+		}
 
 
 
@@ -278,14 +287,10 @@ void main_pressedDOWN(Controller_Model *Model){
 			if (HoneywellSSC_status.status < 4) LVM.vars->pressure_level = HoneywellSSC_Pressure;
 		}
 
-		xbee_wake_up_plus();
+
 		
 		
-		if (xbee.netstat == NO_NETWORK)
-		{
-			xbee_Set_Scan_Channels(LVM.options->SC_mask);
-			xbee_WR();
-		}
+
 
 		// Define frame
 
