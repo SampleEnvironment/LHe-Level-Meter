@@ -39,7 +39,7 @@
       </framework-data>
     </AsfFrameworkConfig>
     <avrtool>com.atmel.avrdbg.tool.powerdebugger</avrtool>
-    <avrtoolserialnumber>J50200002200</avrtoolserialnumber>
+    <avrtoolserialnumber>J51800003073</avrtoolserialnumber>
     <avrdeviceexpectedsignature>0x1E9705</avrdeviceexpectedsignature>
     <com_atmel_avrdbg_tool_stk500>
       <ToolOptions>
@@ -85,7 +85,7 @@
         <InterfaceName>ISP</InterfaceName>
       </ToolOptions>
       <ToolType>com.atmel.avrdbg.tool.powerdebugger</ToolType>
-      <ToolNumber>J50200002200</ToolNumber>
+      <ToolNumber>J51800003073</ToolNumber>
       <ToolName>Power Debugger</ToolName>
     </com_atmel_avrdbg_tool_powerdebugger>
     <ResetRule>0</ResetRule>
