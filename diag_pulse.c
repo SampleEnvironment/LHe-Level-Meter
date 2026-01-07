@@ -13,6 +13,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "diag_pulse.h"
+#include "adwandler.h"
 #include "Controller/pulse_select_mode.h"
 #include "Controller/option_mode.h"
 #include "timer_utilities.h"
@@ -1174,6 +1175,16 @@ void diag_pulse(diag_pulseType *dp){
 		}
 		
 		ready_for_new_key();
+		
+		// Exit diag_pulse display when battery is critical (auto shutdown will happen once in main menu)
+		if(LVM.options->batt_min >= map_to_batt(readChannel(BATTERY, 10*ADC_LOOPS)))
+		{			
+			back = false;
+			_delay_ms(100);
+			not_ready_for_new_key();
+			return;
+
+		}
 	}
 
 
