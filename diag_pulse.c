@@ -645,7 +645,13 @@ void diag_pulse_move_cursor(diag_pulseType *dp,int8_t direction){
 
 	//draw top Plot line segments
 	for(uint8_t i = 0 ; i < 4; i++){
-		diag_pulse_plot_seg((dp->active_point-2)+i,dp);
+		uint8_t cursor = (dp->active_point-2)+i;
+		if ( cursor <= 0 || (cursor >= dp->points_in_plot - 1 ))
+		{
+			continue;
+		}
+
+		diag_pulse_plot_seg(cursor ,dp);
 	}
 
 
@@ -1044,7 +1050,7 @@ void diag_pulse(diag_pulseType *dp){
 
 			break;
 			case KEY_RIGHT_S8:
-			if(++dp->active_point> dp->points_in_plot-3)
+			if(++dp->active_point > dp->points_in_plot)
 			{
 				dp->active_point--;
 				break;
@@ -1062,7 +1068,7 @@ void diag_pulse(diag_pulseType *dp){
 
 			while(keyhitwithoutinterrupt()==KEY_RIGHT_S8)
 			{
-				if(++dp->active_point> dp->points_in_plot-3)
+				if(++dp->active_point > dp->points_in_plot)
 				{
 					dp->active_point--;
 					break;
