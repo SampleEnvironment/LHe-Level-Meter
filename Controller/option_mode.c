@@ -13,6 +13,7 @@
 
 #include "base_controller.h"
 #include "option_mode.h"
+#include "adwandler.h"
 
 #include "../display_utilities.h"
 #include "../HoneywellSSC.h"
@@ -1163,6 +1164,12 @@ void option_exit(Controller_Model * Model, uint8_t headless){
 	LVM.options->batt_min = option_model.batt_min_buff;
 	LVM.options->batt_max = option_model.batt_max_buff;
 	LVM.options->critical_batt = option_model.critical_batt_buff;
+	
+	// update batt level, since batt min/ batt max might have changed
+	LVM.vars->batt_level = get_batt_level(LVM.options->batt_min, LVM.options->batt_max);
+	
+	// update he level rmin / rmax might have changed
+	LVM.vars->he_level = calc_he_level(LVM.vars->r_val_last_Meas, LVM.options->res_min, LVM.options->res_max);
 
 	// Set display orientation
 	DISPLAY_CONFIG
