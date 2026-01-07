@@ -771,6 +771,10 @@ void diag_pulse_send(diag_pulseType *dp){
 	xbee_wake_up_plus();
 	
 
+	InitScreen_AddLine("Sending Pulse Data:",1);	
+
+	
+	diag_send_r_calibration(dp);
 	
 
 	if (connected.DS3231M)
@@ -804,7 +808,7 @@ void diag_pulse_send(diag_pulseType *dp){
 	diag_send_buffer[6] = n_Packets;
 	
 	
-	InitScreen_AddLine("Sending Pulse Data:",1);
+
 
 
 	InitScreen_AddLine("Sending I data...",0);
@@ -890,6 +894,29 @@ void diag_send_sub_packets(diag_pulseType *dp,uint8_t Message_code,uint8_t n_Pac
 		xbee_send_message(Message_code,LVM.temp->buffer,(datapoints_in_fragment*2)+header_offset+1);
 		_delay_ms(500);
 	}
+}
+
+void diag_send_r_calibration(diag_pulseType *dp){
+	sprintf(LVM.temp->string,"Sending R span, zero");
+	InitScreen_AddLine(LVM.temp->string,0);
+	
+	int32_t span32 = (int32_t)round(dp->r_span* 1000);
+	diag_send_buffer[0] = (span32 >> 24) & 0xFF;
+	diag_send_buffer[1] = (span32 >> 16) & 0xFF;
+	diag_send_buffer[2] = (span32 >> 8) & 0xFF;
+	diag_send_buffer[3] = span32 & 0xFF;
+
+	
+	int16_t zero16 = (int16_t)round(dp->r_zero*10);
+	diag_send_buffer[4] = zero16 >> 8 & 0xFF;
+	diag_send_buffer[5] = zero16 & 0xFF ;
+	
+	memcpy(LVM.temp->buffer,diag_send_buffer,6);
+	xbee_send_message(GET_R_CALIBRATION,LVM.temp->buffer,6);
+	_delay_ms(500);
+	
+	
+	
 }
 
 
