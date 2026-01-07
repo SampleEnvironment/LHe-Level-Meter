@@ -928,7 +928,7 @@ void diag_send_r_calibration(diag_pulseType *dp){
 
 
 
-void diag_pulse(diag_pulseType *dp){
+uint8_t diag_pulse(diag_pulseType *dp){
 
 	diag_pulse_coords(dp); // draw Window
 	
@@ -1010,8 +1010,23 @@ void diag_pulse(diag_pulseType *dp){
 
 	while(back)
 	{
+		int key = keyhit_block();
+		
+		if (key != 0)
+		{
+			set_timeout(0, TIMER_3, RESET_TIMER);
+			set_timeout(OPT_TIMEOUT_TIME, TIMER_3, USE_TIMER);
+		}
 
-		switch(keyhit_block())
+		if(!set_timeout(0,TIMER_3, USE_TIMER))  //exit options  if no key was pressed
+		{
+			back = false;
+			_delay_ms(100);
+			not_ready_for_new_key();
+			return 1;
+		}
+
+		switch(key)
 		{
 
 			case KEY_LEFT_S7:
@@ -1127,7 +1142,7 @@ void diag_pulse(diag_pulseType *dp){
 			back = false;
 			_delay_ms(100);
 			not_ready_for_new_key();
-			return;
+			return 0;
 			break;
 
 			case  KEY_DOWN_S9:
@@ -1182,13 +1197,13 @@ void diag_pulse(diag_pulseType *dp){
 			back = false;
 			_delay_ms(100);
 			not_ready_for_new_key();
-			return;
+			return 1;
 
 		}
 	}
 
 
-
+	return 0;
 }
 
 

@@ -446,7 +446,19 @@ void pulse_select_pressedBOT(Controller_Model *Model){
 
 	diag_pulse_init(&dp,0, pselect_model.page);
 
-	diag_pulse(&dp);
+	if (diag_pulse(&dp)){
+		// diag pulse exited due to critical battery or reaching an inactivity timeout 
+		// any changed options are not sent to the server 
+		// --> exiting to main window 
+		LCD_Cls(BGC);
+		
+		Controller_Model_options*  opt_model = get_option_model();
+		opt_model->options_changed= false;
+		option_exit((Controller_Model*) opt_model, 0);
+		
+		return;
+		
+	}
 
 	pulse_select_drawPage();
 
@@ -468,9 +480,13 @@ void pulse_select_pre_Switch_case_Tasks(Controller_Model *Model){
 	if(!set_timeout(0,TIMER_3, USE_TIMER))
 	{
 		LCD_Cls(BGC);
-		paint_diag(1);
+		
+		Controller_Model_options*  opt_model = get_option_model();
+		opt_model->options_changed= false;
+		option_exit((Controller_Model*) opt_model, 0);
+		
 
-		Model->mode->next = ex_diagnostic;
+		
 		
 	}
 }
