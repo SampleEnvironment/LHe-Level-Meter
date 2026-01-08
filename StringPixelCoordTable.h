@@ -328,7 +328,7 @@
 #define DP_U_ZEROLINE_70 70
 #define DP_I_ZEROLINE_125 125
 #define DP_Y_MAX_PIXELS_50 50
-#define DP_PADDING_10 2
+#define DP_PADDING_10 0
 #define DP_X_FACTOR 1
 #define DP_AXIS_FONTNR 1
 #define DP_SEND_FONTNR 1
