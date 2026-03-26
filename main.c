@@ -735,7 +735,7 @@ int main(void)
 	keyboard_init();				// Initialize keyboard & interrupts on PORT D, C & A for front panel buttons
 
 
-	usart_init(39);					// Initialize RS232 Communication, PRESCALE-Konstante, s. CPU-Manual oder usart.h
+	usart_init();					// Initialize RS232 Communication, PRESCALE-Konstante, s. CPU-Manual oder usart.h
 	adc_init(VOLT_SUPPLY_MEAS);		// Initialize ADC on PORTA.0 for measuring the voltage supply probe
 	adc_init(CURRENT_PROBE_MEAS);	// Initialize ADC on PORTA.1 for measuring the current supply probe
 	adc_init(VOLT_PROBE_MEAS);		// Initialize ADC on PORTA.2 for measuring the voltage probe
