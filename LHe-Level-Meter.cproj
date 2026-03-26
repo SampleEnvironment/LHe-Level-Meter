@@ -326,6 +326,7 @@
       <Value>USE_XBEE</Value>
       <Value>DISP_3000</Value>
       <Value>DEFAULT_DISP_CONFIG</Value>
+      <Value>INTERNAL_OSZ</Value>
     </ListValues>
   </avrgcc.compiler.symbols.DefSymbols>
   <avrgcc.compiler.directories.IncludePaths>
@@ -377,6 +378,7 @@
       <Value>USE_XBEE</Value>
       <Value>DISP_3000</Value>
       <Value>ILL_DISP_CONFIG</Value>
+      <Value>INTERNAL_OSZ</Value>
     </ListValues>
   </avrgcc.compiler.symbols.DefSymbols>
   <avrgcc.compiler.directories.IncludePaths>
@@ -428,6 +430,7 @@
       <Value>USE_XBEE</Value>
       <Value>ili9341</Value>
       <Value>DEFAULT_DISP_CONFIG</Value>
+      <Value>INTERNAL_OSZ</Value>
     </ListValues>
   </avrgcc.compiler.symbols.DefSymbols>
   <avrgcc.compiler.directories.IncludePaths>
@@ -479,6 +482,7 @@
       <Value>USE_XBEE</Value>
       <Value>ili9341</Value>
       <Value>ILL_DISP_CONFIG</Value>
+      <Value>INTERNAL_OSZ</Value>
     </ListValues>
   </avrgcc.compiler.symbols.DefSymbols>
   <avrgcc.compiler.directories.IncludePaths>

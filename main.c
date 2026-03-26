@@ -17,6 +17,7 @@
 #include <string.h>
 #include <math.h>
 #include <stdbool.h>
+#include <avr/fuse.h>
 
 #include "main.h"
 
@@ -59,6 +60,29 @@
 #endif
 
 
+
+
+
+#ifdef INTERNAL_OSZ
+// ============================================================
+// Clock: Internal RC oscillator 8 MHz
+// ============================================================
+#  define FUSE_LOW (0xE2)
+
+#else
+// ============================================================
+// Clock: External crystal/resonator 3-8 MHz, 16K CK + 65ms
+// ============================================================
+#  define FUSE_LOW (0xFD)
+#endif
+
+FUSES = {
+	.low = FUSE_LOW,
+
+	.high = (0xD7),              
+
+	.extended = (0xFF),                 // = 0xFF
+};
 
 
 
