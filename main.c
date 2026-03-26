@@ -49,6 +49,8 @@
 #include "module_globals.h"
 #include "status.h"
 
+#include "fuse_config.h"
+
 
 
 #ifdef DISP_3000
@@ -63,26 +65,6 @@
 
 
 
-#ifdef INTERNAL_OSZ
-// ============================================================
-// Clock: Internal RC oscillator 8 MHz
-// ============================================================
-#  define FUSE_LOW (0xE2)
-
-#else
-// ============================================================
-// Clock: External crystal/resonator 3-8 MHz, 16K CK + 65ms
-// ============================================================
-#  define FUSE_LOW (0xFD)
-#endif
-
-FUSES = {
-	.low = FUSE_LOW,
-
-	.high = (0xD1),              
-
-	.extended = (0xFF),                 // = 0xFF
-};
 
 
 
