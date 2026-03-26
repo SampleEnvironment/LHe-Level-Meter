@@ -79,7 +79,7 @@
 FUSES = {
 	.low = FUSE_LOW,
 
-	.high = (0xD7),              
+	.high = (0xD1),              
 
 	.extended = (0xFF),                 // = 0xFF
 };
