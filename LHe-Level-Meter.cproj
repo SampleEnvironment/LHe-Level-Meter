@@ -53,7 +53,8 @@
       </ToolNumber>
       <ToolName>STK500</ToolName>
     </com_atmel_avrdbg_tool_stk500>
-    <avrtoolinterface>ISP</avrtoolinterface>
+    <avrtoolinterface>
+    </avrtoolinterface>
     <avrtoolinterfaceclock>976236</avrtoolinterfaceclock>
     <com_atmel_avrdbg_tool_simulator>
       <ToolOptions>
@@ -152,6 +153,8 @@
       </AvrGcc>
     </ToolchainSettings>
     <OutputPath>bin\ili9341-ILL\</OutputPath>
+    <OutputFileName>Level-Meter-ili9341-ILL</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'DISP_3000-ILL' ">
     <ToolchainSettings>
@@ -203,6 +206,8 @@
       </AvrGcc>
     </ToolchainSettings>
     <OutputPath>bin\DISP_3000-ILL\</OutputPath>
+    <OutputFileName>Level-Meter-DISP_3000-ILL</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'ili9341-DEFAULT' ">
     <ToolchainSettings>
@@ -254,6 +259,8 @@
       </AvrGcc>
     </ToolchainSettings>
     <OutputPath>bin\ili9341-DEFAULT\</OutputPath>
+    <OutputFileName>Level-Meter-ili9341-DEFAULT</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'DISP_3000-DEFAULT' ">
     <ToolchainSettings>
@@ -305,6 +312,8 @@
       </AvrGcc>
     </ToolchainSettings>
     <OutputPath>bin\DISP_3000-DEFAULT\</OutputPath>
+    <OutputFileName>Level-Meter-DISP_3000-DEFAULT</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'DISP_3000-DEFAULT-INTERNAL_OSZ' ">
     <ToolchainSettings>
@@ -357,6 +366,8 @@
       </AvrGcc>
     </ToolchainSettings>
     <OutputPath>bin\DISP_3000-DEFAULT-INTERNAL_OSZ\</OutputPath>
+    <OutputFileName>Level-Meter-DISP_3000-DEFAULT-INTERNAL_OSZ</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'DISP_3000-ILL-INTERNAL_OSZ' ">
     <ToolchainSettings>
@@ -409,6 +420,8 @@
       </AvrGcc>
     </ToolchainSettings>
     <OutputPath>bin\DISP_3000-ILL-INTERNAL_OSZ\</OutputPath>
+    <OutputFileName>Level-Meter-DISP_3000-ILL-INTERNAL_OSZ</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'ili9341-DEFAULT-INTERNAL_OSZ' ">
     <ToolchainSettings>
@@ -461,6 +474,8 @@
       </AvrGcc>
     </ToolchainSettings>
     <OutputPath>bin\ili9341-DEFAULT-INTERNAL_OSZ\</OutputPath>
+    <OutputFileName>Level-Meter-ili9341-DEFAULT</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'ili9341-ILL-INTERNAL_OSZ' ">
     <ToolchainSettings>
@@ -513,6 +528,13 @@
       </AvrGcc>
     </ToolchainSettings>
     <OutputPath>bin\ili9341-ILL-INTERNAL_OSZ\</OutputPath>
+    <OutputFileName>Level-Meter-ili9341-ILL-INTERNAL_OSZ</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)' == 'D3000-DEFAULT' ">
+    <OutputPath>bin\D3000-DEFAULT\</OutputPath>
+    <OutputFileName>Level-Meter-DISP_3000-DEFAULT-INTERNAL_OSZ</OutputFileName>
+    <OutputFileExtension>.elf</OutputFileExtension>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="avr-util-library\adwandler.c">
