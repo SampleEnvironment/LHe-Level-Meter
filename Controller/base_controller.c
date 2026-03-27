@@ -781,7 +781,7 @@ void set_Options(uint8_t * optBuffer,uint8_t OpCode){
 	OptBuff.zero             = ((double)(((int16_t) optBuffer[26] << 8) | optBuffer[27]))/10;
 	OptBuff.total_volume     = ((optBuffer[28]<<8) + optBuffer[29])/10.0;
 	OptBuff.he_min           =  optBuffer[30];
-	OptBuff.display_reversed = optBuffer[31];
+	OptBuff.display_reversed = 0;
 	OptBuff.batt_min         = ((optBuffer[32]<<8) + optBuffer[33])/10.0;
 	OptBuff.batt_max         = ((optBuffer[34]<<8) + optBuffer[35])/10.0;
 	OptBuff.critical_batt    =  optBuffer[36];

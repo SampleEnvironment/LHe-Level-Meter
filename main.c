@@ -669,7 +669,7 @@ int main(void)
 	// Initialization
 	//=========================================================================
 	#ifdef ALLOW_EEPROM_SAVING
-	LVM.options->display_reversed 	= eeprom_read_byte(&eeVars.eeOptions.display_reversed);
+	LVM.options->display_reversed 	= 0;
 	uint8_t SC_already_received 	= eeprom_read_byte(&eeVars.eeOptions.SC_mask_alerady_received);
 	uint8_t SC_EEPROM				= eeprom_read_word(&eeVars.eeOptions.SC_mask);
 
@@ -772,6 +772,8 @@ int main(void)
 
 	
 	eeprom_read_block(LVM.options,&LVM.eeprom->eeOptions,sizeof(optionsType));
+	
+	LVM.options->display_reversed = 0;
 	
 	Options_Buonds_Check(LVM.options);
 	
